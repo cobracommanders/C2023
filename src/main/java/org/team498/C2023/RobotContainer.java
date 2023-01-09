@@ -2,6 +2,8 @@ package org.team498.C2023;
 
 import org.team498.C2023.commands.CalibrateGyro;
 import org.team498.C2023.commands.auto.Auto_1;
+import org.team498.C2023.commands.drivetrain.AlignWithSubstation;
+import org.team498.C2023.commands.drivetrain.AlignWithSubstation.SubstationSide;
 import org.team498.C2023.commands.drivetrain.archive.FieldOrientedDrive;
 import org.team498.C2023.commands.drivetrain.archive.OffenseDrive;
 import org.team498.C2023.commands.drivetrain.archive.RobotOrientedDrive;
@@ -9,6 +11,7 @@ import org.team498.C2023.subsystems.Drivetrain;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class RobotContainer {
 	private static RobotContainer mInstance;
@@ -30,9 +33,13 @@ public class RobotContainer {
 		drivetrain.setDefaultCommand(new OffenseDrive());
 	}
 
+
 	private void configureDriverBindings() {
-		//driverControls.aButton.whenPressed(new SetWrist(Wrist.State.OUT));
-		//driverControls.bButton.whenPressed(new SetWrist(Wrist.State.IN));
+		Trigger robotInLoadingZone = new Trigger(() -> drivetrain.isInRegion(null, null)); //TODO add to constants
+		driverControls.xButton.and(robotInLoadingZone).onTrue(new AlignWithSubstation(SubstationSide.LEFT));
+
+		// driverControls.aButton.whenPressed(new SetWrist(Wrist.State.OUT));
+		// driverControls.bButton.whenPressed(new SetWrist(Wrist.State.IN));
 		driverControls.aButton.onTrue(new InstantCommand(() -> drivetrain.IMU.reset()));
 
 		driverControls.getControlSet().toggleOnTrue(new FieldOrientedDrive());

@@ -140,11 +140,11 @@ public class Drivetrain extends SubsystemBase {
 
 		odometry = new SwerveDriveOdometry(kinematics, Rotation2d.fromDegrees(0),
 				new SwerveModulePosition[] {
-						new SwerveModulePosition(), 
 						new SwerveModulePosition(),
-						new SwerveModulePosition(), 
+						new SwerveModulePosition(),
+						new SwerveModulePosition(),
 						new SwerveModulePosition()
-					});
+				});
 
 		matchEncoders();
 
@@ -252,7 +252,8 @@ public class Drivetrain extends SubsystemBase {
 	}
 
 	public synchronized void resetOdometry(Pose2d pose) {
-		odometry.resetPosition(Rotation2d.fromDegrees(getYaw()), getModulePositions(), pose);// TODO: should this be getYaw180() ?
+		odometry.resetPosition(Rotation2d.fromDegrees(getYaw()), getModulePositions(), pose);// TODO: should this be
+																								// getYaw180() ?
 	}
 
 	public synchronized void setModuleStates(SwerveModuleState[] moduleStates) {
@@ -296,6 +297,7 @@ public class Drivetrain extends SubsystemBase {
 			angleAdjustment = 0;
 		}
 		SmartDashboard.putNumber("Angle adjustment", angleAdjustment);
+		System.out.println(angleAdjustment);
 		drive(ChassisSpeeds.fromFieldRelativeSpeeds(x, y, angleAdjustment, Rotation2d.fromDegrees(getYaw180())));
 		// drive(translation2d, angleAdjustment, fieldRelative, false);
 	}
@@ -390,5 +392,30 @@ public class Drivetrain extends SubsystemBase {
 		ChassisSpeeds speed = kinematics.toChassisSpeeds(getModuleStates());
 		return ((Math.abs(speed.vxMetersPerSecond) + Math.abs(speed.vyMetersPerSecond)
 				+ Math.abs(speed.omegaRadiansPerSecond)) > 0.1);
+	}
+
+
+	/**
+	 * 
+	 * @param bottomLeft The bottom left corner of the area
+	 * @param upperRight The upper right corner of the area
+	 * @return
+	 */
+	public boolean isInRegion(Pose2d bottomLeft, Pose2d upperRight) {
+		Pose2d currentPose = getPose();
+		double x = currentPose.getX();
+		double y = currentPose.getY();
+
+		if (bottomLeft.getY() > upperRight.getY() 
+		 || bottomLeft.getX() > upperRight.getX()) {
+		
+			new Exception("Insert valid coordinates").printStackTrace();
+			return false;
+		}
+
+		return    (x >= bottomLeft.getX()
+				&& x <= upperRight.getX()
+				&& y >= bottomLeft.getY()
+				&& y <= upperRight.getY());
 	}
 }
