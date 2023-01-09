@@ -1,56 +1,59 @@
 package org.team498.C2023;
 
-import org.team498.C2023.commands.CalibrateGyro;
-import org.team498.C2023.commands.auto.Auto_1;
-import org.team498.C2023.commands.drivetrain.AlignWithSubstation;
-import org.team498.C2023.commands.drivetrain.AlignWithSubstation.SubstationSide;
-import org.team498.C2023.commands.drivetrain.archive.FieldOrientedDrive;
-import org.team498.C2023.commands.drivetrain.archive.OffenseDrive;
-import org.team498.C2023.commands.drivetrain.archive.RobotOrientedDrive;
-import org.team498.C2023.subsystems.Drivetrain;
-
-import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import org.team498.C2023.commands.drivetrain.CameraDrive;
+import org.team498.C2023.commands.drivetrain.DefenseDrive;
+import org.team498.C2023.commands.drivetrain.FollowTrajectory;
+import org.team498.C2023.commands.drivetrain.OffenseDrive;
+import org.team498.C2023.subsystems.Drivetrain;
+import org.team498.lib.drivers.Gyro;
+import org.team498.lib.drivers.Xbox;
+import org.team498.lib.util.Trajectories;
+
+import java.util.function.DoubleSupplier;
+
+import static org.team498.C2023.Constants.OIConstants;
 
 public class RobotContainer {
-	private static RobotContainer mInstance;
+    public static final Xbox xbox = new Xbox(OIConstants.DRIVER_CONTROLLER_ID);
 
-	public static RobotContainer getInstance() {
-		if (mInstance == null) {
-			mInstance = new RobotContainer();
-		}
-		return mInstance;
-	}
+    Drivetrain drivetrain = Drivetrain.getInstance();
 
-	// private final Vision vision = new Vision();
-	private final Drivetrain drivetrain = Drivetrain.getInstance();
+    public RobotContainer() {
+        Gyro gyro = Gyro.getInstance();
 
-	private final DriverController driverControls = DriverController.getInstance();
+        drivetrain.setInitialPose(new Pose2d(8, 4, Rotation2d.fromDegrees(0)));
+        xbox.setDeadzone(0.2);
+        xbox.setTriggerThreshold(0.2);
+        xbox.setRightStickLastAngle(gyro.getAngleOffset());
+        xbox.setLeftStickLastAngle(gyro.getAngleOffset());
 
-	public RobotContainer() {
-		configureDriverBindings();
-		drivetrain.setDefaultCommand(new OffenseDrive());
-	}
+        configureCommands();
+
+        Trigger robotInLoadingZone = new Trigger(() -> FieldPositions.LOADING_ZONE.containsPosition(drivetrain.getPose()));
+    }
+
+    private void configureCommands() {
+        // Default drivetrain to offense mode
+        drivetrain.setDefaultCommand(new OffenseDrive(xbox::leftX, xbox::leftY, xbox::rightAngle));
+
+        // Toggle drivetrain to defense mode when X is pressed
+        xbox.X().toggleOnTrue(new DefenseDrive(xbox::leftX, xbox::leftY, xbox::rightX));
+
+        // Toggle drivetrain to camera mode when Y is pressed
+        xbox.Y().toggleOnTrue(new CameraDrive(xbox::leftX, xbox::leftY, xbox::rightX));
+
+        // Reset the gyro sensor when A is pressed
+        xbox.A().onTrue(new InstantCommand(() -> Gyro.getInstance().reset()));
 
 
-	private void configureDriverBindings() {
-		Trigger robotInLoadingZone = new Trigger(() -> drivetrain.isInRegion(null, null)); //TODO add to constants
-		driverControls.xButton.and(robotInLoadingZone).onTrue(new AlignWithSubstation(SubstationSide.LEFT));
+        xbox.start().onTrue(new FollowTrajectory(Trajectories.getTrajectory("test")));
+    }
 
-		// driverControls.aButton.whenPressed(new SetWrist(Wrist.State.OUT));
-		// driverControls.bButton.whenPressed(new SetWrist(Wrist.State.IN));
-		driverControls.aButton.onTrue(new InstantCommand(() -> drivetrain.IMU.reset()));
-
-		driverControls.getControlSet().toggleOnTrue(new FieldOrientedDrive());
-		driverControls.getRobotOriented().toggleOnTrue(new RobotOrientedDrive());
-	}
-
-	public Command getAutoCommand() {
-		return new Auto_1();
-	}
-
-	public Command getRobotInitCommand() {
-		return new CalibrateGyro(drivetrain);
-	}
+    public DoubleSupplier test() {
+        return xbox::POVAngle;
+    }
 }
