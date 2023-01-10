@@ -114,14 +114,12 @@ public class Xbox {
 
     /** @return a trigger object using the controller's right trigger */
     public Trigger rightTrigger() {
-        return buttonTriggers.computeIfAbsent(Button.RightTrigger,
-                                              k -> new Trigger(() -> getRawAxis(Axis.RightTrigger) > triggerThreshold));
+        return buttonTriggers.computeIfAbsent(Button.RightTrigger, k -> new Trigger(() -> getRawAxis(Axis.RightTrigger) > triggerThreshold));
     }
 
     /** @return a trigger object using the controller's left trigger */
     public Trigger leftTrigger() {
-        return buttonTriggers.computeIfAbsent(Button.LeftTrigger,
-                                              k -> new Trigger(() -> getRawAxis(Axis.LeftTrigger) > triggerThreshold));
+        return buttonTriggers.computeIfAbsent(Button.LeftTrigger, k -> new Trigger(() -> getRawAxis(Axis.LeftTrigger) > triggerThreshold));
     }
 
 
@@ -141,10 +139,10 @@ public class Xbox {
     }
 
     /** @return the controller's left X axis */
-    public double leftX() {return getAxis(Axis.LeftX);}
+    public double leftX() {return -getAxis(Axis.LeftX);}
 
     /** @return the controller's left Y axis */
-    public double leftY() {return getAxis(Axis.LeftY);}
+    public double leftY() {return -getAxis(Axis.LeftY);}
 
     /** @return the controller's right X axis */
     public double rightX() {return getAxis(Axis.RightX);}
@@ -153,12 +151,10 @@ public class Xbox {
     public double rightY() {return getAxis(Axis.RightY);}
 
 
-    //TODO make left 90 instead 0f 270 //TODO see if this is done
     public void setRightStickLastAngle(double lastAngle) {lastAngleRight = lastAngle;}
     private double lastAngleRight = 0;
     /**
-     * Gets the angle of the right joystick, from -180 to 180. Upwards is 0 degrees, right is 90, etc. This value uses the last
-     * read angle when the joystick is returned to the center.
+     * Gets the angle of the right joystick, from -180 to 180. Upwards is 0 degrees, right is 90, etc. This value uses the last read angle when the joystick is returned to the center.
      *
      * @return the angle of the right joystick
      */
@@ -183,8 +179,7 @@ public class Xbox {
     public void setLeftStickLastAngle(double lastAngle) {lastAngleLeft = lastAngle;}
     private double lastAngleLeft = 0;
     /**
-     * Gets the angle of the left joystick, from -180 to 180. Upwards is 0 degrees, right is 90, etc. This value uses the last
-     * read angle when the joystick is returned to the center.
+     * Gets the angle of the left joystick, from -180 to 180. Upwards is 0 degrees, right is 90, etc. This value uses the last read angle when the joystick is returned to the center.
      *
      * @return the angle of the left joystick
      */
@@ -220,8 +215,6 @@ public class Xbox {
     /* * * * * * * * * * POV * * * * * * * * * */
     /* * * * * * * * * * * * * * * * * * * * * */
 
-    //TODO triggers for each angle of the POV
-
     /**
      * Get the current value from the POV.
      *
@@ -233,8 +226,7 @@ public class Xbox {
 
     private double lastAnglePOV = -0.0;
     /**
-     * Gets the angle of the POV, from -180 to 180. Upwards is 0 degrees, right is 90, etc. This value uses the last read angle
-     * when the POV is returned to the center.
+     * Gets the angle of the POV, from -180 to 180. Upwards is 0 degrees, right is 90, etc. This value uses the last read angle when the POV is returned to the center.
      *
      * @return the angle of the POV
      */

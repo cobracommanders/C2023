@@ -37,14 +37,14 @@ public class Drivetrain extends SubsystemBase {
     private final Gyro gyro = Gyro.getInstance();
 
     private Drivetrain() {
-        TalonFX FL_Drive = new TalonFX(FL_DRIVE_MOTOR_ID);
-        TalonFX FR_Drive = new TalonFX(FR_DRIVE_MOTOR_ID);
-        TalonFX BL_Drive = new TalonFX(BL_DRIVE_MOTOR_ID);
-        TalonFX BR_Drive = new TalonFX(BR_DRIVE_MOTOR_ID);
-        TalonFX FL_Steer = new TalonFX(FL_STEER_MOTOR_ID);
-        TalonFX FR_Steer = new TalonFX(FR_STEER_MOTOR_ID);
-        TalonFX BL_Steer = new TalonFX(BL_STEER_MOTOR_ID);
-        TalonFX BR_Steer = new TalonFX(BR_STEER_MOTOR_ID);
+        TalonFX FL_Drive = new TalonFX(FL_DRIVE_ID);
+        TalonFX FR_Drive = new TalonFX(FR_DRIVE_ID);
+        TalonFX BL_Drive = new TalonFX(BL_DRIVE_ID);
+        TalonFX BR_Drive = new TalonFX(BR_DRIVE_ID);
+        TalonFX FL_Steer = new TalonFX(FL_STEER_ID);
+        TalonFX FR_Steer = new TalonFX(FR_STEER_ID);
+        TalonFX BL_Steer = new TalonFX(BL_STEER_ID);
+        TalonFX BR_Steer = new TalonFX(BR_STEER_ID);
         CANCoder FL_CANCoder = new CANCoder(FL_CANCODER_ID);
         CANCoder FR_CANCoder = new CANCoder(FR_CANCODER_ID);
         CANCoder BL_CANCoder = new CANCoder(BL_CANCODER_ID);
@@ -132,7 +132,9 @@ public class Drivetrain extends SubsystemBase {
 
     /** Calculate the rotational speed from the pid controller, unless it's already at the goal */
     public double calculateSnapSpeed() {
-        return angleController.atGoal() ? 0 : angleController.calculate(getYaw());
+        return angleController.atGoal()
+               ? 0
+               : angleController.calculate(getYaw());
     }
     /** @return true if the snap controller is at its goal */
     public boolean atSnapGoal() {return angleController.atGoal();}
@@ -143,16 +145,27 @@ public class Drivetrain extends SubsystemBase {
         double xAdjustment = xController.calculate(getPose().getY());
         double yAdjustment = -yController.calculate(getPose().getX());
         double angleAdjustment = angleController.calculate(getYaw());
-        drive(ChassisSpeeds.fromFieldRelativeSpeeds(xAdjustment, yAdjustment, angleAdjustment, Rotation2d.fromDegrees(getYaw())));
+        drive(xAdjustment, yAdjustment, angleAdjustment, true);
     }
 
     /**
      * Sets the swerve drive to desired speed of direction and rotation.
      *
-     * @param chassisSpeeds drive speeds to set
+     * @param vx x velocity
+     * @param vy y velocity
+     * @param degreesPerSecond rotational speed in degrees per second
+     * @param fieldOriented true if the robot is driving in field oriented mode, false if robot oriented
      */
-    public void drive(ChassisSpeeds chassisSpeeds) {
-        drive(chassisSpeeds, new Translation2d());
+    public void drive(double vx, double vy, double degreesPerSecond, boolean fieldOriented) {
+        ChassisSpeeds speeds = fieldOriented
+                               ? ChassisSpeeds.fromFieldRelativeSpeeds(vx, vy, Math.toRadians(degreesPerSecond), Rotation2d.fromDegrees(getYaw()))
+                               : new ChassisSpeeds(vx, vy, Math.toRadians(degreesPerSecond));
+
+        drive(speeds, new Translation2d());
+    }
+
+    public void stop() {
+        drive(0, 0, 0, false);
     }
 
     /**

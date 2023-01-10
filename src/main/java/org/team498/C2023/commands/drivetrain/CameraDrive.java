@@ -30,11 +30,11 @@ public class CameraDrive extends CommandBase {
         double rotation = rotationSupplier.getAsDouble();
 
         // Set the robot to drive in robot oriented mode
-        drivetrain.drive(new ChassisSpeeds(xTranslation, yTranslation, rotation));
+        drivetrain.drive(xTranslation, yTranslation, rotation, false);
     }
 
     @Override
     public void end(boolean interrupted) {
-        drivetrain.drive(new ChassisSpeeds());
+        drivetrain.stop();
     }
 }

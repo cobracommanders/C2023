@@ -1,7 +1,5 @@
 package org.team498.C2023.commands.drivetrain;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import org.team498.C2023.subsystems.Drivetrain;
 
@@ -31,11 +29,11 @@ public class DefenseDrive extends CommandBase {
         double rotation = rotationSupplier.getAsDouble();
 
         // Set the robot to drive in field relative mode
-        drivetrain.drive(ChassisSpeeds.fromFieldRelativeSpeeds(xTranslation, yTranslation, rotation, Rotation2d.fromDegrees(drivetrain.getYaw())));
+        drivetrain.drive(xTranslation, yTranslation, rotation, true);
     }
 
     @Override
     public void end(boolean interrupted) {
-        drivetrain.drive(new ChassisSpeeds());
+        drivetrain.stop();
     }
 }

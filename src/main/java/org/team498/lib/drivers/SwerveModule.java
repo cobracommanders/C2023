@@ -20,9 +20,7 @@ public class SwerveModule extends SubsystemBase {
     private final TalonFX driveMotor;
     private final TalonFX steerMotor;
     private final CANCoder encoder;
-    // offset of the CANCoder in degrees
     private final double angleOffset;
-    // TODO test current limiting
 
     private double lastAngle;
 

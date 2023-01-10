@@ -1,5 +1,6 @@
 package org.team498.C2023.commands.drivetrain;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Timer;
@@ -28,7 +29,7 @@ public class FollowTrajectory extends CommandBase {
         Trajectory.State goal = trajectory.sample(timer.get());
 
         ChassisSpeeds speeds = drivetrain.getSpeedsFromTrajectoryState(goal);
-        drivetrain.drive(speeds);
+        drivetrain.drive(speeds, new Translation2d());
     }
 
     @Override
@@ -38,6 +39,6 @@ public class FollowTrajectory extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        drivetrain.drive(new ChassisSpeeds());
+        drivetrain.stop();
     }
 }

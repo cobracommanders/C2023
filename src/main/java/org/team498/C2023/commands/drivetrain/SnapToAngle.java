@@ -1,6 +1,5 @@
 package org.team498.C2023.commands.drivetrain;
 
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import org.team498.C2023.subsystems.Drivetrain;
 
@@ -25,10 +24,9 @@ public class SnapToAngle extends CommandBase {
     public void execute() {
         // Calculate the rotational speed from the pid controller, unless it's already at the goal
         double rotationalSpeed = drivetrain.calculateSnapSpeed();
-        rotationalSpeed = Math.toDegrees(rotationalSpeed);
 
         // Set the drivetrain to drive, remaining in the set position but snapping to the target
-        drivetrain.drive(new ChassisSpeeds(0, 0, rotationalSpeed));
+        drivetrain.drive(0, 0, rotationalSpeed, false);
     }
 
     @Override
@@ -38,7 +36,7 @@ public class SnapToAngle extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        drivetrain.drive(new ChassisSpeeds());
+        drivetrain.stop();
     }
 
 

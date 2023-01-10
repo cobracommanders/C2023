@@ -3,7 +3,6 @@ package org.team498.C2023.commands.drivetrain;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import org.team498.C2023.Constants;
 import org.team498.C2023.RobotState;
@@ -50,14 +49,14 @@ public class TargetLock extends CommandBase {
         double yOutput = drivetrain.calculateYController(-state.getY());
         double headingOutput = drivetrain.calculateSnapController(drivetrain.getYaw() - initialHeading);
 
-        drivetrain.drive(ChassisSpeeds.fromFieldRelativeSpeeds(xOutput, yOutput, headingOutput, Rotation2d.fromDegrees(drivetrain.getYaw())));
+        drivetrain.drive(xOutput, yOutput, headingOutput, true);
 
 
     }
 
     @Override
     public void end(boolean interrupted) {
-        drivetrain.drive(new ChassisSpeeds());
+        drivetrain.stop();
         t = 0.0;
     }
 }

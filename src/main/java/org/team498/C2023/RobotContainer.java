@@ -25,11 +25,11 @@ public class RobotContainer {
     public RobotContainer() {
         Gyro gyro = Gyro.getInstance();
 
-        drivetrain.setInitialPose(new Pose2d(8, 4, Rotation2d.fromDegrees(0)));
+        drivetrain.setInitialPose(new Pose2d(8, 4, Rotation2d.fromDegrees(-90)));
         xbox.setDeadzone(0.2);
         xbox.setTriggerThreshold(0.2);
-        xbox.setRightStickLastAngle(gyro.getAngleOffset());
-        xbox.setLeftStickLastAngle(gyro.getAngleOffset());
+        xbox.setRightStickLastAngle(-gyro.getAngleOffset());
+        xbox.setLeftStickLastAngle(-gyro.getAngleOffset());
 
         configureCommands();
 
@@ -38,7 +38,7 @@ public class RobotContainer {
 
     private void configureCommands() {
         // Default drivetrain to offense mode
-        drivetrain.setDefaultCommand(new OffenseDrive(xbox::leftX, xbox::leftY, xbox::rightAngle));
+        drivetrain.setDefaultCommand(new OffenseDrive(xbox::leftY, xbox::leftX, xbox::rightAngle));
 
         // Toggle drivetrain to defense mode when X is pressed
         xbox.X().toggleOnTrue(new DefenseDrive(xbox::leftX, xbox::leftY, xbox::rightX));
@@ -54,6 +54,6 @@ public class RobotContainer {
     }
 
     public DoubleSupplier test() {
-        return xbox::POVAngle;
+        return xbox::rightAngle;
     }
 }
