@@ -2,6 +2,8 @@ package org.team498.C2023.commands.drivetrain;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+
+import org.team498.C2023.RobotContainer;
 import org.team498.C2023.subsystems.Drivetrain;
 
 public class DriveToPosition extends CommandBase {
@@ -27,7 +29,7 @@ public class DriveToPosition extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return drivetrain.atPositionGoals();
+        return drivetrain.atPositionGoals() || RobotContainer.xbox.getLeftStickActive() || RobotContainer.xbox.getRightStickActive();
     }
 
     @Override

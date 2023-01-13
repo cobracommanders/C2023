@@ -29,7 +29,7 @@ public class Vision extends SubsystemBase {
             field.setRobotPose(pose);
         }
         SmartDashboard.putNumber("Cam X", pose.getX());
-        SmartDashboard.putData(field);
+        //SmartDashboard.putData(field);
     }
 
     public Pose2d getPose() {

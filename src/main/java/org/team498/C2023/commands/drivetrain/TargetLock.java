@@ -16,9 +16,9 @@ public class TargetLock extends CommandBase {
     private final DoubleSupplier velocity;
     private Double t;
 
-    public TargetLock(RobotState robotState, DoubleSupplier velocity) {
+    public TargetLock(DoubleSupplier velocity) {
         this.drivetrain = Drivetrain.getInstance();
-        this.robotState = robotState;
+        this.robotState = RobotState.getInstance();
         this.velocity = velocity;
 
         addRequirements(drivetrain);
@@ -31,7 +31,8 @@ public class TargetLock extends CommandBase {
 
     @Override
     public void execute() {
-        Transform2d state = robotState.getRobotToTarget();
+        Transform2d state = robotState.getRobotToPoint(new Pose2d(6.5, 4.5, new Rotation2d()));
+        
         double radius = Math.hypot(state.getX(), state.getY());
         double tVelocity = velocity.getAsDouble();
 
@@ -50,8 +51,6 @@ public class TargetLock extends CommandBase {
         double headingOutput = drivetrain.calculateSnapController(drivetrain.getYaw() - initialHeading);
 
         drivetrain.drive(xOutput, yOutput, headingOutput, true);
-
-
     }
 
     @Override

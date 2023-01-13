@@ -11,7 +11,7 @@ public class RobotState extends SubsystemBase {
     private final Drivetrain drivetrain;
 
     private RobotState() {
-        this.vision = Vision.getInstance();
+        this.vision = null;
         this.drivetrain = Drivetrain.getInstance();
     }
 
@@ -21,6 +21,10 @@ public class RobotState extends SubsystemBase {
 
     public Transform2d getRobotToTarget() {
         return getVisionToTarget().plus(getVisionToRobot().inverse());
+    }
+
+    public Transform2d getRobotToPoint(Pose2d target) {
+        return new Transform2d(drivetrain.getPose(), target);
     }
 
     public Transform2d getVisionToTarget() {

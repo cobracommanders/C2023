@@ -9,7 +9,7 @@ public final class Constants {
 
     public static final class DrivetrainConstants {
 
-        public static final double MAX_VELOCITY_METERS_PER_SECOND = 5;
+        public static final double MAX_VELOCITY_METERS_PER_SECOND = 2.5;
 
         public static final double SWERVE_MODULE_DISTANCE_FROM_CENTER = 10.75;
 
@@ -33,7 +33,7 @@ public final class Constants {
 
 
         // Constraints for the profiled angle controller
-        public static final double MAX_ANGULAR_SPEED_DEGREES_PER_SECOND = Math.toDegrees(2.0 * Math.PI);
+        public static final double MAX_ANGULAR_SPEED_DEGREES_PER_SECOND = 360;
         public static final double MAX_ANGULAR_SPEED_DEGREES_PER_SECOND_SQUARED = Math.pow(MAX_ANGULAR_SPEED_DEGREES_PER_SECOND, 2);
 
         public static final TrapezoidProfile.Constraints CONTROLLER_CONSTRAINTS = new TrapezoidProfile.Constraints(MAX_ANGULAR_SPEED_DEGREES_PER_SECOND, MAX_ANGULAR_SPEED_DEGREES_PER_SECOND_SQUARED);
@@ -42,12 +42,14 @@ public final class Constants {
 
     public static final class PoseConstants {
         public static final double P = 2.5;
+
         public static final double I = 0;
         public static final double D = 0;
-        public static final double EPSILON = 0;
+        
+        public static final double EPSILON = 0.1;
 
         // Constraints for the profiled angle controller
-        public static final double MAX_SPEED_PER_SECOND = 2;
+        public static final double MAX_SPEED_PER_SECOND = 5;
         public static final double MAX_SPEED_PER_SECOND_SQUARED = Math.pow(MAX_SPEED_PER_SECOND, 2);
 
         public static final TrapezoidProfile.Constraints CONTROLLER_CONSTRAINTS = new TrapezoidProfile.Constraints(MAX_SPEED_PER_SECOND, MAX_SPEED_PER_SECOND_SQUARED);
