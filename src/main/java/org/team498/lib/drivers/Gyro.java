@@ -1,20 +1,21 @@
 package org.team498.lib.drivers;
 
-import edu.wpi.first.wpilibj.ADIS16448_IMU;
+import com.ctre.phoenix.sensors.Pigeon2;
 import edu.wpi.first.wpilibj.RobotBase;
 import org.team498.lib.util.RotationUtil;
 
-public class Gyro extends ADIS16448_IMU {
+public class Gyro extends Pigeon2 {
     private double angleOffset = 0;
     private double simAngle = 0;
 
     /** @return yaw angle in degrees (CCW positive), ranging from -180 to 180 degrees */
     @Override
-    public synchronized double getAngle() {
+    public synchronized double getYaw() {
         return RobotBase.isReal()
-               ? -RotationUtil.toSignedDegrees(super.getAngle() + angleOffset)
+               ? RotationUtil.toSignedDegrees(super.getYaw() + angleOffset)
                : -RotationUtil.toSignedDegrees(simAngle + angleOffset);
     }
+
 
     /** @return the rotation offset of the gyro */
     public double getAngleOffset() {
@@ -34,13 +35,15 @@ public class Gyro extends ADIS16448_IMU {
         simAngle = angle - angleOffset;
     }
 
-    private Gyro() {}
+    private Gyro(int CANId) {
+        super(CANId);
+    }
 
     private static Gyro instance;
 
     public static Gyro getInstance() {
         if (instance == null) {
-            instance = new Gyro();
+            instance = new Gyro(20);
         }
         return instance;
     }

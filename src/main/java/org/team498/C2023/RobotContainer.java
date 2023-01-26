@@ -1,77 +1,82 @@
 package org.team498.C2023;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.DoubleSupplier;
-
-import org.team498.C2023.Constants.OIConstants;
-import org.team498.C2023.commands.drivetrain.CameraDrive;
-import org.team498.C2023.commands.drivetrain.DefenseDrive;
-import org.team498.C2023.commands.drivetrain.OffenseDrive;
-import org.team498.C2023.commands.drivetrain.PathPlannerFollower;
-import org.team498.C2023.commands.drivetrain.TargetDrive;
-import org.team498.C2023.subsystems.Drivetrain;
-import org.team498.lib.drivers.Gyro;
-import org.team498.lib.drivers.Xbox;
-import org.team498.lib.field.Point;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+
+import org.team498.C2023.Constants.OIConstants;
+import org.team498.C2023.RobotState.GamePiece;
+import org.team498.C2023.commands.drivetrain.*;
+import org.team498.C2023.commands.prototype.PrototypeTest;
+import org.team498.C2023.commands.robot.AlignAndScore;
+import org.team498.C2023.subsystems.*;
+import org.team498.C2023.subsystems.Outtake.State;
+import org.team498.lib.drivers.Gyro;
+import org.team498.lib.drivers.Xbox;
 
 public class RobotContainer {
-    public static final Xbox xbox = new Xbox(OIConstants.DRIVER_CONTROLLER_ID);
+    public final Xbox driver = new Xbox(OIConstants.DRIVER_CONTROLLER_ID);
+    public final Xbox operator = new Xbox(OIConstants.OPERATOR_CONTROLLER_ID);
 
-    Drivetrain drivetrain = Drivetrain.getInstance();
+    private final Drivetrain drivetrain = Drivetrain.getInstance();
+    private final Elevator elevator = Elevator.getInstance();
+    private final Outtake outtake = Outtake.getInstance();
+    private final Intake intake = Intake.getInstance();
+    private final Prototype prototype = Prototype.getInstance();
+    private final RobotState robotState = RobotState.getInstance();
 
     public RobotContainer() {
-        Gyro gyro = Gyro.getInstance();
+        driver.setDeadzone(0.2);
+        driver.setTriggerThreshold(0.2);
 
-        drivetrain.setInitialPose(new Pose2d(8.29, 4, Rotation2d.fromDegrees(0)));
-        xbox.setDeadzone(0.2);
-        xbox.setTriggerThreshold(0.2);
-        xbox.setRightStickLastAngle(-gyro.getAngleOffset());
-
-        configureCommands();
-
+        configureDefaultCommands();
+        configureDriverCommands();
+        configureOperatorCommands();
     }
 
-    private void configureCommands() {
-        // Default drivetrain to offense mode
-        //drivetrain.setDefaultCommand(new OffenseDrive(xbox::leftX, xbox::leftY, xbox::rightAngle));
-
-        Trigger robotInLoadingZone = new Trigger(() -> FieldPositions.blueLoadingZone.contains(Point.fromPose2d(drivetrain.getPose())));
-
-        //xbox.B().and(robotInLoadingZone).onTrue(new DriveToPosition(FieldPositions.SUBSTATION_RIGHT_BLUE));
-
-
-        drivetrain.setDefaultCommand(new OffenseDrive(xbox::leftY, xbox::leftX, xbox::rightAngle));
-
-        xbox.A().toggleOnTrue(new TargetDrive(xbox::leftY, xbox::leftX, new Pose2d(6, 4, new Rotation2d())));
-
-        xbox.start().onTrue(new PathPlannerFollower(PathLib.pathPlannerTrajectory));        
-
-        List<Pose2d> poses = new LinkedList<>();
-        List<Trajectory.State> trajectoryStates = PathLib.pathPlannerTrajectory.getStates();
-        for (int i = 0; i < trajectoryStates.size(); i += trajectoryStates.size() / 84) {
-            poses.add(trajectoryStates.get(i).poseMeters);
-        }
-        Robot.field.getObject("Trajectory").setPoses(poses);
-
-
-        // Toggle drivetrain to defense mode when X is pressed
-        xbox.X().toggleOnTrue(new DefenseDrive(xbox::leftY, xbox::leftX, xbox::rightX));
-
-        // Toggle drivetrain to camera mode when Y is pressed
-        xbox.Y().toggleOnTrue(new CameraDrive(xbox::leftY, xbox::leftX, xbox::rightX));
-        
-
-        // Reset the gyro sensor when A is pressed
-        //xbox.A().onTrue(new InstantCommand(() -> Gyro.getInstance().reset()));
+    private void configureDefaultCommands() {
+        drivetrain.setDefaultCommand(new OffenseDrive(driver::leftY, driver::leftX, driver::rightAngle));
+        prototype.setDefaultCommand(new PrototypeTest(operator::leftX));
+        elevator.setDefaultCommand(elevator.setPosition(Elevator.Position.DRIVING));
     }
 
-    public DoubleSupplier test() {
-        return xbox::rightAngle;
+    private void configureDriverCommands() {
+        driver.back().onTrue(new InstantCommand(() -> {
+                if (robotState.getCurrentGamePiece() == GamePiece.CONE) {
+                    robotState.setCurrentGamePiece(GamePiece.CUBE);
+                } else {
+                    robotState.setCurrentGamePiece(GamePiece.CONE);
+                }
+            }));
+    
+        driver.start().onTrue(new PathPlannerFollower(PathLib.pathPlannerTrajectory));
+
+        driver.POVMinus90().and(RobotPositions::inCommunity).and(() -> RobotState.getInstance().getCurrentGamePiece() == GamePiece.CONE).onTrue(new AlignAndScore(RobotPositions::getLeftPosition).until(driver::isStickActive));
+        driver.POV90().and(RobotPositions::inCommunity).and(() -> RobotState.getInstance().getCurrentGamePiece() == GamePiece.CONE).onTrue(new AlignAndScore(RobotPositions::getRightPosition).until(driver::isStickActive));
+
+        driver.POV90().and(RobotPositions::inCommunity).and(() -> RobotState.getInstance().getCurrentGamePiece() == GamePiece.CUBE).onTrue(new AlignAndScore(RobotPositions::getCenterPosition).until(driver::isStickActive));
+        driver.POVMinus90().and(RobotPositions::inCommunity).and(() -> RobotState.getInstance().getCurrentGamePiece() == GamePiece.CUBE).onTrue(new AlignAndScore(RobotPositions::getCenterPosition).until(driver::isStickActive));
+
+        driver.rightTrigger().onTrue(intake.setIntakeMode(Intake.State.INTAKE)).onFalse(intake.setIntakeMode(Intake.State.IDLE));
+
+        driver.rightTrigger().onTrue(intake.setIntakeMode(Intake.State.OUTTAKE)).onFalse(intake.setIntakeMode(Intake.State.IDLE));
+
+        driver.rightBumper().and(RobotPositions::inCommunity).onTrue(outtake.setOuttake(State.SHOOT_CONE)).onFalse(outtake.setOuttake(State.IDLE));
+        driver.leftBumper().and(RobotPositions::inCommunity).onTrue(outtake.setOuttake(State.SHOOT_CUBE)).onFalse(outtake.setOuttake(State.IDLE));
+
+        driver.A().onTrue(new InstantCommand(() -> Gyro.getInstance().setYaw(0)));
+        driver.B().toggleOnTrue(new TargetDrive(driver::leftY, driver::leftX, new Pose2d(6, 4, new Rotation2d())));
+        driver.X().toggleOnTrue(new DefenseDrive(driver::leftY, driver::leftX, driver::rightX));
+        driver.Y().toggleOnTrue(new CameraDrive(driver::leftY, driver::leftX, driver::rightX));
+    }
+
+    private void configureOperatorCommands() {
+        operator.Y().onTrue(elevator.setNextHeight(Elevator.Position.HIGH)).and(RobotPositions::inCommunity).onTrue(elevator.setPosition(Elevator.Position.HIGH));
+        operator.X().onTrue(elevator.setNextHeight(Elevator.Position.MID)).and(RobotPositions::inCommunity).onTrue(elevator.setPosition(Elevator.Position.MID));
+        operator.A().onTrue(elevator.setNextHeight(Elevator.Position.LOW)).and(RobotPositions::inCommunity).onTrue(elevator.setPosition(Elevator.Position.LOW));
+        operator.B().onTrue(elevator.setNextHeight(Elevator.Position.FLOOR)).and(RobotPositions::inCommunity).onTrue(elevator.setPosition(Elevator.Position.FLOOR));
+
+        operator.start().onTrue(new InstantCommand(() -> robotState.setCurrentGamePiece(GamePiece.CONE)));
+        operator.back().onTrue(new InstantCommand(() -> robotState.setCurrentGamePiece(GamePiece.CUBE)));
     }
 }

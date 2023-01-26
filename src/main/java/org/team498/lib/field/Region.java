@@ -1,18 +1,13 @@
 package org.team498.lib.field;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Region implements BaseRegion {
     private final ArrayList<BaseRegion> regions = new ArrayList<>();
 
     public Region(BaseRegion... regions) {
-        for (BaseRegion region : regions) {
-            this.regions.add(region);
-        }
-    }
-
-    public void addRegion(BaseRegion region) {
-        regions.add(region);
+        Collections.addAll(this.regions, regions);
     }
 
     @Override

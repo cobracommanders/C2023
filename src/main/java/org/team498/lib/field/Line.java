@@ -10,6 +10,7 @@ import java.awt.geom.Line2D;
 public class Line extends Line2D.Double implements BaseRegion {
     /**
      * Constructs and initializes a {@code Line2D} from the specified {@code Point2D} objects.
+     *
      * @param p1 the start {@code Point2D} of this line segment
      * @param p2 the end {@code Point2D} of this line segment
      */
@@ -19,6 +20,7 @@ public class Line extends Line2D.Double implements BaseRegion {
 
     /**
      * Constructs and initializes a {@code Line2D} from the specified coordinates.
+     *
      * @param x1 the X coordinate of the start point
      * @param y1 the Y coordinate of the start point
      * @param x2 the X coordinate of the end point

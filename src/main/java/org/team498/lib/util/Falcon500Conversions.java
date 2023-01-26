@@ -23,8 +23,7 @@ public class Falcon500Conversions {
 
     /**
      * @param velocityCounts Falcon Velocity Counts
-     * @param gearRatio      Gear Ratio between Falcon and mechanism (set to 1 for
-     *                       Falcon RPM)
+     * @param gearRatio      Gear Ratio between Falcon and mechanism (set to 1 for Falcon RPM)
      * @return RPM of mechanism
      */
     public static double falconToRPM(double velocityCounts, double gearRatio) {
@@ -34,8 +33,7 @@ public class Falcon500Conversions {
 
     /**
      * @param RPM       RPM of mechanism
-     * @param gearRatio Gear Ratio between Falcon and mechanism (set to 1 for Falcon
-     *                  RPM)
+     * @param gearRatio Gear Ratio between Falcon and mechanism (set to 1 for Falcon RPM)
      * @return RPM of mechanism
      */
     public static double RPMToFalcon(double RPM, double gearRatio) {
@@ -46,8 +44,7 @@ public class Falcon500Conversions {
     /**
      * @param velocitycounts Falcon Velocity Counts
      * @param circumference  Circumference of Wheel
-     * @param gearRatio      Gear Ratio between Falcon and mechanism (set to 1 for
-     *                       Falcon RPM)
+     * @param gearRatio      Gear Ratio between Falcon and mechanism (set to 1 for Falcon RPM)
      * @return Falcon Velocity Counts
      */
     public static double falconToMPS(double velocitycounts, double circumference, double gearRatio) {
@@ -58,8 +55,7 @@ public class Falcon500Conversions {
     /**
      * @param velocity      Velocity MPS
      * @param circumference Circumference of Wheel
-     * @param gearRatio     Gear Ratio between Falcon and mechanism (set to 1 for
-     *                      Falcon RPM)
+     * @param gearRatio     Gear Ratio between Falcon and mechanism (set to 1 for Falcon RPM)
      * @return Falcon Velocity Counts
      */
     public static double MPSToFalcon(double velocity, double circumference, double gearRatio) {

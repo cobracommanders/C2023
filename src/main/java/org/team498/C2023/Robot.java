@@ -1,79 +1,73 @@
 package org.team498.C2023;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
+import org.team498.C2023.RobotState.GamePiece;
 import org.team498.C2023.subsystems.Drivetrain;
+import org.team498.C2023.subsystems.Vision;
 import org.team498.lib.drivers.Gyro;
-import org.team498.lib.field.Ellipse;
-import org.team498.lib.field.Line;
 import org.team498.lib.field.Point;
-import org.team498.lib.field.Rectangle;
-import org.team498.lib.field.Region;
 
-import java.util.function.DoubleSupplier;
+import java.util.LinkedList;
 
 public class Robot extends TimedRobot {
+    public static int rotationDirection;
     public static Field2d field = new Field2d();
+    public static Alliance alliance = Alliance.Blue;
+    public static RobotContainer robotContainer = new RobotContainer();
 
-    DoubleSupplier x;
-
-    Region region;
+    private final Vision vision = Vision.getInstance();
+    private final Drivetrain drivetrain = Drivetrain.getInstance();
+    private final Gyro gyro = Gyro.getInstance();
 
     @Override
     public void robotInit() {
-        new RobotContainer();
+        if (isReal()) {
+            rotationDirection = -1;
+        } else {
+            rotationDirection = 1;
+        }
+        drivetrain.setPose(new Pose2d(8.29, 4, Rotation2d.fromDegrees(0)));
+        robotContainer.driver.setRightStickLastAngle(-gyro.getAngleOffset());
 
-        var R = new Rectangle(4, 3, 3, 3);
-        var E = new Ellipse(new Rectangle(1, 2, 3, 3));
-
-        //R.displayOnDashboard("R");
-        //E.displayOnDashboard("E");
-
-        region = new Region(R, E);
-        //region.displayOnDashboard("combo");
-
+        SmartDashboard.putData(field);
         FieldPositions.displayAll();
-
-        // Calibrate the gyro sensor when the robot is powered on
-        Gyro.getInstance().calibrate();
     }
 
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
-        SmartDashboard.putData(field);
-        SmartDashboard.putBoolean("In Zone", region.contains(Point.fromPose2d(Drivetrain.getInstance().getPose())));
 
-        SmartDashboard.putNumber("xbox", RobotContainer.xbox.rightAngle());
-    }
+        SmartDashboard.putNumber("Tag ID", vision.getTargetedTag());
 
-    @Override
-    public void disabledInit() {
+        vision.getRobotPose().ifPresent(drivetrain::setPose);
+
+        if (RobotPositions.inCommunity()) {
+            if (RobotState.getInstance().getCurrentGamePiece() == GamePiece.CONE) {
+                field.getObject("Scoring Targets").setPoses(RobotPositions.getRightPosition(),
+                        RobotPositions.getLeftPosition());
+            } else {
+                field.getObject("Scoring Targets").setPose(RobotPositions.getCenterPosition());
+            }
+        } else {
+            field.getObject("Scoring Targets").setPose(new Pose2d(-1, -1, new Rotation2d()));
+        }
+
+        SmartDashboard.putString("Current Game Piece", RobotState.getInstance().getCurrentGamePiece().name());
+        SmartDashboard.putBoolean("In Community", RobotPositions.inCommunity());
     }
 
     @Override
     public void disabledPeriodic() {
-    }
-
-    @Override
-    public void autonomousInit() {
-    }
-
-    @Override
-    public void autonomousPeriodic() {
-    }
-
-    @Override
-    public void teleopInit() {
-    }
-
-    @Override
-    public void teleopPeriodic() {
-        // SmartDashboard.putBoolean("In Region",
-        // FieldPositions.LOADING_ZONE.containsPosition(Drivetrain.getInstance().getPose()));
+        alliance = DriverStation.getAlliance();
     }
 
     @Override
@@ -81,7 +75,8 @@ public class Robot extends TimedRobot {
         CommandScheduler.getInstance().cancelAll();
     }
 
-    @Override
-    public void testPeriodic() {
+    public static void main(String... args) {
+        RobotBase.startRobot(Robot::new);
     }
+
 }

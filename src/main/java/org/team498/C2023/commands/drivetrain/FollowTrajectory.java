@@ -5,17 +5,17 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import org.team498.C2023.Robot;
 import org.team498.C2023.subsystems.Drivetrain;
 
 public class FollowTrajectory extends CommandBase {
-    private final Drivetrain drivetrain;
+    private final Drivetrain drivetrain = Drivetrain.getInstance();
     private final Trajectory trajectory;
     private final Timer timer = new Timer();
 
-
     public FollowTrajectory(Trajectory trajectory) {
-        this.drivetrain = Drivetrain.getInstance();
         this.trajectory = trajectory;
+
         addRequirements(drivetrain);
     }
 
@@ -24,7 +24,7 @@ public class FollowTrajectory extends CommandBase {
         timer.reset();
         timer.start();
 
-        drivetrain.setInitialPose(trajectory.getInitialPose());
+        drivetrain.setPose(trajectory.getInitialPose());
     }
 
     @Override
@@ -38,8 +38,7 @@ public class FollowTrajectory extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        //return drivetrain.atTrajectoryGoal();
-        return false;
+        return timer.get() > trajectory.getTotalTimeSeconds() || Robot.robotContainer.driver.isStickActive();
     }
 
     @Override

@@ -63,9 +63,11 @@ public class Xbox {
         }
     }
 
-    public boolean getPOVActive() {return getRawPOV() == -1;}
-    public boolean getRightStickActive() {return Math.hypot(getAxis(Axis.RightY), getAxis(Axis.RightX)) != 0;}
-    public boolean getLeftStickActive() {return Math.hypot(getAxis(Axis.LeftY), getAxis(Axis.LeftX)) != 0;}
+    public boolean isPOVActive() {return getRawPOV() == -1;}
+    public boolean isRightStickActive() {return Math.hypot(getAxis(Axis.RightY), getAxis(Axis.RightX)) != 0;}
+    public boolean isLeftStickActive() {return Math.hypot(getAxis(Axis.LeftY), getAxis(Axis.LeftX)) != 0;}
+
+    public boolean isStickActive() {return isLeftStickActive() || isRightStickActive();}
 
 
     /* * * * * * * * * * * * * * * * * * * * * * * */
@@ -135,7 +137,9 @@ public class Xbox {
      */
     public double getAxis(Axis axis) {
         double rawAxis = DriverStation.getStickAxis(port, axis.value);
-        return Math.abs(rawAxis) > deadzone ? rawAxis : 0;
+        return Math.abs(rawAxis) > deadzone
+               ? rawAxis
+               : 0;
     }
 
     /** @return the controller's left X axis */
@@ -159,7 +163,7 @@ public class Xbox {
      * @return the angle of the right joystick
      */
     public double rightAngle() {
-        if (!getRightStickActive()) return lastAngleRight;
+        if (!isRightStickActive()) return lastAngleRight;
 
         double x = getAxis(Axis.RightX);
         double y = getAxis(Axis.RightY);
@@ -184,7 +188,7 @@ public class Xbox {
      * @return the angle of the left joystick
      */
     public double leftAngle() {
-        if (!getLeftStickActive()) return lastAngleLeft;
+        if (!isLeftStickActive()) return lastAngleLeft;
 
         double x = getAxis(Axis.LeftX);
         double y = getAxis(Axis.LeftY);
@@ -224,6 +228,7 @@ public class Xbox {
         return DriverStation.getStickPOV(port, 0);
     }
 
+
     private double lastAnglePOV = -0.0;
     /**
      * Gets the angle of the POV, from -180 to 180. Upwards is 0 degrees, right is 90, etc. This value uses the last read angle when the POV is returned to the center.
@@ -240,13 +245,26 @@ public class Xbox {
         return angle;
     }
 
-    public Trigger POV0() {return new Trigger(() -> POVAngle() == -0);}
-    public Trigger POV45() {return new Trigger(() -> POVAngle() == 45);}
-    public Trigger POV90() {return new Trigger(() -> POVAngle() == 90);}
-    public Trigger POV135() {return new Trigger(() -> POVAngle() == 135);}
-    public Trigger POV180() {return new Trigger(() -> POVAngle() == -180);}
-    public Trigger POVMinus135() {return new Trigger(() -> POVAngle() == -135);}
-    public Trigger POVMinus90() {return new Trigger(() -> POVAngle() == -90);}
-    public Trigger POVMinus45() {return new Trigger(() -> POVAngle() == -45);}
+    /**
+     * Gets the angle of the POV, from -180 to 180. Upwards is 0 degrees, right is 90, etc. This value uses the last read angle when the POV is returned to the center.
+     *
+     * @return the angle of the POV
+     */
+    public double rawPOVAngle() {
+        double angle = getRawPOV();
+
+        angle = -RotationUtil.toSignedDegrees(angle);
+
+        return angle;
+    }
+
+    public Trigger POV0() {return new Trigger(() -> rawPOVAngle() == -0);}
+    public Trigger POV45() {return new Trigger(() -> rawPOVAngle() == 45);}
+    public Trigger POV90() {return new Trigger(() -> rawPOVAngle() == 90);}
+    public Trigger POV135() {return new Trigger(() -> rawPOVAngle() == 135);}
+    public Trigger POV180() {return new Trigger(() -> rawPOVAngle() == -180);}
+    public Trigger POVMinus135() {return new Trigger(() -> rawPOVAngle() == -135);}
+    public Trigger POVMinus90() {return new Trigger(() -> rawPOVAngle() == -90);}
+    public Trigger POVMinus45() {return new Trigger(() -> rawPOVAngle() == -45);}
 }
 

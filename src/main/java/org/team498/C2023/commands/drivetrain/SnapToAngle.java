@@ -1,14 +1,15 @@
 package org.team498.C2023.commands.drivetrain;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+
+import org.team498.C2023.Robot;
 import org.team498.C2023.subsystems.Drivetrain;
 
 public class SnapToAngle extends CommandBase {
-    private final Drivetrain drivetrain;
+    private final Drivetrain drivetrain = Drivetrain.getInstance();
     private final double angle;
 
     public SnapToAngle(double angle) {
-        this.drivetrain = Drivetrain.getInstance();
         this.angle = angle;
 
         addRequirements(drivetrain);
@@ -26,7 +27,7 @@ public class SnapToAngle extends CommandBase {
         double rotationalSpeed = drivetrain.calculateSnapSpeed();
 
         // Set the drivetrain to drive, remaining in the set position but snapping to the target
-        drivetrain.drive(0, 0, rotationalSpeed, false);
+        drivetrain.drive(0, 0, rotationalSpeed * Robot.rotationDirection, false);
     }
 
     @Override

@@ -12,13 +12,12 @@ import java.util.function.DoubleSupplier;
 import static org.team498.C2023.Constants.DrivetrainConstants.MAX_VELOCITY_METERS_PER_SECOND;
 
 public class TargetDrive extends CommandBase {
-    private final Drivetrain drivetrain;
+    private final Drivetrain drivetrain = Drivetrain.getInstance();
     private final DoubleSupplier xTranslationSupplier;
     private final DoubleSupplier yTranslationSupplier;
     private final Pose2d target;
 
     public TargetDrive(DoubleSupplier xTranslationSupplier, DoubleSupplier yTranslationSupplier, Pose2d target) {
-        this.drivetrain = Drivetrain.getInstance();
         this.xTranslationSupplier = xTranslationSupplier;
         this.yTranslationSupplier = yTranslationSupplier;
         this.target = target;
@@ -38,7 +37,7 @@ public class TargetDrive extends CommandBase {
         double rotationalSpeed = drivetrain.calculateSnapSpeed();
 
         // Set the robot to drive in field relative mode, with the rotation controlled by the snap controller
-        drivetrain.drive(xTranslation, yTranslation, rotationalSpeed, true);
+        drivetrain.drive(xTranslation, yTranslation, rotationalSpeed * Robot.rotationDirection, true);
     }
 
     public double calculateDegreesToTarget(Pose2d target) {

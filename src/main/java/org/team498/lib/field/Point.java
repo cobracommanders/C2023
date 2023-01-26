@@ -38,7 +38,7 @@ public class Point extends Point2D.Double implements BaseRegion {
      */
     @Override
     public void displayOnDashboard(String name) {
-        Robot.field.getObject(name).setPose(new Pose2d(x, y, new Rotation2d()));
+        Robot.field.getObject(name).setPose(toPose2d());
     }
 
     /**

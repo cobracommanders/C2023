@@ -7,7 +7,6 @@ import org.team498.C2023.Robot;
 
 import java.awt.geom.Ellipse2D;
 import java.util.LinkedList;
-import java.util.List;
 
 public class Ellipse extends Ellipse2D.Double implements BaseRegion {
     /**
@@ -26,10 +25,9 @@ public class Ellipse extends Ellipse2D.Double implements BaseRegion {
      */
     @Override
     public void displayOnDashboard(String name) {
-        List<Pose2d> allPoses = new LinkedList<Pose2d>();
+        LinkedList<Pose2d> allPoses = new LinkedList<Pose2d>();
 
-        // Number of lines to draw the ellipse with, must be less than 85 for it to draw
-        // the whole thing
+        // Number of lines to draw the ellipse with, must be less than 85 for it to draw the whole thing
         double lines = 25;
 
         for (int angle = 0; angle < lines + 1; angle++) {
@@ -44,8 +42,6 @@ public class Ellipse extends Ellipse2D.Double implements BaseRegion {
 
             double xCoordinate = centerX + a * Math.cos(angleRadians);
             double yCoordinate = centerY + b * Math.sin(angleRadians);
-
-            System.out.println(angle * (360 / lines));
 
             allPoses.add(new Pose2d(xCoordinate, yCoordinate, new Rotation2d()));
         }

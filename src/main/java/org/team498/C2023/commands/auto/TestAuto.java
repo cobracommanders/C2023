@@ -11,7 +11,7 @@ public class TestAuto extends SequentialCommandGroup {
 
     public TestAuto() {
         addRequirements(drivetrain);
-        addCommands(new InstantCommand(() -> drivetrain.setInitialPose(PathLib.unnamed.getInitialPose())),
+        addCommands(new InstantCommand(() -> drivetrain.setPose(PathLib.unnamed.getInitialPose())),
                     new FollowTrajectory(PathLib.unnamed));
     }
 }

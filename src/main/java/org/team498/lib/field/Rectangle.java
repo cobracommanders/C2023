@@ -6,13 +6,11 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import org.team498.C2023.Robot;
 
 import java.awt.geom.Rectangle2D;
-import java.util.List;
 
 public class Rectangle extends Rectangle2D.Double implements BaseRegion {
 
     /**
-     * Constructs and initializes a {@code Rectangle}
-     * from the specified {@code double} coordinates.
+     * Constructs and initializes a {@code Rectangle} from the specified {@code double} coordinates.
      *
      * @param x the X coordinate of the lower-left corner of the newly constructed {@code Rectangle2D}
      * @param y the Y coordinate of the lower-left corner of the newly constructed {@code Rectangle2D}
@@ -20,7 +18,7 @@ public class Rectangle extends Rectangle2D.Double implements BaseRegion {
      * @param h the height of the newly constructed {@code Rectangle2D}
      */
     public Rectangle(double x, double y, double w, double h) {
-        super(x, y, h, w);
+        super(x, y, w, h);
     }
 
     /**
@@ -30,9 +28,9 @@ public class Rectangle extends Rectangle2D.Double implements BaseRegion {
      */
     @Override
     public void displayOnDashboard(String name) {
-        Pose2d bottomLeft = new Pose2d(x + height, y, new Rotation2d());
-        Pose2d bottomRight = new Pose2d(x + height, y + width, new Rotation2d());
-        Pose2d upperRight = new Pose2d(x , y + width, new Rotation2d());
+        Pose2d bottomLeft = new Pose2d(x + width, y, new Rotation2d());
+        Pose2d bottomRight = new Pose2d(x + width, y + height, new Rotation2d());
+        Pose2d upperRight = new Pose2d(x, y + height, new Rotation2d());
         Pose2d upperLeft = new Pose2d(x, y, new Rotation2d());
 
         Robot.field.getObject(name).setPoses(bottomLeft, bottomRight, upperRight, upperLeft, bottomLeft);

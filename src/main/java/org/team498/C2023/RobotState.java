@@ -9,10 +9,23 @@ import org.team498.C2023.subsystems.Vision;
 public class RobotState extends SubsystemBase {
     private final Vision vision;
     private final Drivetrain drivetrain;
+    private GamePiece currentGamePiece = GamePiece.CONE;
+
+    public enum GamePiece {
+        CUBE, CONE, EMPTY
+    }
 
     private RobotState() {
-        this.vision = null;
+        this.vision = Vision.getInstance();
         this.drivetrain = Drivetrain.getInstance();
+    }
+
+    public GamePiece getCurrentGamePiece() {
+        return currentGamePiece;
+    }
+
+    public void setCurrentGamePiece(GamePiece gamePiece) {
+        currentGamePiece = gamePiece;
     }
 
     public Transform2d getRobotToField() {
@@ -28,7 +41,7 @@ public class RobotState extends SubsystemBase {
     }
 
     public Transform2d getVisionToTarget() {
-        return toTransform2d(vision.getPose());
+        return toTransform2d(vision.pose);
     }
 
     public Transform2d getVisionToRobot() {
