@@ -7,6 +7,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import org.team498.C2023.Constants.OIConstants;
 import org.team498.C2023.RobotState.GamePiece;
 import org.team498.C2023.commands.drivetrain.*;
+import org.team498.C2023.commands.elevator.ManualElevator;
+import org.team498.C2023.commands.outtake.CollectCone;
 import org.team498.C2023.commands.prototype.PrototypeTest;
 import org.team498.C2023.commands.robot.AlignAndScore;
 import org.team498.C2023.subsystems.*;
@@ -35,9 +37,9 @@ public class RobotContainer {
     }
 
     private void configureDefaultCommands() {
-        drivetrain.setDefaultCommand(new OffenseDrive(driver::leftY, driver::leftX, driver::rightAngle));
+        //drivetrain.setDefaultCommand(new OffenseDrive(driver::leftY, driver::leftX, driver::rightAngle));
         prototype.setDefaultCommand(new PrototypeTest(operator::leftX));
-        elevator.setDefaultCommand(elevator.setPosition(Elevator.Position.DRIVING));
+        // elevator.setDefaultCommand(new ManualElevator(operator::rightX));
     }
 
     private void configureDriverCommands() {
@@ -71,12 +73,25 @@ public class RobotContainer {
     }
 
     private void configureOperatorCommands() {
-        operator.Y().onTrue(elevator.setNextHeight(Elevator.Position.HIGH)).and(RobotPositions::inCommunity).onTrue(elevator.setPosition(Elevator.Position.HIGH));
-        operator.X().onTrue(elevator.setNextHeight(Elevator.Position.MID)).and(RobotPositions::inCommunity).onTrue(elevator.setPosition(Elevator.Position.MID));
-        operator.A().onTrue(elevator.setNextHeight(Elevator.Position.LOW)).and(RobotPositions::inCommunity).onTrue(elevator.setPosition(Elevator.Position.LOW));
-        operator.B().onTrue(elevator.setNextHeight(Elevator.Position.FLOOR)).and(RobotPositions::inCommunity).onTrue(elevator.setPosition(Elevator.Position.FLOOR));
+        // operator.Y().onTrue(elevator.setNextHeight(Elevator.Position.HIGH)).and(RobotPositions::inCommunity).onTrue(elevator.setPosition(Elevator.Position.HIGH));
+        // operator.X().onTrue(elevator.setNextHeight(Elevator.Position.MID)).and(RobotPositions::inCommunity).onTrue(elevator.setPosition(Elevator.Position.MID));
+        // operator.A().onTrue(elevator.setNextHeight(Elevator.Position.LOW)).and(RobotPositions::inCommunity).onTrue(elevator.setPosition(Elevator.Position.LOW));
+        // operator.B().onTrue(elevator.setNextHeight(Elevator.Position.FLOOR)).and(RobotPositions::inCommunity).onTrue(elevator.setPosition(Elevator.Position.FLOOR));
+
+        // operator.Y().onTrue(elevator.setPosition(Elevator.Position.HIGH));
+        // operator.X().onTrue(elevator.setPosition(Elevator.Position.LOW));
+
+        // operator.X().onTrue(new InstantCommand(() -> outtake.setBottomRollers(1))).onFalse(new InstantCommand(() -> outtake.setBottomRollers(0))); // Intake cone
+        operator.X().onTrue(new CollectCone());
+        operator.Y().onTrue(new InstantCommand(() -> outtake.setBottomRollers(-0.75))).onFalse(new InstantCommand(() -> outtake.setBottomRollers(0))); // Shoot cone
+        operator.A().onTrue(new InstantCommand(() -> {outtake.setTopRollers(-0.45); outtake.setBottomRollers(0.45);})).onFalse(new InstantCommand(() -> outtake.stop())); // Shoot cube
+        operator.B().onTrue(new InstantCommand(() -> {outtake.setTopRollers(0.5); outtake.setBottomRollers(-0.5);})).onFalse(new InstantCommand(() -> outtake.stop())); // Intake cube
+
 
         operator.start().onTrue(new InstantCommand(() -> robotState.setCurrentGamePiece(GamePiece.CONE)));
         operator.back().onTrue(new InstantCommand(() -> robotState.setCurrentGamePiece(GamePiece.CUBE)));
+
+
     }
 }
+

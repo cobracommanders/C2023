@@ -1,5 +1,11 @@
 package org.team498.C2023;
 
+import org.team498.C2023.RobotState.GamePiece;
+import org.team498.C2023.subsystems.Drivetrain;
+import org.team498.C2023.subsystems.Outtake;
+import org.team498.C2023.subsystems.Vision;
+import org.team498.lib.drivers.Gyro;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -9,14 +15,6 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-
-import org.team498.C2023.RobotState.GamePiece;
-import org.team498.C2023.subsystems.Drivetrain;
-import org.team498.C2023.subsystems.Vision;
-import org.team498.lib.drivers.Gyro;
-import org.team498.lib.field.Point;
-
-import java.util.LinkedList;
 
 public class Robot extends TimedRobot {
     public static int rotationDirection;
@@ -37,6 +35,8 @@ public class Robot extends TimedRobot {
         }
         drivetrain.setPose(new Pose2d(8.29, 4, Rotation2d.fromDegrees(0)));
         robotContainer.driver.setRightStickLastAngle(-gyro.getAngleOffset());
+
+        gyro.setYaw(0);
 
         SmartDashboard.putData(field);
         FieldPositions.displayAll();
@@ -63,6 +63,8 @@ public class Robot extends TimedRobot {
 
         SmartDashboard.putString("Current Game Piece", RobotState.getInstance().getCurrentGamePiece().name());
         SmartDashboard.putBoolean("In Community", RobotPositions.inCommunity());
+
+        SmartDashboard.putBoolean("Bottom Stalling", Outtake.getInstance().isBottomStalling());
     }
 
     @Override

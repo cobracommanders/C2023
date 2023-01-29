@@ -1,11 +1,13 @@
 package org.team498.C2023.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.team498.C2023.Compressor;
 
@@ -29,12 +31,11 @@ public class Outtake extends SubsystemBase {
     }
 
     public enum State {
-        SHOOT_CONE(Position.SHOOTING, 0, -1),
-        SHOOT_CUBE(Position.INTAKING, -1, 0),
-        INTAKE_CONE(Position.INTAKING, 1, 1),
-        INTAKE_CUBE(Position.INTAKING, 1, 0),
+        SHOOT_CONE(Position.SHOOTING, -0.75, 0),
+        SHOOT_CUBE(Position.INTAKING, -0.45, 0.45),
+        INTAKE_CONE(Position.INTAKING, 1, 0),
+        INTAKE_CUBE(Position.INTAKING, 0.5, -0.5),
         IDLE(Position.INTAKING, 0, 0);
-
 
         private final Position position;
         private final double bottomRollerSpeed;
@@ -50,6 +51,13 @@ public class Outtake extends SubsystemBase {
     private Outtake() {
         topRollers = new CANSparkMax(OUTTAKE_TOP, MotorType.kBrushless);
         bottomRollers = new CANSparkMax(OUTTAKE_BOTTOM, MotorType.kBrushless);
+
+        topRollers.restoreFactoryDefaults();
+        bottomRollers.restoreFactoryDefaults();
+
+        topRollers.setIdleMode(IdleMode.kBrake);
+        bottomRollers.setIdleMode(IdleMode.kBrake);
+
         solenoid = Compressor.getInstance().createDoubleSolenoid(SOLENOID_FORWARDS, SOLENOID_REVERSE);
         beamBreak = new DigitalInput(BEAM_BREAK);
     }
@@ -59,7 +67,7 @@ public class Outtake extends SubsystemBase {
     }
 
     public boolean isBottomStalling() {
-        return bottomRollers.getOutputCurrent() > 20;
+        return bottomRollers.getOutputCurrent() > 25;
     }
 
     public boolean hasGamePiece() {
@@ -67,14 +75,11 @@ public class Outtake extends SubsystemBase {
     }
 
     public FunctionalCommand setOuttake(State state) {
-        return new FunctionalCommand(() -> {
+        return new InstantCommand(() -> {
             setTopRollers(state.topRollerSpeed);
             setBottomRollers(state.bottomRollerSpeed);
             setPosition(state.position);
-        }, () -> {}, b -> {
-            setTopRollers(0);
-            setBottomRollers(0);
-        }, () -> isTopStalling() || isBottomStalling(), this);
+        });
     }
 
     public void setTopRollers(double speed) {
@@ -89,6 +94,10 @@ public class Outtake extends SubsystemBase {
         solenoid.set(position.value);
     }
 
+    public void stop() {
+        setTopRollers(0);
+        setBottomRollers(0);
+    }
 
     private static Outtake instance;
 

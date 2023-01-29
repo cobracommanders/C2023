@@ -136,6 +136,7 @@ public class Drivetrain extends SubsystemBase {
 
     /** Sets the goal of the snap controller to a specified target in degrees. */
     public void setSnapGoal(double goal) {
+        SmartDashboard.putNumber("Snap Goal", goal);
         angleController.setGoal(goal);
     }
 

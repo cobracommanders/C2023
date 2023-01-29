@@ -35,7 +35,7 @@ public final class Ports {
     }
 
     public static class Intake {
-        public static final int ROLLERS = 35;
+        public static final int ROLLERS = 20;
         public static final int L_WRIST = 36;
         public static final int R_WRIST = 37;
     }

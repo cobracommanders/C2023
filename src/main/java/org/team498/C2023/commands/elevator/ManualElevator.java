@@ -12,6 +12,7 @@ public class ManualElevator extends CommandBase {
 
     public ManualElevator(DoubleSupplier speedSupplier) {
         this.speedSupplier = speedSupplier;
+        addRequirements(elevator);
     }
 
     @Override

@@ -1,5 +1,7 @@
 package org.team498.C2023.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -14,7 +16,7 @@ import static org.team498.C2023.Constants.IntakeConstants.*;
 import static org.team498.C2023.Ports.Intake.*;
 
 public class Intake extends SubsystemBase {
-    private final CANSparkMax rollers;
+    private final TalonFX rollers;
     private final CANSparkMax leftWrist;
     private final CANSparkMax rightWrist;
 
@@ -41,11 +43,14 @@ public class Intake extends SubsystemBase {
     }
 
     private Intake() {
-        rollers = new CANSparkMax(ROLLERS, MotorType.kBrushless);
+        rollers = new TalonFX(ROLLERS);
+
         leftWrist = new CANSparkMax(L_WRIST, MotorType.kBrushless);
         rightWrist = new CANSparkMax(R_WRIST, MotorType.kBrushless);
 
         rightWrist.follow(leftWrist, true);
+
+        rollers.setInverted(true);
 
         encoder = leftWrist.getAbsoluteEncoder(Type.kDutyCycle);
 
@@ -55,11 +60,11 @@ public class Intake extends SubsystemBase {
 
     @Override
     public void periodic() {
-        leftWrist.set(PID.calculate(getPositionDegrees()) + feedforward.calculate(Math.toRadians(PID.getSetpoint()), 0));
+        //leftWrist.set(PID.calculate(getPositionDegrees()) + feedforward.calculate(Math.toRadians(PID.getSetpoint()), 0));
     }
 
     private InstantCommand setRollers(double speed) {
-        return new InstantCommand(() -> rollers.set(speed));
+        return new InstantCommand(() -> rollers.set(ControlMode.PercentOutput, speed));
     }
 
     private InstantCommand setPosition(Position position) {
@@ -70,7 +75,7 @@ public class Intake extends SubsystemBase {
         ParallelCommandGroup output = new ParallelCommandGroup();
         switch (state) {
             case INTAKE:
-                output = new ParallelCommandGroup(setRollers(1), setPosition(Position.OUT));
+                output = new ParallelCommandGroup(setRollers(0.001), setPosition(Position.OUT));
                 break;
             case OUTTAKE:
                 output = new ParallelCommandGroup(setRollers(-1), setPosition(Position.OUT));

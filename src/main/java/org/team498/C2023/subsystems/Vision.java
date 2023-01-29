@@ -11,7 +11,7 @@ import org.team498.C2023.FieldPositions;
 import java.util.Optional;
 
 public class Vision extends SubsystemBase {
-    private final PhotonCamera cam1 = new PhotonCamera("Microsoft_LifeCam_Cinema(TM)");
+    private final PhotonCamera cam1 = new PhotonCamera("Arducam_OV9281_USB_Camera");
     private PhotonPipelineResult pipelineResult = new PhotonPipelineResult();
     public Pose2d pose = new Pose2d();
     public PhotonPipelineResult lastResult;
@@ -40,20 +40,20 @@ public class Vision extends SubsystemBase {
     }
 
     public int getTargetedTag() {
-        if (cam1.getLatestResult().hasTargets()) return cam1.getLatestResult().getBestTarget().getFiducialId();
+        if (pipelineResult.hasTargets()) return pipelineResult.getBestTarget().getFiducialId();
         return -1;
     }
 
     public Optional<Pose2d> getRobotPose() {
         int tag = getTargetedTag();
 
-        if (tag != -1 && tag <= 8) {
+        if (tag != -1 && tag <= 8) {            
             Pose2d pose = new Pose2d(FieldPositions.aprilTags.get(tag).getX(), FieldPositions.aprilTags.get(tag).getY(), new Rotation2d());
 
             if (tag > 4) {
-                return Optional.of(pose.plus(new Transform2d(new Translation2d(pose.getX(), pose.getY()), new Rotation2d())));
+                return Optional.of(pose.plus(new Transform2d(new Translation2d(this.pose.getX(), this.pose.getY()), new Rotation2d())));
             } else {
-                return Optional.of(pose.plus(new Transform2d(new Translation2d(-pose.getX(), pose.getY()), Rotation2d.fromDegrees(180))));
+                return Optional.of(pose.plus(new Transform2d(new Translation2d(-this.pose.getX(), this.pose.getY()), Rotation2d.fromDegrees(180))));
             }
         }
 
