@@ -10,6 +10,7 @@ public class Compressor {
     private Compressor() {
         pneumaticHub = new PneumaticHub(Ports.PENUMATIC_HUB);
         compressor = pneumaticHub.makeCompressor();
+        int fakevar = 1;
     }
 
     public void enableCompressor() {
