@@ -2,39 +2,43 @@ package org.team498.C2023.subsystems;
 
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
-import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.*;
-import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.team498.C2023.Robot;
 import org.team498.lib.drivers.Gyro;
 import org.team498.lib.drivers.SwerveModule;
+import org.team498.lib.field.Point;
+import org.team498.lib.field.Region;
+import org.team498.lib.wpilib.ChassisSpeeds;
 
 import static org.team498.C2023.Constants.DrivetrainConstants.*;
-import static org.team498.C2023.Constants.PoseConstants;
-import static org.team498.C2023.Constants.SnapConstants;
-import static org.team498.C2023.Ports.*;
+import static org.team498.C2023.Ports.Drivetrain.*;
 
 public class Drivetrain extends SubsystemBase {
     // Profiled controller for the rotation of the robot
-    private final ProfiledPIDController angleController = new ProfiledPIDController(SnapConstants.P, SnapConstants.I, SnapConstants.D, SnapConstants.CONTROLLER_CONSTRAINTS);
+    // TODO see if the profiled controller here causes the robot to turn on startup
+    private final ProfiledPIDController angleController = new ProfiledPIDController(AngleConstants.P, AngleConstants.I, AngleConstants.D, AngleConstants.CONTROLLER_CONSTRAINTS);
     // Profiled controller for the x position of the robot
-    private final ProfiledPIDController xController = new ProfiledPIDController(PoseConstants.P, PoseConstants.I, PoseConstants.D, PoseConstants.CONTROLLER_CONSTRAINTS);
+    private final PIDController xController = new PIDController(PoseConstants.P, PoseConstants.I, PoseConstants.D);
     // Profiled controller for the y position of the robot
-    private final ProfiledPIDController yController = new ProfiledPIDController(PoseConstants.P, PoseConstants.I, PoseConstants.D, PoseConstants.CONTROLLER_CONSTRAINTS);
-    // Holonomic drive controller to follow trajectories
-    private final HolonomicDriveController trajectoryController = new HolonomicDriveController(new PIDController(PoseConstants.P, PoseConstants.I, PoseConstants.D), new PIDController(PoseConstants.P, PoseConstants.I, PoseConstants.D), angleController);
+    private final PIDController yController = new PIDController(PoseConstants.P, PoseConstants.I, PoseConstants.D);
+
     private final SwerveModule[] swerveModules;
     private final SwerveDriveKinematics kinematics;
     private final SwerveDriveOdometry odometry;
     private final Gyro gyro = Gyro.getInstance();
+    public ChassisSpeeds currentSpeeds = new ChassisSpeeds();
 
     private Drivetrain() {
         TalonFX FL_Drive = new TalonFX(FL_DRIVE_ID);
@@ -59,7 +63,7 @@ public class Drivetrain extends SubsystemBase {
         swerveModules = new SwerveModule[] {FL_Module, FR_Module, BL_Module, BR_Module};
 
         angleController.enableContinuousInput(-180, 180);
-        angleController.setTolerance(SnapConstants.EPSILON);
+        angleController.setTolerance(AngleConstants.EPSILON);
         xController.setTolerance(PoseConstants.EPSILON);
         yController.setTolerance(PoseConstants.EPSILON);
 
@@ -75,98 +79,95 @@ public class Drivetrain extends SubsystemBase {
 
     @Override
     public void periodic() {
-        odometry.update(Rotation2d.fromDegrees(-getYaw()), getModulePositions());
+        if (Robot.isReal()) odometry.update(Rotation2d.fromDegrees(getYaw()), getModulePositions());
 
-        if (RobotState.isDisabled()) {matchEncoders();}
+        if (RobotState.isDisabled()) {
+            for (SwerveModule swerveModule : swerveModules) {
+                swerveModule.matchEncoders();
+            }
+        }
 
         SmartDashboard.putData(this);
         SmartDashboard.putNumber("Gyro", getYaw());
-        SmartDashboard.putNumber("Snap Setpoint", angleController.getGoal().position);
+        SmartDashboard.putNumber("Angle Setpoint", angleController.getGoal().position);
+
+        Robot.field.setRobotPose(getPose());
     }
 
-    public ChassisSpeeds getSpeedsFromTrajectoryState(Trajectory.State goal) {
-        return trajectoryController.calculate(getPose(), goal, goal.poseMeters.getRotation());
+    @Override
+    public void simulationPeriodic() {
+        Pose2d currentPose = getPose();
+
+        double newX = currentPose.getX() + currentSpeeds.vxMetersPerSecond * Robot.kDefaultPeriod;
+        double newY = currentPose.getY() + currentSpeeds.vyMetersPerSecond * Robot.kDefaultPeriod;
+        double newAngle = currentPose.getRotation().getDegrees() + Math.toDegrees(currentSpeeds.omegaRadiansPerSecond * Robot.kDefaultPeriod);
+        gyro.setSimAngle(newAngle);
+
+        Robot.field.setRobotPose(newX, newY, Rotation2d.fromDegrees(-newAngle));
+
+        odometry.resetPosition(Rotation2d.fromDegrees(newAngle), getModulePositions(), new Pose2d(newX, newY, Rotation2d.fromDegrees(newAngle)));
     }
 
-    public boolean atTrajectoryGoal() {
-        return trajectoryController.atReference();
+    public Pose2d getPose() {
+        return odometry.getPoseMeters();
     }
 
-
-    public Pose2d getPose() {return odometry.getPoseMeters();}
-
-    public void setInitialPose(Pose2d pose) {
-        odometry.resetPosition(Rotation2d.fromDegrees(gyro.getRawAngle()), getModulePositions(), pose);
+    public void setPose(Pose2d pose) {
+        odometry.resetPosition(Rotation2d.fromDegrees(gyro.getYaw()), getModulePositions(), pose);
         gyro.setAngleOffset(pose.getRotation().getDegrees());
     }
 
     /** @return true if all three swerve controllers have reached their position goals (x pos, y pos, angle) */
     public boolean atPositionGoals() {
-        return xController.atGoal() && yController.atGoal() && angleController.atGoal();
+        return xController.atSetpoint() && yController.atSetpoint() && atAngleGoal();
     }
 
-    /**
-     * Sets the position goals of the swerve drive.
-     *
-     * @param pose The position goal
-     */
-    public void setPositionGoal(Pose2d pose) {
-        xController.setGoal(pose.getX());
-        yController.setGoal(pose.getY());
-        angleController.setGoal(pose.getRotation().getDegrees());
+    /** Sets the position goals of the swerve drive. */
+    public void setPositionGoal(Pose2d pose2d) {
+        xController.setSetpoint(pose2d.getX());
+        yController.setSetpoint(pose2d.getY());
+        angleController.setGoal(pose2d.getRotation().getDegrees());
     }
 
-    /** @return the value from the x position controller with a custom input measurement */
-    public double calculateXController(double measurement) {return xController.calculate(measurement);}
-    /** @return the value from the y position controller with a custom input measurement */
-    public double calculateYController(double measurement) {return yController.calculate(measurement);}
-    /** @return the value from the snap controller with a custom input measurement */
-    public double calculateSnapController(double measurement) {return angleController.calculate(measurement);}
-
-    /**
-     * Sets the goal of the snap controller to a specified target.
-     *
-     * @param goal the goal to set in degrees
-     */
-    public void setSnapGoal(double goal) {angleController.setGoal(goal);}
-
-    /** Calculate the rotational speed from the pid controller, unless it's already at the goal */
-    public double calculateSnapSpeed() {
-        return angleController.atGoal()
-               ? 0
-               : angleController.calculate(getYaw());
+    /** Sets the goal of the angle controller to a specified target in degrees. */
+    public void setAngleGoal(double goal) {
+        SmartDashboard.putNumber("Angle Goal", goal);
+        angleController.setGoal(goal);
     }
-    /** @return true if the snap controller is at its goal */
-    public boolean atSnapGoal() {return angleController.atGoal();}
+
+    /** Calculate the rotational speed from the pid controller */
+    public double calculateRotationalSpeed() {
+        return -angleController.calculate(getYaw());
+    }
+
+    /** @return true if the angle controller is at its goal */
+    public boolean atAngleGoal() {return Math.abs(angleController.getPositionError()) < angleController.getPositionTolerance();}
 
     /** Sets the swerve drive to move towards the values specified by the position controllers. */
     public void driveToPositionGoals() {
-        // TODO Figure out why x/y between PID controller and odometry pose are reversed
-        double xAdjustment = xController.calculate(getPose().getY());
-        double yAdjustment = -yController.calculate(getPose().getX());
-        double angleAdjustment = angleController.calculate(getYaw());
-        drive(xAdjustment, yAdjustment, angleAdjustment, true);
+        double xAdjustment = xController.calculate(getPose().getX());
+        double yAdjustment = yController.calculate(getPose().getY());
+        double angleAdjustment = -angleController.calculate(getYaw());
+        drive(xAdjustment, yAdjustment, angleAdjustment * Robot.rotationFlip, true);
     }
 
     /**
      * Sets the swerve drive to desired speed of direction and rotation.
      *
-     * @param vx x velocity
-     * @param vy y velocity
+     * @param vx               x velocity
+     * @param vy               y velocity
      * @param degreesPerSecond rotational speed in degrees per second
-     * @param fieldOriented true if the robot is driving in field oriented mode, false if robot oriented
+     * @param fieldOriented    true if the robot is driving in field oriented mode, false if robot oriented
      */
     public void drive(double vx, double vy, double degreesPerSecond, boolean fieldOriented) {
         ChassisSpeeds speeds = fieldOriented
-                               ? ChassisSpeeds.fromFieldRelativeSpeeds(vx, vy, Math.toRadians(degreesPerSecond), Rotation2d.fromDegrees(getYaw()))
+                               ? ChassisSpeeds.fromFieldRelativeSpeeds(vx, vy, Math.toRadians(degreesPerSecond), getYaw())
                                : new ChassisSpeeds(vx, vy, Math.toRadians(degreesPerSecond));
 
         drive(speeds, new Translation2d());
     }
 
-    public void stop() {
-        drive(0, 0, 0, false);
-    }
+    public void stop() {drive(0, 0, 0, false);}
 
     /**
      * Sets the swerve drive to desired speed of direction and rotation, with the option to use a custom center of rotation.
@@ -175,14 +176,7 @@ public class Drivetrain extends SubsystemBase {
      * @param rotation      a {@link Translation2d} representing the distance from the center of the robot to the desired center of rotation
      */
     public void drive(ChassisSpeeds chassisSpeeds, Translation2d rotation) {
-        // Use the kinematics to set the desired speed and angle for each swerve module using the input velocities for direction and rotation
         setModuleStates(kinematics.toSwerveModuleStates(chassisSpeeds, rotation), false);
-    }
-
-    public void matchEncoders() {
-        for (SwerveModule swerveModule : swerveModules) {
-            swerveModule.matchEncoders();
-        }
     }
 
     /**
@@ -194,10 +188,11 @@ public class Drivetrain extends SubsystemBase {
     public void setModuleStates(SwerveModuleState[] moduleStates, boolean force) {
         SwerveDriveKinematics.desaturateWheelSpeeds(moduleStates, MAX_VELOCITY_METERS_PER_SECOND);
 
-        // Set the motors of the swerve module to the calculated state
         for (int i = 0; i < swerveModules.length; i++) {
             swerveModules[i].setState(moduleStates[i], force);
         }
+
+        currentSpeeds = ChassisSpeeds.toFieldRelativeSpeeds(kinematics.toChassisSpeeds(moduleStates), Rotation2d.fromDegrees(getYaw()));
     }
 
     /** @return an array of {@link edu.wpi.first.math.kinematics.SwerveModulePosition module positions} representing each of the modules */
@@ -211,11 +206,11 @@ public class Drivetrain extends SubsystemBase {
 
     /** @return The current yaw angle in degrees (-180 to 180) */
     public double getYaw() {
-        return gyro.getAngle();
+        return gyro.getYaw();
     }
 
-    public void resetAngleController() {
-        angleController.reset(getYaw());
+    public boolean isInRegion(Region region) {
+        return region.contains(Point.fromPose2d(getPose()));
     }
 
 

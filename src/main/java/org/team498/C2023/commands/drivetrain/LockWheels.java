@@ -6,7 +6,8 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import org.team498.C2023.subsystems.Drivetrain;
 
 public class LockWheels extends CommandBase {
-    private final Drivetrain drivetrain;
+    private final Drivetrain drivetrain = Drivetrain.getInstance();
+
     private final SwerveModuleState[] lockedStates = new SwerveModuleState[] {
             // Front left
             new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
@@ -18,7 +19,6 @@ public class LockWheels extends CommandBase {
             new SwerveModuleState(0, Rotation2d.fromDegrees(45))};
 
     public LockWheels() {
-        this.drivetrain = Drivetrain.getInstance();
         addRequirements(this.drivetrain);
     }
 

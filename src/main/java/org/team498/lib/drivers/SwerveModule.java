@@ -67,7 +67,9 @@ public class SwerveModule extends SubsystemBase {
         driveMotor.set(ControlMode.Velocity, velocity);
 
 
-        double angle = (Math.abs(velocity) <= MAX_VELOCITY_METERS_PER_SECOND * 0.01) && !forcedAngle ? lastAngle : currentAngleTarget;
+        double angle = (Math.abs(velocity) <= MAX_VELOCITY_METERS_PER_SECOND * 0.01) && !forcedAngle
+                       ? lastAngle
+                       : currentAngleTarget;
         steerMotor.set(ControlMode.Position, Falcon500Conversions.degreesToFalcon(angle - angleOffset, MK4I_STEER_REDUCTION_L2));
 
         lastAngle = getState().angle.getDegrees();
@@ -93,7 +95,7 @@ public class SwerveModule extends SubsystemBase {
     }
 
     private double getPositionMeters() {
-        return Falcon500Conversions.falconToDegrees(driveMotor.getSelectedSensorPosition(), (MK4I_DRIVE_REDUCTION_L2 / 360) * Units.inchesToMeters(DRIVE_WHEEL_CIRCUMFERENCE));
+        return Falcon500Conversions.falconToDegrees(driveMotor.getSelectedSensorPosition(), MK4I_DRIVE_REDUCTION_L2) / 360 * Units.inchesToMeters(DRIVE_WHEEL_CIRCUMFERENCE);
     }
 
     // Custom optimize method by team 364
@@ -176,7 +178,6 @@ public class SwerveModule extends SubsystemBase {
         motor.config_kD(0, 0.1);
 
         motor.setInverted(true);
-
     }
 
     private void configCANCoder(CANCoder CANCoder) {

@@ -2,22 +2,24 @@ package org.team498.C2023.commands.drivetrain;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+
 import org.team498.C2023.subsystems.Drivetrain;
 
-public class DriveToPosition extends CommandBase {
-    private final Drivetrain drivetrain;
-    private final Pose2d pose;
+import java.util.function.Supplier;
 
-    public DriveToPosition(Pose2d pose) {
-        this.drivetrain = Drivetrain.getInstance();
-        this.pose = pose;
+public class DriveToPosition extends CommandBase {
+    private final Drivetrain drivetrain = Drivetrain.getInstance();
+    private final Supplier<Pose2d> target;
+
+    public DriveToPosition(Supplier<Pose2d> target) {
+        this.target = target;
 
         addRequirements(drivetrain);
     }
 
     @Override
     public void initialize() {
-        drivetrain.setPositionGoal(pose);
+        drivetrain.setPositionGoal(target.get());
     }
 
     @Override

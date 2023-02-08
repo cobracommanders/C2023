@@ -1,21 +1,23 @@
 package org.team498.lib.drivers;
 
-import edu.wpi.first.wpilibj.ADIS16448_IMU;
+import com.ctre.phoenix.sensors.Pigeon2;
+import edu.wpi.first.wpilibj.RobotBase;
 import org.team498.lib.util.RotationUtil;
 
-public class Gyro extends ADIS16448_IMU {
+import static org.team498.C2023.Ports.Drivetrain.GYRO;
+
+public class Gyro extends Pigeon2 {
     private double angleOffset = 0;
+    private double simAngle = 0;
 
     /** @return yaw angle in degrees (CCW positive), ranging from -180 to 180 degrees */
     @Override
-    public synchronized double getAngle() {
-        return -RotationUtil.toSignedDegrees(super.getAngle() + angleOffset);
+    public synchronized double getYaw() {
+        return RobotBase.isReal()
+               ? RotationUtil.toSignedDegrees(super.getYaw() + angleOffset)
+               : -RotationUtil.toSignedDegrees(simAngle + angleOffset);
     }
 
-    /** @return raw angle unaffected by the offset */
-    public double getRawAngle() {
-        return -RotationUtil.toSignedDegrees(super.getAngle());
-    }
 
     /** @return the rotation offset of the gyro */
     public double getAngleOffset() {
@@ -28,17 +30,22 @@ public class Gyro extends ADIS16448_IMU {
      * @param angleOffset the offset in degrees
      */
     public void setAngleOffset(double angleOffset) {
-        this.angleOffset = -angleOffset;
+        this.angleOffset = angleOffset;
     }
 
+    public void setSimAngle(double angle) {
+        simAngle = angle - angleOffset;
+    }
 
-    private Gyro() {}
+    private Gyro(int CANId) {
+        super(CANId);
+    }
 
     private static Gyro instance;
 
     public static Gyro getInstance() {
         if (instance == null) {
-            instance = new Gyro();
+            instance = new Gyro(GYRO);
         }
         return instance;
     }
