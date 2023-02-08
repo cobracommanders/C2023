@@ -31,13 +31,13 @@ public class TargetDrive extends CommandBase {
         double yTranslation = yTranslationSupplier.getAsDouble() * MAX_VELOCITY_METERS_PER_SECOND;
 
         // Set the target of the PID controller
-        drivetrain.setSnapGoal(calculateDegreesToTarget(target));
+        drivetrain.setAngleGoal(calculateDegreesToTarget(target));
 
         // Calculate the rotational speed from the pid controller, unless it's already at the goal
-        double rotationalSpeed = drivetrain.calculateSnapSpeed();
+        double rotationalSpeed = drivetrain.calculateRotationalSpeed();
 
         // Set the robot to drive in field relative mode, with the rotation controlled by the snap controller
-        drivetrain.drive(xTranslation, yTranslation, rotationalSpeed * Robot.rotationDirection, true);
+        drivetrain.drive(xTranslation, yTranslation, rotationalSpeed * Robot.rotationFlip, true);
     }
 
     public double calculateDegreesToTarget(Pose2d target) {

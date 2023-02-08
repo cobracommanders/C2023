@@ -12,11 +12,9 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import org.team498.C2023.FieldPositions;
 import org.team498.C2023.Robot;
 import org.team498.lib.drivers.Gyro;
 import org.team498.lib.drivers.SwerveModule;
@@ -24,16 +22,13 @@ import org.team498.lib.field.Point;
 import org.team498.lib.field.Region;
 import org.team498.lib.wpilib.ChassisSpeeds;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import static org.team498.C2023.Constants.DrivetrainConstants.*;
 import static org.team498.C2023.Ports.Drivetrain.*;
 
 public class Drivetrain extends SubsystemBase {
     // Profiled controller for the rotation of the robot
     // TODO see if the profiled controller here causes the robot to turn on startup
-    private final ProfiledPIDController angleController = new ProfiledPIDController(SnapConstants.P, SnapConstants.I, SnapConstants.D, SnapConstants.CONTROLLER_CONSTRAINTS);
+    private final ProfiledPIDController angleController = new ProfiledPIDController(AngleConstants.P, AngleConstants.I, AngleConstants.D, AngleConstants.CONTROLLER_CONSTRAINTS);
     // Profiled controller for the x position of the robot
     private final PIDController xController = new PIDController(PoseConstants.P, PoseConstants.I, PoseConstants.D);
     // Profiled controller for the y position of the robot
@@ -68,7 +63,7 @@ public class Drivetrain extends SubsystemBase {
         swerveModules = new SwerveModule[] {FL_Module, FR_Module, BL_Module, BR_Module};
 
         angleController.enableContinuousInput(-180, 180);
-        angleController.setTolerance(SnapConstants.EPSILON);
+        angleController.setTolerance(AngleConstants.EPSILON);
         xController.setTolerance(PoseConstants.EPSILON);
         yController.setTolerance(PoseConstants.EPSILON);
 
@@ -84,7 +79,7 @@ public class Drivetrain extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (Robot.isReal()) odometry.update(Rotation2d.fromDegrees(-getYaw()), getModulePositions());
+        if (Robot.isReal()) odometry.update(Rotation2d.fromDegrees(getYaw()), getModulePositions());
 
         if (RobotState.isDisabled()) {
             for (SwerveModule swerveModule : swerveModules) {
@@ -94,7 +89,7 @@ public class Drivetrain extends SubsystemBase {
 
         SmartDashboard.putData(this);
         SmartDashboard.putNumber("Gyro", getYaw());
-        SmartDashboard.putNumber("Snap Setpoint", angleController.getGoal().position);
+        SmartDashboard.putNumber("Angle Setpoint", angleController.getGoal().position);
 
         Robot.field.setRobotPose(getPose());
     }
@@ -124,7 +119,7 @@ public class Drivetrain extends SubsystemBase {
 
     /** @return true if all three swerve controllers have reached their position goals (x pos, y pos, angle) */
     public boolean atPositionGoals() {
-        return xController.atSetpoint() && yController.atSetpoint() && angleController.atGoal();
+        return xController.atSetpoint() && yController.atSetpoint() && atAngleGoal();
     }
 
     /** Sets the position goals of the swerve drive. */
@@ -134,28 +129,26 @@ public class Drivetrain extends SubsystemBase {
         angleController.setGoal(pose2d.getRotation().getDegrees());
     }
 
-    /** Sets the goal of the snap controller to a specified target in degrees. */
-    public void setSnapGoal(double goal) {
-        SmartDashboard.putNumber("Snap Goal", goal);
+    /** Sets the goal of the angle controller to a specified target in degrees. */
+    public void setAngleGoal(double goal) {
+        SmartDashboard.putNumber("Angle Goal", goal);
         angleController.setGoal(goal);
     }
 
-    /** Calculate the rotational speed from the pid controller, unless it's already at the goal. */
-    public double calculateSnapSpeed() {
-        return angleController.atGoal()
-               ? 0
-               : -angleController.calculate(getYaw());
+    /** Calculate the rotational speed from the pid controller */
+    public double calculateRotationalSpeed() {
+        return -angleController.calculate(getYaw());
     }
 
-    /** @return true if the snap controller is at its goal */
-    public boolean atSnapGoal() {return angleController.atGoal();}
+    /** @return true if the angle controller is at its goal */
+    public boolean atAngleGoal() {return Math.abs(angleController.getPositionError()) < angleController.getPositionTolerance();}
 
     /** Sets the swerve drive to move towards the values specified by the position controllers. */
     public void driveToPositionGoals() {
         double xAdjustment = xController.calculate(getPose().getX());
         double yAdjustment = yController.calculate(getPose().getY());
         double angleAdjustment = -angleController.calculate(getYaw());
-        drive(xAdjustment, yAdjustment, angleAdjustment, true);
+        drive(xAdjustment, yAdjustment, angleAdjustment * Robot.rotationFlip, true);
     }
 
     /**
@@ -216,16 +209,9 @@ public class Drivetrain extends SubsystemBase {
         return gyro.getYaw();
     }
 
-    //TODO: See if this actually does anything helpful
-    public void resetAngleController() {
-        angleController.reset(getYaw());
-    }
-
     public boolean isInRegion(Region region) {
         return region.contains(Point.fromPose2d(getPose()));
     }
-
-
 
 
     private static Drivetrain instance;

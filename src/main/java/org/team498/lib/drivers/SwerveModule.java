@@ -178,7 +178,6 @@ public class SwerveModule extends SubsystemBase {
         motor.config_kD(0, 0.1);
 
         motor.setInverted(true);
-
     }
 
     private void configCANCoder(CANCoder CANCoder) {

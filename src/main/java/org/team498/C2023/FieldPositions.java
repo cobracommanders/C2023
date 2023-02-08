@@ -32,7 +32,10 @@ public class FieldPositions {
 
     public static final Region redCommunity = new Region(flip(new Rectangle(1.37, height - 3.98, 1.985, 1.475)), flip(new Rectangle(1.37, 0, 3.54, 4.0337)));
 
-    public static final Point[] stagingMarkers = new Point[] {new Point(7.0775, height - 7.085), new Point(7.0775, height - 5.862), new Point(7.0775, height - 4.6396), new Point(7.0775, height - 3.4219), flip(new Point(7.0775, height - 7.085)), flip(new Point(7.0775, height - 5.862)), flip(new Point(7.0775, height - 4.6396)), flip(new Point(7.0775, height - 3.4219)),};
+    public static final Point[] stagingMarkers = new Point[] {new Point(7.0775, height - 7.085), new Point(7.0775, height - 5.862), new Point(7.0775, height - 4.6396), new Point(7.0775, height - 3.4219), flip(new Point(7.0775, height - 7.085)), flip(new Point(7.0775,
+                                                                                                                                                                                                                                                                    height - 5.862)), flip(new Point(7.0775,
+                                                                                                                                                                                                                                                                                                     height - 4.6396)), flip(
+            new Point(7.0775, height - 3.4219)),};
 
     public static class Grid {
         // {topConeNodeL, topCubeNode, topConeNodeR},

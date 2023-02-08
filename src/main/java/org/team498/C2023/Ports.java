@@ -1,7 +1,6 @@
 package org.team498.C2023;
 
 public final class Ports {
-    public static final int PENUMATIC_HUB = 4;
 
     public static class Drivetrain {
         public static final int FL_DRIVE_ID = 3;
@@ -18,6 +17,8 @@ public final class Ports {
         public static final int FR_CANCODER_ID = 13;
         public static final int BL_CANCODER_ID = 11;
         public static final int BR_CANCODER_ID = 14;
+
+        public static final int GYRO = 20;
     }
 
     public static class Elevator {
@@ -26,22 +27,17 @@ public final class Ports {
         public static final int ELEVATOR_LIMIT = 0;
     }
 
-    public static class Outtake {
-        public static final int OUTTAKE_TOP = 33;
+    public static class Manipulator {
+        public static final int ROLLERS = 33;
         public static final int OUTTAKE_BOTTOM = 34;
-        public static final int SOLENOID_FORWARDS = 1;
-        public static final int SOLENOID_REVERSE = 2;
+        public static final int WRIST = 35;
         public static final int BEAM_BREAK = 3;
     }
 
     public static class Intake {
-        public static final int ROLLERS = 20;
-        public static final int L_WRIST = 36;
-        public static final int R_WRIST = 37;
-    }
-
-    public static class Prototype {
-        public static final int PROTOTYPE = 30;
+        public static final int ROLLERS = 40;
+        public static final int L_WRIST = 41;
+        public static final int R_WRIST = 42;
     }
 
 }

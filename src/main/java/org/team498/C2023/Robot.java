@@ -1,11 +1,5 @@
 package org.team498.C2023;
 
-import org.team498.C2023.RobotState.GamePiece;
-import org.team498.C2023.subsystems.Drivetrain;
-import org.team498.C2023.subsystems.Outtake;
-import org.team498.C2023.subsystems.Vision;
-import org.team498.lib.drivers.Gyro;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -15,11 +9,18 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import org.team498.C2023.subsystems.Drivetrain;
+import org.team498.C2023.subsystems.Manipulator;
+import org.team498.C2023.subsystems.Vision;
+import org.team498.lib.drivers.Gyro;
 
 public class Robot extends TimedRobot {
-    public static int rotationDirection;
+    public static int rotationFlip = -1;
+    public static int coordinateFlip = 1;
+    public static int rotationOffset = 0;
+
     public static Field2d field = new Field2d();
-    public static Alliance alliance = Alliance.Blue;
+    public static Alliance alliance = Alliance.Invalid;
     public static RobotContainer robotContainer = new RobotContainer();
 
     private final Vision vision = Vision.getInstance();
@@ -29,9 +30,9 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         if (isReal()) {
-            rotationDirection = -1;
+            rotationFlip = -1;
         } else {
-            rotationDirection = 1;
+            rotationFlip = 1;
         }
         drivetrain.setPose(new Pose2d(8.29, 4, Rotation2d.fromDegrees(0)));
         robotContainer.driver.setRightStickLastAngle(-gyro.getAngleOffset());
@@ -51,9 +52,8 @@ public class Robot extends TimedRobot {
         vision.getRobotPose().ifPresent(drivetrain::setPose);
 
         if (RobotPositions.inCommunity()) {
-            if (RobotState.getInstance().getCurrentGamePiece() == GamePiece.CONE) {
-                field.getObject("Scoring Targets").setPoses(RobotPositions.getRightPosition(),
-                        RobotPositions.getLeftPosition());
+            if (RobotState.getInstance().hasCone()) {
+                field.getObject("Scoring Targets").setPoses(RobotPositions.getRightPosition(), RobotPositions.getLeftPosition());
             } else {
                 field.getObject("Scoring Targets").setPose(RobotPositions.getCenterPosition());
             }
@@ -61,15 +61,34 @@ public class Robot extends TimedRobot {
             field.getObject("Scoring Targets").setPose(new Pose2d(-1, -1, new Rotation2d()));
         }
 
-        SmartDashboard.putString("Current Game Piece", RobotState.getInstance().getCurrentGamePiece().name());
         SmartDashboard.putBoolean("In Community", RobotPositions.inCommunity());
 
-        SmartDashboard.putBoolean("Bottom Stalling", Outtake.getInstance().isBottomStalling());
-    }
+        SmartDashboard.putBoolean("Manipulator Stalling", Manipulator.getInstance().isStalling());
 
+        //TODO: Check if alliance is actually invalid when the FMS is not connected
+        if (alliance == Alliance.Invalid) {
+            alliance = DriverStation.getAlliance();
+            // This reverses the coordinates/direction of the drive commands on the red alliance
+            coordinateFlip = alliance == Alliance.Blue
+                             ? 1
+                             : -1;
+            // Add 180 degrees to all teleop rotation setpoints while on the red alliance
+            rotationOffset = alliance == Alliance.Blue
+                             ? 0
+                             : 180;
+        }
+    }
     @Override
     public void disabledPeriodic() {
         alliance = DriverStation.getAlliance();
+        // This reverses the coordinates/direction of the drive commands on the red alliance
+        coordinateFlip = alliance == Alliance.Blue
+                         ? 1
+                         : -1;
+        // Add 180 degrees to all teleop rotation setpoints while on the red alliance
+        rotationOffset = alliance == Alliance.Blue
+                         ? 0
+                         : 180;
     }
 
     @Override

@@ -35,8 +35,7 @@ public class Vision extends SubsystemBase {
 
     private Pose2d getPose() {
         Transform3d pose = pipelineResult.getBestTarget().getBestCameraToTarget();
-        double y = -pose.getX() / Math.tan(Math.PI / 2 - pose.getRotation().getZ());
-        return new Pose2d(pose.getX(), y, new Rotation2d(-pose.getRotation().toRotation2d().getRadians()));
+        return new Pose2d(pose.getX(), pose.getY(), new Rotation2d(-pose.getRotation().toRotation2d().getRadians()));
     }
 
     public int getTargetedTag() {
@@ -47,7 +46,7 @@ public class Vision extends SubsystemBase {
     public Optional<Pose2d> getRobotPose() {
         int tag = getTargetedTag();
 
-        if (tag != -1 && tag <= 8) {            
+        if (tag != -1 && tag <= 8) {
             Pose2d pose = new Pose2d(FieldPositions.aprilTags.get(tag).getX(), FieldPositions.aprilTags.get(tag).getY(), new Rotation2d());
 
             if (tag > 4) {

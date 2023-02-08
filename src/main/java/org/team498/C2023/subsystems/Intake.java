@@ -1,7 +1,5 @@
 package org.team498.C2023.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -16,7 +14,7 @@ import static org.team498.C2023.Constants.IntakeConstants.*;
 import static org.team498.C2023.Ports.Intake.*;
 
 public class Intake extends SubsystemBase {
-    private final TalonFX rollers;
+    private final CANSparkMax rollers;
     private final CANSparkMax leftWrist;
     private final CANSparkMax rightWrist;
 
@@ -43,7 +41,7 @@ public class Intake extends SubsystemBase {
     }
 
     private Intake() {
-        rollers = new TalonFX(ROLLERS);
+        rollers = new CANSparkMax(ROLLERS, MotorType.kBrushless);
 
         leftWrist = new CANSparkMax(L_WRIST, MotorType.kBrushless);
         rightWrist = new CANSparkMax(R_WRIST, MotorType.kBrushless);
@@ -64,7 +62,7 @@ public class Intake extends SubsystemBase {
     }
 
     private InstantCommand setRollers(double speed) {
-        return new InstantCommand(() -> rollers.set(ControlMode.PercentOutput, speed));
+        return new InstantCommand(() -> rollers.set(speed));
     }
 
     private InstantCommand setPosition(Position position) {

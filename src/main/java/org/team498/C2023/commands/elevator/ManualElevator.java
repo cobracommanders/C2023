@@ -1,10 +1,10 @@
 package org.team498.C2023.commands.elevator;
 
-import java.util.function.DoubleSupplier;
-
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import org.team498.C2023.subsystems.Elevator;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import java.util.function.DoubleSupplier;
 
 public class ManualElevator extends CommandBase {
     private final Elevator elevator = Elevator.getInstance();
@@ -23,6 +23,7 @@ public class ManualElevator extends CommandBase {
     @Override
     public void execute() {
         elevator.setSpeed(speedSupplier.getAsDouble());
+        SmartDashboard.putNumber("Elevator Power", speedSupplier.getAsDouble());
     }
 
     @Override

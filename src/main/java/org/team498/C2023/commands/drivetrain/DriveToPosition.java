@@ -1,12 +1,11 @@
 package org.team498.C2023.commands.drivetrain;
 
-import java.util.function.Supplier;
-
-import org.team498.C2023.Robot;
-import org.team498.C2023.subsystems.Drivetrain;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+
+import org.team498.C2023.subsystems.Drivetrain;
+
+import java.util.function.Supplier;
 
 public class DriveToPosition extends CommandBase {
     private final Drivetrain drivetrain = Drivetrain.getInstance();

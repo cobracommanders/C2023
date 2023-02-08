@@ -4,6 +4,8 @@ import com.ctre.phoenix.sensors.Pigeon2;
 import edu.wpi.first.wpilibj.RobotBase;
 import org.team498.lib.util.RotationUtil;
 
+import static org.team498.C2023.Ports.Drivetrain.GYRO;
+
 public class Gyro extends Pigeon2 {
     private double angleOffset = 0;
     private double simAngle = 0;
@@ -43,7 +45,7 @@ public class Gyro extends Pigeon2 {
 
     public static Gyro getInstance() {
         if (instance == null) {
-            instance = new Gyro(20);
+            instance = new Gyro(GYRO);
         }
         return instance;
     }

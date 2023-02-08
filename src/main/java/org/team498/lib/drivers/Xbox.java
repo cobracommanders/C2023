@@ -136,7 +136,7 @@ public class Xbox {
      * @return the value of the axis
      */
     public double getAxis(Axis axis) {
-        double rawAxis = DriverStation.getStickAxis(port, axis.value);
+        double rawAxis = getRawAxis(axis);
         return Math.abs(rawAxis) > deadzone
                ? rawAxis
                : 0;
@@ -154,6 +154,29 @@ public class Xbox {
     /** @return the controller's right Y axis */
     public double rightY() {return getAxis(Axis.RightY);}
 
+    /**
+     * Get the current value of an axis, squared to increase control.
+     *
+     * @param axis the axis to read
+     * @return the value of the axis squared
+     */
+    public double getAxisSquared(Axis axis) {
+        double currentValue = getAxis(axis);
+        return Math.copySign(currentValue * currentValue, currentValue);
+    }
+
+    /** @return the controller's left X axis squared */
+    public double leftXSquared() {return -getAxisSquared(Axis.LeftX);}
+
+    /** @return the controller's left Y axis squared */
+    public double leftYSquared() {return -getAxisSquared(Axis.LeftY);}
+
+    /** @return the controller's right X axis squared */
+    public double rightXSquared() {return getAxisSquared(Axis.RightX);}
+
+    /** @return the controller's right Y axis squared */
+    public double rightYSquared() {return getAxisSquared(Axis.RightY);}
+
 
     public void setRightStickLastAngle(double lastAngle) {lastAngleRight = lastAngle;}
     private double lastAngleRight = 0;
@@ -170,6 +193,8 @@ public class Xbox {
 
         double result = Math.toDegrees(Math.atan2(-x, -y));
 
+        //TODO: Check if this actually is needed
+        
         if (result < 0) {
             result += 360;
         }

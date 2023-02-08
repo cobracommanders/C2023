@@ -2,17 +2,17 @@ package org.team498.C2023;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-
 import org.team498.C2023.Constants.OIConstants;
 import org.team498.C2023.RobotState.GamePiece;
 import org.team498.C2023.commands.drivetrain.*;
-import org.team498.C2023.commands.elevator.ManualElevator;
-import org.team498.C2023.commands.outtake.CollectCone;
-import org.team498.C2023.commands.prototype.PrototypeTest;
+import org.team498.C2023.commands.robot.ScoreGamePiece;
 import org.team498.C2023.commands.robot.AlignAndScore;
-import org.team498.C2023.subsystems.*;
-import org.team498.C2023.subsystems.Outtake.State;
+import org.team498.C2023.subsystems.Drivetrain;
+import org.team498.C2023.subsystems.Elevator;
+import org.team498.C2023.subsystems.Intake;
+import org.team498.C2023.subsystems.Manipulator;
 import org.team498.lib.drivers.Gyro;
 import org.team498.lib.drivers.Xbox;
 
@@ -22,14 +22,15 @@ public class RobotContainer {
 
     private final Drivetrain drivetrain = Drivetrain.getInstance();
     private final Elevator elevator = Elevator.getInstance();
-    private final Outtake outtake = Outtake.getInstance();
+    private final Manipulator manipulator = Manipulator.getInstance();
     private final Intake intake = Intake.getInstance();
-    private final Prototype prototype = Prototype.getInstance();
     private final RobotState robotState = RobotState.getInstance();
 
     public RobotContainer() {
         driver.setDeadzone(0.2);
         driver.setTriggerThreshold(0.2);
+        operator.setDeadzone(0.2);
+        operator.setTriggerThreshold(0.2);
 
         configureDefaultCommands();
         configureDriverCommands();
@@ -37,61 +38,43 @@ public class RobotContainer {
     }
 
     private void configureDefaultCommands() {
-        //drivetrain.setDefaultCommand(new OffenseDrive(driver::leftY, driver::leftX, driver::rightAngle));
-        prototype.setDefaultCommand(new PrototypeTest(operator::leftX));
+
+        drivetrain.setDefaultCommand(new DefenseDrive(driver::leftYSquared, driver::leftXSquared, driver::rightX, driver.rightBumper()));
         // elevator.setDefaultCommand(new ManualElevator(operator::rightX));
     }
 
     private void configureDriverCommands() {
-        driver.back().onTrue(new InstantCommand(() -> {
-                if (robotState.getCurrentGamePiece() == GamePiece.CONE) {
-                    robotState.setCurrentGamePiece(GamePiece.CUBE);
-                } else {
-                    robotState.setCurrentGamePiece(GamePiece.CONE);
-                }
-            }));
-    
         driver.start().onTrue(new PathPlannerFollower(PathLib.pathPlannerTrajectory));
 
-        driver.POVMinus90().and(RobotPositions::inCommunity).and(() -> RobotState.getInstance().getCurrentGamePiece() == GamePiece.CONE).onTrue(new AlignAndScore(RobotPositions::getLeftPosition).until(driver::isStickActive));
-        driver.POV90().and(RobotPositions::inCommunity).and(() -> RobotState.getInstance().getCurrentGamePiece() == GamePiece.CONE).onTrue(new AlignAndScore(RobotPositions::getRightPosition).until(driver::isStickActive));
+        driver.POVMinus90().and(RobotPositions::inCommunity).and(() -> RobotState.getInstance().hasCone()).onTrue(new AlignAndScore(RobotPositions::getLeftPosition).until(driver::isStickActive));
+        driver.POV90().and(RobotPositions::inCommunity).and(() -> RobotState.getInstance().hasCone()).onTrue(new AlignAndScore(RobotPositions::getRightPosition).until(driver::isStickActive));
 
-        driver.POV90().and(RobotPositions::inCommunity).and(() -> RobotState.getInstance().getCurrentGamePiece() == GamePiece.CUBE).onTrue(new AlignAndScore(RobotPositions::getCenterPosition).until(driver::isStickActive));
-        driver.POVMinus90().and(RobotPositions::inCommunity).and(() -> RobotState.getInstance().getCurrentGamePiece() == GamePiece.CUBE).onTrue(new AlignAndScore(RobotPositions::getCenterPosition).until(driver::isStickActive));
+        driver.POV90().or(driver.POVMinus90()).and(RobotPositions::inCommunity).and(() -> RobotState.getInstance().hasCube()).onTrue(new AlignAndScore(RobotPositions::getCenterPosition).until(driver::isStickActive));
 
-        driver.rightTrigger().onTrue(intake.setIntakeMode(Intake.State.INTAKE)).onFalse(intake.setIntakeMode(Intake.State.IDLE));
+        // Raise elevator and score
+        driver.leftTrigger().onTrue(new ScoreGamePiece());
 
-        driver.rightTrigger().onTrue(intake.setIntakeMode(Intake.State.OUTTAKE)).onFalse(intake.setIntakeMode(Intake.State.IDLE));
-
-        driver.rightBumper().and(RobotPositions::inCommunity).onTrue(outtake.setOuttake(State.SHOOT_CONE)).onFalse(outtake.setOuttake(State.IDLE));
-        driver.leftBumper().and(RobotPositions::inCommunity).onTrue(outtake.setOuttake(State.SHOOT_CUBE)).onFalse(outtake.setOuttake(State.IDLE));
+        // Intake a cone
+        driver.leftBumper().onTrue(manipulator.intake()).onFalse(manipulator.stop());
 
         driver.A().onTrue(new InstantCommand(() -> Gyro.getInstance().setYaw(0)));
-        driver.B().toggleOnTrue(new TargetDrive(driver::leftY, driver::leftX, new Pose2d(6, 4, new Rotation2d())));
-        driver.X().toggleOnTrue(new DefenseDrive(driver::leftY, driver::leftX, driver::rightX));
-        driver.Y().toggleOnTrue(new CameraDrive(driver::leftY, driver::leftX, driver::rightX));
+        driver.B().toggleOnTrue(new TargetDrive(driver::leftYSquared, driver::leftXSquared, new Pose2d(6, 4, new Rotation2d())));
+        driver.X().toggleOnTrue(new OffenseDrive(driver::leftYSquared, driver::leftXSquared, driver::rightAngle, driver.rightBumper()));
+        driver.Y().toggleOnTrue(new CameraDrive(driver::leftYSquared, driver::leftXSquared, driver::rightXSquared));
     }
 
     private void configureOperatorCommands() {
-        // operator.Y().onTrue(elevator.setNextHeight(Elevator.Position.HIGH)).and(RobotPositions::inCommunity).onTrue(elevator.setPosition(Elevator.Position.HIGH));
-        // operator.X().onTrue(elevator.setNextHeight(Elevator.Position.MID)).and(RobotPositions::inCommunity).onTrue(elevator.setPosition(Elevator.Position.MID));
-        // operator.A().onTrue(elevator.setNextHeight(Elevator.Position.LOW)).and(RobotPositions::inCommunity).onTrue(elevator.setPosition(Elevator.Position.LOW));
-        // operator.B().onTrue(elevator.setNextHeight(Elevator.Position.FLOOR)).and(RobotPositions::inCommunity).onTrue(elevator.setPosition(Elevator.Position.FLOOR));
+        operator.Y().onTrue(elevator.setPosition(Elevator.Position.HIGH));
+        operator.X().onTrue(elevator.setPosition(Elevator.Position.MID));
+        operator.A().onTrue(elevator.setPosition(Elevator.Position.LOW));
+        operator.B().onTrue(elevator.setPosition(Elevator.Position.FLOOR));
 
-        // operator.Y().onTrue(elevator.setPosition(Elevator.Position.HIGH));
-        // operator.X().onTrue(elevator.setPosition(Elevator.Position.LOW));
+        // Reset the drivetrain pose to the field corner for driver practice
+        operator.start().onTrue(new InstantCommand(() -> drivetrain.setPose(new Pose2d(Units.inchesToMeters(70.5), Units.inchesToMeters(16.5), new Rotation2d()))));
 
-        // operator.X().onTrue(new InstantCommand(() -> outtake.setBottomRollers(1))).onFalse(new InstantCommand(() -> outtake.setBottomRollers(0))); // Intake cone
-        operator.X().onTrue(new CollectCone());
-        operator.Y().onTrue(new InstantCommand(() -> outtake.setBottomRollers(-0.75))).onFalse(new InstantCommand(() -> outtake.setBottomRollers(0))); // Shoot cone
-        operator.A().onTrue(new InstantCommand(() -> {outtake.setTopRollers(-0.45); outtake.setBottomRollers(0.45);})).onFalse(new InstantCommand(() -> outtake.stop())); // Shoot cube
-        operator.B().onTrue(new InstantCommand(() -> {outtake.setTopRollers(0.5); outtake.setBottomRollers(-0.5);})).onFalse(new InstantCommand(() -> outtake.stop())); // Intake cube
-
-
-        operator.start().onTrue(new InstantCommand(() -> robotState.setCurrentGamePiece(GamePiece.CONE)));
-        operator.back().onTrue(new InstantCommand(() -> robotState.setCurrentGamePiece(GamePiece.CUBE)));
-
-
+        // Left bumper sets the current game piece to a cone, right bumper sets it to a cube
+        operator.leftBumper().onTrue(new InstantCommand(() -> robotState.setCurrentGamePiece(GamePiece.CONE)));
+        operator.rightBumper().onTrue(new InstantCommand(() -> robotState.setCurrentGamePiece(GamePiece.CUBE)));
     }
 }
 

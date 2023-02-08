@@ -9,7 +9,7 @@ public final class Constants {
     }
 
     public static final class DrivetrainConstants {
-        public static final double MAX_VELOCITY_METERS_PER_SECOND = 2.5;
+        public static final double MAX_VELOCITY_METERS_PER_SECOND = 5;
 
         public static final double SWERVE_MODULE_DISTANCE_FROM_CENTER = 10.75;
 
@@ -26,7 +26,7 @@ public final class Constants {
 
         public static final double ROBOT_WIDTH = 26.5 + 6; // Robot width with bumpers, in inches
 
-        public static final class SnapConstants {
+        public static final class AngleConstants {
             public static final double P = 5;
             public static final double I = 0;
             public static final double D = 0;
@@ -34,7 +34,7 @@ public final class Constants {
 
 
             // Constraints for the profiled angle controller
-            public static final double MAX_ANGULAR_SPEED_DEGREES_PER_SECOND = 360;
+            public static final double MAX_ANGULAR_SPEED_DEGREES_PER_SECOND = 720;
             public static final double MAX_ANGULAR_SPEED_DEGREES_PER_SECOND_SQUARED = Math.pow(MAX_ANGULAR_SPEED_DEGREES_PER_SECOND, 2);
 
             public static final TrapezoidProfile.Constraints CONTROLLER_CONSTRAINTS = new TrapezoidProfile.Constraints(MAX_ANGULAR_SPEED_DEGREES_PER_SECOND, MAX_ANGULAR_SPEED_DEGREES_PER_SECOND_SQUARED);
@@ -47,20 +47,13 @@ public final class Constants {
             public static final double D = 0;
 
             public static final double EPSILON = 0.1;
-
-            // Constraints for the profiled angle controller
-            public static final double MAX_SPEED_PER_SECOND = 5;
-            public static final double MAX_SPEED_PER_SECOND_SQUARED = Math.pow(MAX_SPEED_PER_SECOND, 2);
-
-            public static final TrapezoidProfile.Constraints CONTROLLER_CONSTRAINTS = new TrapezoidProfile.Constraints(MAX_SPEED_PER_SECOND, MAX_SPEED_PER_SECOND_SQUARED);
         }
     }
 
     public static final class ElevatorConstants {
-        public static final double P = 0.04;
+        public static final double P = 0.075;
         public static final double I = 0;
         public static final double D = 0;
-        public static final double FF = 0;
     }
 
     public static final class IntakeConstants {
