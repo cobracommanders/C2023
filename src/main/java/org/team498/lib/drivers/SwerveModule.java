@@ -1,215 +1,191 @@
 package org.team498.lib.drivers;
 
-import static org.team498.C2023.Constants.DrivetrainConstants.kDriveWheelCircumference;
-import static org.team498.C2023.Constants.DrivetrainConstants.kDriveWheelDiameter;
-import static org.team498.C2023.Constants.DrivetrainConstants.kMK4IDriveReductionL2;
-import static org.team498.C2023.Constants.DrivetrainConstants.kMK4ISteerReductionL2;
-import static org.team498.C2023.Constants.DrivetrainConstants.kMaxVelocityMetersPerSecond;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
-
-import org.team498.lib.util.Falcon500Conversions;
-import org.team498.lib.util.Unit;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.team498.lib.util.Falcon500Conversions;
+
+import static org.team498.C2023.Constants.DrivetrainConstants.*;
 
 public class SwerveModule extends SubsystemBase {
-	// Motors
-	private final WPI_TalonFX driveMotor;
-	private final WPI_TalonFX steerMotor;
+    private final TalonFX driveMotor;
+    private final TalonFX steerMotor;
+    private final CANCoder encoder;
+    private final double angleOffset;
 
-	// CANCoder
-	private final CANCoder encoder;
+    private double lastAngle;
 
-	private final double angleOffset;
-	private TalonFXConfiguration driveMotorConfig = new TalonFXConfiguration();
-	private TalonFXConfiguration steerMotorConfig = new TalonFXConfiguration();
+    public SwerveModule(TalonFX driveMotor, TalonFX steerMotor, CANCoder CANCoder, double angleOffset) {
+        this.driveMotor = driveMotor;
+        this.steerMotor = steerMotor;
+        this.encoder = CANCoder;
+        configDriveMotor(driveMotor);
+        configSteerMotor(steerMotor);
+        configCANCoder(CANCoder);
 
-	private double lastAngle;
+        this.angleOffset = angleOffset;
+        this.lastAngle = getState().angle.getDegrees();
 
-	public SwerveModule(int driveMotorID, int steerMotorID, int CANCoderID, double angleOffset) {
-		// Creates the motors with the given CAN IDs
-		driveMotor = new WPI_TalonFX(driveMotorID);
-		steerMotor = new WPI_TalonFX(steerMotorID);
-
-		driveMotor.configFactoryDefault();
-		steerMotor.configFactoryDefault();
-
-		driveMotorConfig.supplyCurrLimit.currentLimit = 35;
-		driveMotorConfig.supplyCurrLimit.enable = true;
-		steerMotorConfig.supplyCurrLimit.currentLimit = 20;
-		steerMotorConfig.supplyCurrLimit.enable = true;
-
-		driveMotor.configAllSettings(driveMotorConfig);
-		steerMotor.configAllSettings(steerMotorConfig);
-
-		driveMotor.setNeutralMode(NeutralMode.Brake);
-		driveMotor.configOpenloopRamp(1);
-
-		steerMotor.setNeutralMode(NeutralMode.Brake);
-		steerMotor.configOpenloopRamp(1);
-
-		driveMotor.setSelectedSensorPosition(0);
-		steerMotor.setSelectedSensorPosition(0);
-
-		steerMotor.setSensorPhase(true);
-
-		driveMotor.config_kP(0, 0.025);
-		driveMotor.config_kI(0, 0.0);
-		driveMotor.config_kD(0, 0.5);
-
-		steerMotor.config_kP(0, 0.2);
-		steerMotor.config_kI(0, 0.0);
-		steerMotor.config_kD(0, 0.1);
-
-		// steerMotor.setSensorPhase(true);
-
-		// Create the CANCoder with the given ID
-		encoder = new CANCoder(CANCoderID);
-
-		// Set inversion of the motors
-		driveMotor.setInverted(true);
-		steerMotor.setInverted(true);
-
-		// Sets the encoder to boot to the absoulte position instead of 0
-		encoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
-
-		// Set the encoder to return values from 0 to 360 instead of -180 to +180
-		encoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
-
-		// Drive current limit: 35
-		// Steer current limit: 20
-		// driveMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true,
-		// 35, 40, .5));
-		// steerMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true,
-		// 20, 40, .5));
-
-		this.angleOffset = angleOffset;
-		this.lastAngle = getState().angle.getDegrees();
-
-		matchEncoders();
-	}
-
-	public void matchEncoders() {
-		steerMotor.setSelectedSensorPosition(Falcon500Conversions
-				.degreesToFalcon(encoder.getAbsolutePosition() - angleOffset, kMK4ISteerReductionL2));
-	}
-
-	// Return the position of the wheel based on the integrated motor encoder
-	public double getSteerEncoder() {
-		return Falcon500Conversions
-				.falconToDegrees(steerMotor.getSelectedSensorPosition(), kMK4ISteerReductionL2) + angleOffset;
-	}
-
-	public double currentSpeed = 0;
-	public double currentAngle = 0;
-
-	public boolean forcedAngle = false;
-
-	// Sets the motors of the swerve module to a provided state
-	public void setState(SwerveModuleState state, boolean force) {
-		this.forcedAngle = force;
-
-		SwerveModuleState newState = optimize(state, Rotation2d.fromDegrees(getSteerEncoder()));
-		this.currentSpeed = newState.speedMetersPerSecond;
-		this.currentAngle = newState.angle.getDegrees();
-	}
-	public double current;
-	@Override
-	public void periodic() {
-		double velocity = Falcon500Conversions.MPSToFalcon(
-				currentSpeed,
-				Unit.inchesToMeters(kDriveWheelDiameter),
-				kMK4IDriveReductionL2);
-		driveMotor.set(ControlMode.Velocity, velocity);
-
-		double angle = (Math.abs(velocity) <= kMaxVelocityMetersPerSecond * 0.01) && !forcedAngle ? lastAngle
-				: currentAngle;
-		steerMotor.set(ControlMode.Position, Falcon500Conversions
-				.degreesToFalcon(angle - angleOffset, kMK4ISteerReductionL2));
-
-		lastAngle = getState().angle.getDegrees();
+        matchEncoders();
+    }
 
 
-		SmartDashboard.putNumber("qurennt", driveMotor.getSupplyCurrent());
-	    current = driveMotor.getSupplyCurrent();
-	}
+    /** Matches the integrated encoder to the reading from the CANCoder */
+    public void matchEncoders() {
+        steerMotor.setSelectedSensorPosition(Falcon500Conversions.degreesToFalcon(encoder.getAbsolutePosition() - angleOffset, MK4I_STEER_REDUCTION_L2));
+    }
 
-	// Get the velocity of the wheel in meters per second
-	private double getVelocityMPS() {
-		// Convert the value returned by the sensor (rotations per 100ms) to rotations
-		// per second
-		return Falcon500Conversions
-				.falconToMPS(driveMotor.getSelectedSensorVelocity(), Units.inchesToMeters(kDriveWheelCircumference),
-						kMK4IDriveReductionL2);
-	}
+    /** Return the position of the wheel based on the integrated motor encoder */
+    public double getSteerEncoder() {
+        return Falcon500Conversions.falconToDegrees(steerMotor.getSelectedSensorPosition(), MK4I_STEER_REDUCTION_L2) + angleOffset;
+    }
 
-	private double getPositionMeters() {
-		return Falcon500Conversions.falconToDegrees(driveMotor.getSelectedSensorPosition(), (kMK4IDriveReductionL2 / 360) * Units.inchesToMeters(kDriveWheelCircumference));
-	}
+    public double currentSpeedTarget = 0;
+    public double currentAngleTarget = 0;
+    public boolean forcedAngle = false;
 
-	// Get the current state of the swerve module
-	public SwerveModuleState getState() {
-		return new SwerveModuleState(
-				// Velocity of the wheel
-				getVelocityMPS(),
-				// The value of the steering encoder
-				Rotation2d.fromDegrees(getSteerEncoder()));
-	}
+    /** Sets the motors of the swerve module to a provided state */
+    public void setState(SwerveModuleState state, boolean force) {
+        SwerveModuleState newState = optimize(state, getSteerEncoder());
+        this.currentSpeedTarget = newState.speedMetersPerSecond;
+        this.currentAngleTarget = newState.angle.getDegrees();
+        this.forcedAngle = force;
+    }
 
-	public SwerveModulePosition getPosition() {
-		return new SwerveModulePosition(getPositionMeters(), Rotation2d.fromDegrees(getSteerEncoder()));
-	}
+    @Override
+    public void periodic() {
+        double velocity = Falcon500Conversions.MPSToFalcon(currentSpeedTarget, Units.inchesToMeters(DRIVE_WHEEL_DIAMETER), MK4I_DRIVE_REDUCTION_L2);
+        driveMotor.set(ControlMode.Velocity, velocity);
 
-	// Custom optimize method by team 364
-	private SwerveModuleState optimize(SwerveModuleState desiredState, Rotation2d currentAngle) {
-		double targetAngle = placeInAppropriate0To360Scope(currentAngle.getDegrees(), desiredState.angle.getDegrees());
 
-		double targetSpeed = desiredState.speedMetersPerSecond;
+        double angle = (Math.abs(velocity) <= MAX_VELOCITY_METERS_PER_SECOND * 0.01) && !forcedAngle
+                       ? lastAngle
+                       : currentAngleTarget;
+        steerMotor.set(ControlMode.Position, Falcon500Conversions.degreesToFalcon(angle - angleOffset, MK4I_STEER_REDUCTION_L2));
 
-		double delta = targetAngle - currentAngle.getDegrees();
+        lastAngle = getState().angle.getDegrees();
+    }
 
-		if (Math.abs(delta) > 90) {
-			targetSpeed = -targetSpeed;
-			targetAngle = delta > 90 ? (targetAngle -= 180) : (targetAngle += 180);
-		}
-		return new SwerveModuleState(targetSpeed, Rotation2d.fromDegrees(targetAngle));
-	}
+    /** Get the velocity of the wheel in meters per second */
+    private double getVelocityMPS() {
+        // Convert the value returned by the sensor (rotations per 100ms) to rotations per second
+        return Falcon500Conversions.falconToMPS(driveMotor.getSelectedSensorVelocity(), Units.inchesToMeters(DRIVE_WHEEL_CIRCUMFERENCE), MK4I_DRIVE_REDUCTION_L2);
+    }
 
-	private double placeInAppropriate0To360Scope(double scopeReference, double newAngle) {
-		double lowerBound;
-		double upperBound;
-		double lowerOffset = scopeReference % 360;
-		if (lowerOffset >= 0) {
-			lowerBound = scopeReference - lowerOffset;
-			upperBound = scopeReference + (360 - lowerOffset);
-		} else {
-			upperBound = scopeReference - lowerOffset;
-			lowerBound = scopeReference - (360 + lowerOffset);
-		}
-		while (newAngle < lowerBound) {
-			newAngle += 360;
-		}
-		while (newAngle > upperBound) {
-			newAngle -= 360;
-		}
-		if (newAngle - scopeReference > 180) {
-			newAngle -= 360;
-		} else if (newAngle - scopeReference < -180) {
-			newAngle += 360;
-		}
-		return newAngle;
-	}
+    /** Get the current state of the swerve module as a {@link SwerveModuleState} */
+    public SwerveModuleState getState() {
+        return new SwerveModuleState(
+                // Velocity of the wheel
+                getVelocityMPS(),
+                // The value of the steering encoder
+                Rotation2d.fromDegrees(getSteerEncoder()));
+    }
+
+    public SwerveModulePosition getPosition() {
+        return new SwerveModulePosition(getPositionMeters(), Rotation2d.fromDegrees(getSteerEncoder()));
+    }
+
+    private double getPositionMeters() {
+        return Falcon500Conversions.falconToDegrees(driveMotor.getSelectedSensorPosition(), MK4I_DRIVE_REDUCTION_L2) / 360 * Units.inchesToMeters(DRIVE_WHEEL_CIRCUMFERENCE);
+    }
+
+    // Custom optimize method by team 364
+    private SwerveModuleState optimize(SwerveModuleState desiredState, double currentAngle) {
+        double targetAngle = placeInAppropriate0To360Scope(currentAngle, desiredState.angle.getDegrees());
+
+        double targetSpeed = desiredState.speedMetersPerSecond;
+
+        double delta = targetAngle - currentAngle;
+
+        if (Math.abs(delta) > 90) {
+            targetSpeed = -targetSpeed;
+            if (delta > 90) {targetAngle -= 180;} else {targetAngle += 180;}
+        }
+        return new SwerveModuleState(targetSpeed, Rotation2d.fromDegrees(targetAngle));
+    }
+
+    private double placeInAppropriate0To360Scope(double scopeReference, double newAngle) {
+        double lowerBound;
+        double upperBound;
+        double lowerOffset = scopeReference % 360;
+        if (lowerOffset >= 0) {
+            lowerBound = scopeReference - lowerOffset;
+            upperBound = scopeReference + (360 - lowerOffset);
+        } else {
+            upperBound = scopeReference - lowerOffset;
+            lowerBound = scopeReference - (360 + lowerOffset);
+        }
+        while (newAngle < lowerBound) {
+            newAngle += 360;
+        }
+        while (newAngle > upperBound) {
+            newAngle -= 360;
+        }
+        if (newAngle - scopeReference > 180) {
+            newAngle -= 360;
+        } else if (newAngle - scopeReference < -180) {
+            newAngle += 360;
+        }
+        return newAngle;
+    }
+
+    private void configDriveMotor(TalonFX motor) {
+        motor.configFactoryDefault();
+        TalonFXConfiguration currentLimitConfig = new TalonFXConfiguration();
+
+        currentLimitConfig.supplyCurrLimit.currentLimit = 35;
+        currentLimitConfig.supplyCurrLimit.enable = true;
+
+        motor.configAllSettings(currentLimitConfig);
+
+        motor.setNeutralMode(NeutralMode.Brake);
+        motor.configOpenloopRamp(1);
+        motor.setSelectedSensorPosition(0);
+
+        motor.config_kP(0, 0.025);
+        motor.config_kI(0, 0.0);
+        motor.config_kD(0, 0.5);
+
+        motor.setInverted(true);
+    }
+
+    private void configSteerMotor(TalonFX motor) {
+        motor.configFactoryDefault();
+        TalonFXConfiguration currentLimitConfig = new TalonFXConfiguration();
+
+        currentLimitConfig.supplyCurrLimit.currentLimit = 20;
+        currentLimitConfig.supplyCurrLimit.enable = true;
+
+        motor.configAllSettings(currentLimitConfig);
+
+        motor.setNeutralMode(NeutralMode.Brake);
+        motor.configOpenloopRamp(1);
+        motor.setSelectedSensorPosition(0);
+
+        motor.setSensorPhase(true);
+
+        motor.config_kP(0, 0.2);
+        motor.config_kI(0, 0.0);
+        motor.config_kD(0, 0.1);
+
+        motor.setInverted(true);
+    }
+
+    private void configCANCoder(CANCoder CANCoder) {
+        // Sets the encoder to boot to the absolute position instead of 0
+        CANCoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
+
+        // Set the encoder to return values from 0 to 360 instead of -180 to +180
+        CANCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
+    }
 
 }

@@ -5,5 +5,12 @@
       "/SmartDashboard/Drivetrain": "Subsystem",
       "/SmartDashboard/Field": "Field2d"
     }
+  },
+  "NetworkTables": {
+    "transitory": {
+      "SmartDashboard": {
+        "open": true
+      }
+    }
   }
 }
