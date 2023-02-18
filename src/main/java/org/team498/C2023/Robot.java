@@ -30,7 +30,7 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         if (isReal()) {
-            rotationFlip = -1;
+            rotationFlip = 1;
         } else {
             rotationFlip = 1;
         }

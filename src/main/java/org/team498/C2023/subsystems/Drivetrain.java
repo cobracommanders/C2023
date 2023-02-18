@@ -58,10 +58,10 @@ public class Drivetrain extends SubsystemBase {
         CANCoder BL_CANCoder = new CANCoder(BL_CANCODER);
         CANCoder BR_CANCoder = new CANCoder(BR_CANCODER);
 
-        SwerveModule FL_Module = new SwerveModule(FL_Drive, FL_Steer, FL_CANCoder, FL_MODULE_OFFSET);
-        SwerveModule FR_Module = new SwerveModule(FR_Drive, FR_Steer, FR_CANCoder, FR_MODULE_OFFSET);
-        SwerveModule BL_Module = new SwerveModule(BL_Drive, BL_Steer, BL_CANCoder, BL_MODULE_OFFSET);
-        SwerveModule BR_Module = new SwerveModule(BR_Drive, BR_Steer, BR_CANCoder, BR_MODULE_OFFSET);
+        SwerveModule FL_Module = new SwerveModule("FL", FL_Drive, FL_Steer, FL_CANCoder, FL_MODULE_OFFSET);
+        SwerveModule FR_Module = new SwerveModule("FR", FR_Drive, FR_Steer, FR_CANCoder, FR_MODULE_OFFSET);
+        SwerveModule BL_Module = new SwerveModule("BL", BL_Drive, BL_Steer, BL_CANCoder, BL_MODULE_OFFSET);
+        SwerveModule BR_Module = new SwerveModule("BR", BR_Drive, BR_Steer, BR_CANCoder, BR_MODULE_OFFSET);
 
         // Put all the swerve modules in an array to make using them easier
         swerveModules = new SwerveModule[] {FL_Module, FR_Module, BL_Module, BR_Module};
