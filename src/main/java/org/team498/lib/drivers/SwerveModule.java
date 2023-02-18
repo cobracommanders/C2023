@@ -41,7 +41,9 @@ public class SwerveModule extends SubsystemBase {
 
     /** Matches the integrated encoder to the reading from the CANCoder */
     public void matchEncoders() {
-        steerMotor.setSelectedSensorPosition(Falcon500Conversions.degreesToFalcon(encoder.getAbsolutePosition() - angleOffset, MK4I_STEER_REDUCTION_L2));
+        steerMotor.setSelectedSensorPosition(Falcon500Conversions.degreesToFalcon(encoder.getAbsolutePosition() - angleOffset,
+                                                                                  MK4I_STEER_REDUCTION_L2
+        ));
     }
 
     /** Return the position of the wheel based on the integrated motor encoder */
@@ -78,7 +80,10 @@ public class SwerveModule extends SubsystemBase {
     /** Get the velocity of the wheel in meters per second */
     private double getVelocityMPS() {
         // Convert the value returned by the sensor (rotations per 100ms) to rotations per second
-        return Falcon500Conversions.falconToMPS(driveMotor.getSelectedSensorVelocity(), Units.inchesToMeters(DRIVE_WHEEL_CIRCUMFERENCE), MK4I_DRIVE_REDUCTION_L2);
+        return Falcon500Conversions.falconToMPS(driveMotor.getSelectedSensorVelocity(),
+                                                Units.inchesToMeters(DRIVE_WHEEL_CIRCUMFERENCE),
+                                                MK4I_DRIVE_REDUCTION_L2
+        );
     }
 
     /** Get the current state of the swerve module as a {@link SwerveModuleState} */
@@ -87,7 +92,8 @@ public class SwerveModule extends SubsystemBase {
                 // Velocity of the wheel
                 getVelocityMPS(),
                 // The value of the steering encoder
-                Rotation2d.fromDegrees(getSteerEncoder()));
+                Rotation2d.fromDegrees(getSteerEncoder())
+        );
     }
 
     public SwerveModulePosition getPosition() {
@@ -95,7 +101,8 @@ public class SwerveModule extends SubsystemBase {
     }
 
     private double getPositionMeters() {
-        return Falcon500Conversions.falconToDegrees(driveMotor.getSelectedSensorPosition(), MK4I_DRIVE_REDUCTION_L2) / 360 * Units.inchesToMeters(DRIVE_WHEEL_CIRCUMFERENCE);
+        return Falcon500Conversions.falconToDegrees(driveMotor.getSelectedSensorPosition(), MK4I_DRIVE_REDUCTION_L2) / 360 * Units.inchesToMeters(
+                DRIVE_WHEEL_CIRCUMFERENCE);
     }
 
     // Custom optimize method by team 364

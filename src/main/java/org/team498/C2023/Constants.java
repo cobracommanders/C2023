@@ -37,7 +37,10 @@ public final class Constants {
             public static final double MAX_ANGULAR_SPEED_DEGREES_PER_SECOND = 720;
             public static final double MAX_ANGULAR_SPEED_DEGREES_PER_SECOND_SQUARED = Math.pow(MAX_ANGULAR_SPEED_DEGREES_PER_SECOND, 2);
 
-            public static final TrapezoidProfile.Constraints CONTROLLER_CONSTRAINTS = new TrapezoidProfile.Constraints(MAX_ANGULAR_SPEED_DEGREES_PER_SECOND, MAX_ANGULAR_SPEED_DEGREES_PER_SECOND_SQUARED);
+            public static final TrapezoidProfile.Constraints CONTROLLER_CONSTRAINTS = new TrapezoidProfile.Constraints(
+                    MAX_ANGULAR_SPEED_DEGREES_PER_SECOND,
+                    MAX_ANGULAR_SPEED_DEGREES_PER_SECOND_SQUARED
+            );
 
         }
 
@@ -61,9 +64,17 @@ public final class Constants {
         public static final double I = 0;
         public static final double D = 0;
 
-        public static final double S = 0;
-        public static final double G = 0;
-        public static final double V = 0;
+        public static final double F = 0;
+    }
+
+    public static final class ManipulatorConstants {
+        public static final double P = 0;
+        public static final double I = 0;
+        public static final double D = 0;
+
+        public static final double F = 0;
+
+        public static final double WRIST_RATIO = 5 * 4 * 3 * (80.0 / 36.0);
     }
 
 

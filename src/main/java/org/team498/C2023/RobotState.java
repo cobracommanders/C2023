@@ -15,8 +15,7 @@ public class RobotState extends SubsystemBase {
 
     public enum GamePiece {
         CUBE,
-        CONE,
-        EMPTY
+        CONE
     }
 
     private RobotState() {

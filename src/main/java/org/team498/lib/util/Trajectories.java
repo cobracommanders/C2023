@@ -1,6 +1,5 @@
 package org.team498.lib.util;
 
-import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -14,7 +13,6 @@ public class Trajectories {
     public static Trajectory getTrajectory(String name) {
         String filepath = "pathplanner/generatedJSON/" + name + ".wpilib.json";
 
-
         Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(filepath);
         try {
             return TrajectoryUtil.fromPathweaverJson(trajectoryPath);
@@ -25,6 +23,6 @@ public class Trajectories {
     }
 
     public static PathPlannerTrajectory getPathPlannerTrajectory(String name) {
-        return PathPlanner.loadPath(name, new PathConstraints(5, 2));
+        return PathPlanner.loadPath(name, 5, 2);
     }
 }

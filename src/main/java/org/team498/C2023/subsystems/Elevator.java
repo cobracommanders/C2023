@@ -6,7 +6,6 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static org.team498.C2023.Constants.ElevatorConstants.*;
@@ -21,23 +20,24 @@ public class Elevator extends SubsystemBase {
     private final PIDController PID;
     private ControlMode controlMode;
     private double speed = 0;
-    // private final DigitalInput limit;
-    public Position nextHeight = Position.HIGH;
+    private State nextScoringHeight = State.HIGH;
 
-    public enum Position {
-        FLOOR(0),
-        SUBSTATION(0),
-        LOW(-3),
-        MID(-5),
-        HIGH(-10),
-        DRIVING(0);
+    public enum State {
+        LOW(3), // Testing
+        MID(5), // Testing
+        HIGH(10), // Testing
+        PASS_CONE(0),
+        PASS_CUBE(0),
+        DOUBLE_SS_CONE(0),
+        DOUBLE_SS_CUBE(0),
+        AUTO_SHOT(0),
+        IDLE(0);
 
-        private final double setpoint;
+        public final double setpoint;
 
-        Position(double setpoint) {
+        State(double setpoint) {
             this.setpoint = setpoint;
         }
-
     }
 
     public enum ControlMode {
@@ -58,12 +58,10 @@ public class Elevator extends SubsystemBase {
         rightMotor.setIdleMode(IdleMode.kBrake);
 
         encoder = leftMotor.getEncoder();
-        rightMotor.follow(leftMotor, false);
+        rightMotor.follow(leftMotor, true);
 
         PID = new PIDController(P, I, D);
-        PID.setTolerance(0);
-
-        // limit = new DigitalInput(ELEVATOR_LIMIT);
+        PID.setTolerance(0.1);
     }
 
     @Override
@@ -84,18 +82,18 @@ public class Elevator extends SubsystemBase {
         leftMotor.set(speed - Math.pow(((0.171 * encoder.getPosition()) / -4.547614) + 0.04, 2));
     }
 
-    public InstantCommand setNextHeight(Position height) {
-        return new InstantCommand(() -> nextHeight = height);
+    public void setNextScoringHeight(State nextScoringHeight) {
+        this.nextScoringHeight = nextScoringHeight;
     }
 
-    public InstantCommand setPosition(Position position) {
-        InstantCommand command = new InstantCommand(() -> {
-            SmartDashboard.putNumber("Elevator setpoint", position.setpoint);
-            setControlMode(ControlMode.PID);
-            PID.setSetpoint(position.setpoint);
-        });
-        command.addRequirements(this);
-        return command;
+    public State getNextScoringPosition() {
+        return nextScoringHeight;
+    }
+
+    public void setState(State state) {
+        SmartDashboard.putNumber("Elevator setpoint", state.setpoint);
+        setControlMode(ControlMode.PID);
+        PID.setSetpoint(state.setpoint);
     }
 
     public void setControlMode(ControlMode mode) {
@@ -108,11 +106,6 @@ public class Elevator extends SubsystemBase {
 
     public boolean atSetpoint() {
         return PID.atSetpoint();
-    }
-
-    public boolean getLimitSwitch() {
-        // return !limit.get();
-        return false;
     }
 
     public void resetEncoder() {

@@ -23,19 +23,22 @@ public class FieldPositions {
 
     public static final Region redLoadingZone = new Region(new Rectangle(0, 6.75, 6.71, 1.265), new Rectangle(0, 6.75 - 1.24, 3.36, 1.24));
 
-    public static final Region blueLoadingZone = new Region(flip(new Rectangle(0, 6.75, 6.71, 1.265)), flip(new Rectangle(0, 6.75 - 1.24, 3.36, 1.24)));
+    public static final Region blueLoadingZone = new Region(flip(new Rectangle(0, 6.75, 6.71, 1.265)),
+                                                            flip(new Rectangle(0, 6.75 - 1.24, 3.36, 1.24))
+    );
 
     public static final Rectangle blueChargeStation = new Rectangle(2.9, height - 6.4955, 1.95, 2.47);
     public static final Rectangle redChargeStation = flip(blueChargeStation);
 
     public static final Region blueCommunity = new Region(new Rectangle(1.37, height - 3.98, 1.985, 1.475), new Rectangle(1.37, 0, 3.54, 4.0337));
 
-    public static final Region redCommunity = new Region(flip(new Rectangle(1.37, height - 3.98, 1.985, 1.475)), flip(new Rectangle(1.37, 0, 3.54, 4.0337)));
+    public static final Region redCommunity = new Region(flip(new Rectangle(1.37, height - 3.98, 1.985, 1.475)),
+                                                         flip(new Rectangle(1.37, 0, 3.54, 4.0337))
+    );
 
-    public static final Point[] stagingMarkers = new Point[] {new Point(7.0775, height - 7.085), new Point(7.0775, height - 5.862), new Point(7.0775, height - 4.6396), new Point(7.0775, height - 3.4219), flip(new Point(7.0775, height - 7.085)), flip(new Point(7.0775,
-                                                                                                                                                                                                                                                                    height - 5.862)), flip(new Point(7.0775,
-                                                                                                                                                                                                                                                                                                     height - 4.6396)), flip(
-            new Point(7.0775, height - 3.4219)),};
+    public static final Point[] stagingMarkers = new Point[] {new Point(7.0775, height - 7.085), new Point(7.0775, height - 5.862), new Point(7.0775, height - 4.6396
+    ), new Point(7.0775, height - 3.4219), flip(new Point(7.0775, height - 7.085)), flip(new Point(7.0775, height - 5.862)), flip(new Point(7.0775, height - 4.6396
+    )), flip(new Point(7.0775, height - 3.4219)),};
 
     public static class Grid {
         // {topConeNodeL, topCubeNode, topConeNodeR},
@@ -125,20 +128,53 @@ public class FieldPositions {
     }
 
     public static final Map<Integer, Pose3d> aprilTags = Map.of(1,
-                                                                new Pose3d(Units.inchesToMeters(610.77), Units.inchesToMeters(42.19), Units.inchesToMeters(18.22), new Rotation3d(0.0, 0.0, Math.PI)),
+                                                                new Pose3d(Units.inchesToMeters(610.77),
+                                                                           Units.inchesToMeters(42.19),
+                                                                           Units.inchesToMeters(18.22),
+                                                                           new Rotation3d(0.0, 0.0, Math.PI)
+                                                                ),
                                                                 2,
-                                                                new Pose3d(Units.inchesToMeters(610.77), Units.inchesToMeters(108.19), Units.inchesToMeters(18.22), new Rotation3d(0.0, 0.0, Math.PI)),
+                                                                new Pose3d(Units.inchesToMeters(610.77),
+                                                                           Units.inchesToMeters(108.19),
+                                                                           Units.inchesToMeters(18.22),
+                                                                           new Rotation3d(0.0, 0.0, Math.PI)
+                                                                ),
                                                                 3,
-                                                                new Pose3d(Units.inchesToMeters(610.77), Units.inchesToMeters(174.19), Units.inchesToMeters(18.22), new Rotation3d(0.0, 0.0, Math.PI)),
+                                                                new Pose3d(Units.inchesToMeters(610.77),
+                                                                           Units.inchesToMeters(174.19),
+                                                                           Units.inchesToMeters(18.22),
+                                                                           new Rotation3d(0.0, 0.0, Math.PI)
+                                                                ),
                                                                 4,
-                                                                new Pose3d(Units.inchesToMeters(636.96), Units.inchesToMeters(265.74), Units.inchesToMeters(27.38), new Rotation3d(0.0, 0.0, Math.PI)),
+                                                                new Pose3d(Units.inchesToMeters(636.96),
+                                                                           Units.inchesToMeters(265.74),
+                                                                           Units.inchesToMeters(27.38),
+                                                                           new Rotation3d(0.0, 0.0, Math.PI)
+                                                                ),
                                                                 5,
-                                                                new Pose3d(Units.inchesToMeters(14.25), Units.inchesToMeters(265.74), Units.inchesToMeters(27.38), new Rotation3d()),
+                                                                new Pose3d(Units.inchesToMeters(14.25),
+                                                                           Units.inchesToMeters(265.74),
+                                                                           Units.inchesToMeters(27.38),
+                                                                           new Rotation3d()
+                                                                ),
                                                                 6,
-                                                                new Pose3d(Units.inchesToMeters(40.45), Units.inchesToMeters(174.19), Units.inchesToMeters(18.22), new Rotation3d()),
+                                                                new Pose3d(Units.inchesToMeters(40.45),
+                                                                           Units.inchesToMeters(174.19),
+                                                                           Units.inchesToMeters(18.22),
+                                                                           new Rotation3d()
+                                                                ),
                                                                 7,
-                                                                new Pose3d(Units.inchesToMeters(40.45), Units.inchesToMeters(108.19), Units.inchesToMeters(18.22), new Rotation3d()),
+                                                                new Pose3d(Units.inchesToMeters(40.45),
+                                                                           Units.inchesToMeters(108.19),
+                                                                           Units.inchesToMeters(18.22),
+                                                                           new Rotation3d()
+                                                                ),
                                                                 8,
-                                                                new Pose3d(Units.inchesToMeters(40.45), Units.inchesToMeters(42.19), Units.inchesToMeters(18.22), new Rotation3d()));
+                                                                new Pose3d(Units.inchesToMeters(40.45),
+                                                                           Units.inchesToMeters(42.19),
+                                                                           Units.inchesToMeters(18.22),
+                                                                           new Rotation3d()
+                                                                )
+    );
 
 }

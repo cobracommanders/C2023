@@ -28,7 +28,11 @@ import static org.team498.C2023.Ports.Drivetrain.*;
 public class Drivetrain extends SubsystemBase {
     // Profiled controller for the rotation of the robot
     // TODO see if the profiled controller here causes the robot to turn on startup
-    private final ProfiledPIDController angleController = new ProfiledPIDController(AngleConstants.P, AngleConstants.I, AngleConstants.D, AngleConstants.CONTROLLER_CONSTRAINTS);
+    private final ProfiledPIDController angleController = new ProfiledPIDController(AngleConstants.P,
+                                                                                    AngleConstants.I,
+                                                                                    AngleConstants.D,
+                                                                                    AngleConstants.CONTROLLER_CONSTRAINTS
+    );
     // Profiled controller for the x position of the robot
     private final PIDController xController = new PIDController(PoseConstants.P, PoseConstants.I, PoseConstants.D);
     // Profiled controller for the y position of the robot
@@ -41,18 +45,18 @@ public class Drivetrain extends SubsystemBase {
     public ChassisSpeeds currentSpeeds = new ChassisSpeeds();
 
     private Drivetrain() {
-        TalonFX FL_Drive = new TalonFX(FL_DRIVE_ID);
-        TalonFX FR_Drive = new TalonFX(FR_DRIVE_ID);
-        TalonFX BL_Drive = new TalonFX(BL_DRIVE_ID);
-        TalonFX BR_Drive = new TalonFX(BR_DRIVE_ID);
-        TalonFX FL_Steer = new TalonFX(FL_STEER_ID);
-        TalonFX FR_Steer = new TalonFX(FR_STEER_ID);
-        TalonFX BL_Steer = new TalonFX(BL_STEER_ID);
-        TalonFX BR_Steer = new TalonFX(BR_STEER_ID);
-        CANCoder FL_CANCoder = new CANCoder(FL_CANCODER_ID);
-        CANCoder FR_CANCoder = new CANCoder(FR_CANCODER_ID);
-        CANCoder BL_CANCoder = new CANCoder(BL_CANCODER_ID);
-        CANCoder BR_CANCoder = new CANCoder(BR_CANCODER_ID);
+        TalonFX FL_Drive = new TalonFX(FL_DRIVE);
+        TalonFX FR_Drive = new TalonFX(FR_DRIVE);
+        TalonFX BL_Drive = new TalonFX(BL_DRIVE);
+        TalonFX BR_Drive = new TalonFX(BR_DRIVE);
+        TalonFX FL_Steer = new TalonFX(FL_STEER);
+        TalonFX FR_Steer = new TalonFX(FR_STEER);
+        TalonFX BL_Steer = new TalonFX(BL_STEER);
+        TalonFX BR_Steer = new TalonFX(BR_STEER);
+        CANCoder FL_CANCoder = new CANCoder(FL_CANCODER);
+        CANCoder FR_CANCoder = new CANCoder(FR_CANCODER);
+        CANCoder BL_CANCoder = new CANCoder(BL_CANCODER);
+        CANCoder BR_CANCoder = new CANCoder(BR_CANCODER);
 
         SwerveModule FL_Module = new SwerveModule(FL_Drive, FL_Steer, FL_CANCoder, FL_MODULE_OFFSET);
         SwerveModule FR_Module = new SwerveModule(FR_Drive, FR_Steer, FR_CANCoder, FR_MODULE_OFFSET);
@@ -180,7 +184,8 @@ public class Drivetrain extends SubsystemBase {
     }
 
     /**
-     * Set the swerve modules to the desired states. Under normal operation, the angle will not change unless the robot is moving, however this can be overridden by setting 'force' to true.
+     * Set the swerve modules to the desired states. Under normal operation, the angle will not change unless the robot is moving, however this can be
+     * overridden by setting 'force' to true.
      *
      * @param moduleStates an array of {@link SwerveModuleState module states} to set the swerve to
      * @param force        if set to true, the module states will be set even if the robot is not moving
@@ -211,6 +216,10 @@ public class Drivetrain extends SubsystemBase {
 
     public boolean isInRegion(Region region) {
         return region.contains(Point.fromPose2d(getPose()));
+    }
+
+    public boolean isNear(Pose2d pose, double epsilon) {
+        return Math.hypot(getPose().getX() - pose.getX(), getPose().getY() - pose.getY()) < epsilon;
     }
 
 
