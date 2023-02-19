@@ -54,9 +54,9 @@ public final class Constants {
     }
 
     public static final class ElevatorConstants {
-        public static final double P = 0.075;
+        public static final double P = 0.4;
         public static final double I = 0;
-        public static final double D = 0;
+        public static final double D = 0.02;
     }
 
     public static final class IntakeConstants {
@@ -68,7 +68,13 @@ public final class Constants {
     }
 
     public static final class ManipulatorConstants {
-        public static final double P = 0;
+        public static final double P = 0.1;
+        public static final double I = 0;
+        public static final double D = 0;
+    }
+
+    public static final class WristConstants {
+        public static final double P = 3;
         public static final double I = 0;
         public static final double D = 0;
 

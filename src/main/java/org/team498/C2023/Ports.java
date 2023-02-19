@@ -40,7 +40,7 @@ public final class Ports {
 
     public static class Wrist {
         public static final int WRIST = 50;
-        public static final int ENCODER_PORT = 5; // DIO
+        public static final int ENCODER_PORT = 7; // DIO
     }
 
     public static class ConeARiser {

@@ -143,10 +143,10 @@ public class Xbox {
     }
 
     /** @return the controller's left X axis */
-    public double leftX() {return -getAxis(Axis.LeftX);}
+    public double leftX() {return getAxis(Axis.LeftX);}
 
     /** @return the controller's left Y axis */
-    public double leftY() {return -getAxis(Axis.LeftY);}
+    public double leftY() {return getAxis(Axis.LeftY);}
 
     /** @return the controller's right X axis */
     public double rightX() {return getAxis(Axis.RightX);}
@@ -166,10 +166,10 @@ public class Xbox {
     }
 
     /** @return the controller's left X axis squared */
-    public double leftXSquared() {return -getAxisSquared(Axis.LeftX);}
+    public double leftXSquared() {return getAxisSquared(Axis.LeftX);}
 
     /** @return the controller's left Y axis squared */
-    public double leftYSquared() {return -getAxisSquared(Axis.LeftY);}
+    public double leftYSquared() {return getAxisSquared(Axis.LeftY);}
 
     /** @return the controller's right X axis squared */
     public double rightXSquared() {return getAxisSquared(Axis.RightX);}

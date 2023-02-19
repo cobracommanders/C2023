@@ -19,14 +19,14 @@ public class    RetrieveFromDoubleSS extends SequentialCommandGroup {
         super(
                 new ParallelCommandGroup(
                         new MoveToDoubleSSPosition(),
-                        new RotateToDoubleSSPosition(),
-                        new OffenseDrive(() -> 0, () -> 0, () -> Robot.rotationOffset, () -> false)
+                        new RotateToDoubleSSPosition()//,
+                        // new OffenseDrive(() -> 0, () -> 0, () -> Robot.rotationOffset, () -> false)
                 ),
                 new CollectGamePiece(),
                 new WaitCommand(0.2),
-                new StopManipulator(),
-                new SetElevatorState(Elevator.State.IDLE),
-                new SetManipulatorState(Manipulator.State.IDLE)
+                new StopManipulator()//,
+                // new SetElevatorState(Elevator.State.IDLE),
+                // new SetManipulatorState(Manipulator.State.IDLE)
         );
     }
 }

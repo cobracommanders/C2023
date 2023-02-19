@@ -121,6 +121,10 @@ public class Drivetrain extends SubsystemBase {
         gyro.setAngleOffset(pose.getRotation().getDegrees());
     }
 
+    public void setOdometry(Pose2d pose) {
+        odometry.resetPosition(Rotation2d.fromDegrees(gyro.getYaw()), getModulePositions(), pose);
+    }
+
     /** @return true if all three swerve controllers have reached their position goals (x pos, y pos, angle) */
     public boolean atPositionGoals() {
         return xController.atSetpoint() && yController.atSetpoint() && atAngleGoal();

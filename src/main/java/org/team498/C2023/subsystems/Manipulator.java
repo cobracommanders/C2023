@@ -13,7 +13,7 @@ public class Manipulator extends SubsystemBase {
     public enum State {
         COLLECT_CONE(1),
         COLLECT_CUBE(-0.45),
-        SCORE_CONE(-0.75),
+        SCORE_CONE(-1),
         SCORE_CUBE(0.5),
         AUTO_SHOT(0.5),
         IDLE(0);
@@ -31,6 +31,7 @@ public class Manipulator extends SubsystemBase {
         rollers.restoreFactoryDefaults();
 
         rollers.setIdleMode(IdleMode.kBrake);
+        setState(State.IDLE);
     }
 
     public boolean isStalling() {

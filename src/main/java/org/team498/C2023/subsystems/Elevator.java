@@ -23,12 +23,19 @@ public class Elevator extends SubsystemBase {
     private State nextScoringHeight = State.HIGH;
 
     public enum State {
-        LOW(3), // Testing
-        MID(5), // Testing
-        HIGH(10), // Testing
+        LOW(10), // Testing
+        MID(15), // Testing
+        HIGH(20), // Testing
+        LOW_CONE(0),
+        LOW_CUBE(0),
+        MID_CONE(21.095142),
+        MID_CUBE(7.047628),
+        TOP_CONE(28.833111),
+        TOP_CUBE(15.999987),
+
         PASS_CONE(0),
         PASS_CUBE(0),
-        DOUBLE_SS_CONE(0),
+        DOUBLE_SS_CONE(20.023731),
         DOUBLE_SS_CUBE(0),
         AUTO_SHOT(0),
         IDLE(0);
@@ -79,7 +86,7 @@ public class Elevator extends SubsystemBase {
         // speed = 0;
         // }
 
-        leftMotor.set(speed - Math.pow(((0.171 * encoder.getPosition()) / -4.547614) + 0.04, 2));
+        leftMotor.set(speed /*- Math.pow(((0.171 * encoder.getPosition()) / -4.547614) + 0.04, 2)()*/);
     }
 
     public void setNextScoringHeight(State nextScoringHeight) {

@@ -49,7 +49,7 @@ public class Robot extends TimedRobot {
 
         SmartDashboard.putNumber("Tag ID", vision.getTargetedTag());
 
-        vision.getRobotPose().ifPresent(drivetrain::setPose);
+        vision.getRobotPose().ifPresent(drivetrain::setOdometry);
 
         if (RobotPositions.inCommunity()) {
             if (RobotState.getInstance().hasCone()) {
