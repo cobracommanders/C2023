@@ -3,6 +3,8 @@ package org.team498.C2023.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static org.team498.C2023.Ports.Manipulator.ROLLERS;
@@ -14,7 +16,7 @@ public class Manipulator extends SubsystemBase {
         COLLECT_CONE(1),
         COLLECT_CUBE(-0.45),
         SCORE_CONE(-1),
-        SCORE_CUBE(0.5),
+        SCORE_CUBE(0.75),
         AUTO_SHOT(0.5),
         IDLE(0);
 
@@ -29,7 +31,7 @@ public class Manipulator extends SubsystemBase {
         rollers = new CANSparkMax(ROLLERS, MotorType.kBrushless);
 
         rollers.restoreFactoryDefaults();
-
+        rollers.setInverted(true);
         rollers.setIdleMode(IdleMode.kBrake);
         setState(State.IDLE);
     }
@@ -40,6 +42,7 @@ public class Manipulator extends SubsystemBase {
 
     public void setState(State state) {
         rollers.set(state.rollerSpeed);
+        SmartDashboard.putString("Manipulator Setting", state.name());
     }
 
 

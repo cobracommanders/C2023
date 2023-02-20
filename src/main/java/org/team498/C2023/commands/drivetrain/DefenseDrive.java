@@ -1,6 +1,5 @@
 package org.team498.C2023.commands.drivetrain;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import org.team498.C2023.Robot;
 import org.team498.C2023.subsystems.Drivetrain;
@@ -39,16 +38,6 @@ public class DefenseDrive extends CommandBase {
         double xTranslation = xTranslationSupplier.getAsDouble() * MAX_VELOCITY_METERS_PER_SECOND * Robot.coordinateFlip * speed;
         double yTranslation = yTranslationSupplier.getAsDouble() * MAX_VELOCITY_METERS_PER_SECOND * Robot.coordinateFlip * speed;
         double rotation = rotationSupplier.getAsDouble() * MAX_ANGULAR_SPEED_DEGREES_PER_SECOND * speed;
-
-        SmartDashboard.putNumber("joystick x", xTranslation);
-        // if (rotation == 0) {
-        //     //drivetrain.drive(xTranslation, yTranslation, rotation * Robot.rotationFlip, true);
-        //     drivetrain.setAngleGoal(drivetrain.getYaw());
-
-        //     // Calculate the rotational speed from the pid controller, unless it's already at the goal
-        //     rotation = drivetrain.calculateRotationalSpeed();
-        // }
-
 
         // Set the robot to drive in field relative mode, with the rotation controlled by the snap controller
         drivetrain.drive(xTranslation, yTranslation, rotation * Robot.rotationFlip, true);

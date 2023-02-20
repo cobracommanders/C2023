@@ -1,10 +1,13 @@
 package org.team498.C2023.commands.robot;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import org.team498.C2023.Robot;
-import org.team498.C2023.commands.drivetrain.OffenseDrive;
+
+import java.util.function.Supplier;
+
+import org.team498.C2023.commands.drivetrain.DriveToPosition;
 import org.team498.C2023.commands.elevator.MoveToDoubleSSPosition;
 import org.team498.C2023.commands.elevator.SetElevatorState;
 import org.team498.C2023.commands.manipulator.CollectGamePiece;
@@ -14,19 +17,17 @@ import org.team498.C2023.commands.wrist.RotateToDoubleSSPosition;
 import org.team498.C2023.subsystems.Elevator;
 import org.team498.C2023.subsystems.Manipulator;
 
-public class    RetrieveFromDoubleSS extends SequentialCommandGroup {
-    public RetrieveFromDoubleSS() {
+public class CollectFromDoubleSS extends SequentialCommandGroup {
+    public CollectFromDoubleSS(Supplier<Pose2d> target) {
         super(
                 new ParallelCommandGroup(
                         new MoveToDoubleSSPosition(),
-                        new RotateToDoubleSSPosition()//,
-                        // new OffenseDrive(() -> 0, () -> 0, () -> Robot.rotationOffset, () -> false)
-                ),
-                new CollectGamePiece(),
-                new WaitCommand(0.2),
-                new StopManipulator()//,
-                // new SetElevatorState(Elevator.State.IDLE),
-                // new SetManipulatorState(Manipulator.State.IDLE)
-        );
+                        new RotateToDoubleSSPosition(),
+                        new DriveToPosition(target),
+                        new CollectGamePiece()),
+                new WaitCommand(0.5),
+                new StopManipulator(),
+                new SetElevatorState(Elevator.State.IDLE),
+                new SetManipulatorState(Manipulator.State.IDLE));
     }
 }

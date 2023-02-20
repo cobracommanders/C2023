@@ -9,7 +9,7 @@ public class ConeARise extends CommandBase {
 
     @Override
     public void initialize() {
-        if (RobotState.getInstance().hasCone()) {
+        if (RobotState.getInstance().inConeMode()) {
             coneARiser.setState(ConeARiser.State.COLLECT);
         } else {
             coneARiser.setState(ConeARiser.State.IDLE);

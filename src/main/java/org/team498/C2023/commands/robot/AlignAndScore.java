@@ -9,6 +9,7 @@ import java.util.function.Supplier;
 public class AlignAndScore extends SequentialCommandGroup {
     public AlignAndScore(Supplier<Pose2d> scoringPosition) {
         super(new DriveToPosition(scoringPosition),
-              new Score());
+              new Score()
+              );
     }
 }

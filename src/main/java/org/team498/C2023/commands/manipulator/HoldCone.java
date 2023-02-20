@@ -14,7 +14,7 @@ public class HoldCone extends CommandBase {
 
     @Override
     public void execute() {
-        if (manipulator.isStalling() || robotState.hasCube()) {
+        if (manipulator.isStalling() || robotState.inCubeMode()) {
             manipulator.setState(Manipulator.State.IDLE);
         } else {
             manipulator.setState(Manipulator.State.COLLECT_CONE);

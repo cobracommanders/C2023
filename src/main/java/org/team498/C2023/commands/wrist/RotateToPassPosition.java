@@ -9,7 +9,7 @@ public class RotateToPassPosition extends CommandBase {
 
     @Override
     public void initialize() {
-        if (RobotState.getInstance().hasCone()) {
+        if (RobotState.getInstance().inConeMode()) {
             wrist.setState(Wrist.State.PASS_CONE);
         } else {
             wrist.setState(Wrist.State.PASS_CUBE);

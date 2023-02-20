@@ -1,7 +1,7 @@
 package org.team498.C2023.commands.wrist;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import org.team498.C2023.RobotState;
 import org.team498.C2023.subsystems.Wrist;
 
 public class RotateToScoringPosition extends CommandBase {
@@ -9,15 +9,12 @@ public class RotateToScoringPosition extends CommandBase {
 
     @Override
     public void initialize() {
-        if (RobotState.getInstance().hasCone()) {
-            wrist.setState(Wrist.State.SCORE_CONE);
-        } else {
-            wrist.setState(Wrist.State.SCORE_CUBE);
-        }
+        wrist.setState(wrist.getNextScoringPosition());
     }
 
     @Override
     public boolean isFinished() {
+        SmartDashboard.putBoolean("Wrist at setpoint", wrist.atSetpoint());
         return wrist.atSetpoint();
     }
 }

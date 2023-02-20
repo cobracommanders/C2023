@@ -19,7 +19,6 @@ public final class Ports {
         public static final int BR_CANCODER = 14;//11 14
 
         public static final int GYRO = 20;
-        //TODO Fix these ids AND the gyro
     }
 
     public static class Intake {

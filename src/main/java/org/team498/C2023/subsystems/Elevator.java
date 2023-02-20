@@ -12,6 +12,8 @@ import static org.team498.C2023.Constants.ElevatorConstants.*;
 import static org.team498.C2023.Ports.Elevator.L_ELEVATOR_ID;
 import static org.team498.C2023.Ports.Elevator.R_ELEVATOR_ID;
 
+import org.team498.C2023.RobotState;
+
 public class Elevator extends SubsystemBase {
     private final CANSparkMax leftMotor;
     private final CANSparkMax rightMotor;
@@ -20,7 +22,6 @@ public class Elevator extends SubsystemBase {
     private final PIDController PID;
     private ControlMode controlMode;
     private double speed = 0;
-    private State nextScoringHeight = State.HIGH;
 
     public enum State {
         LOW(10), // Testing
@@ -31,11 +32,11 @@ public class Elevator extends SubsystemBase {
         MID_CONE(21.095142),
         MID_CUBE(7.047628),
         TOP_CONE(28.833111),
-        TOP_CUBE(15.999987),
+        TOP_CUBE(17),
 
         PASS_CONE(0),
         PASS_CUBE(0),
-        DOUBLE_SS_CONE(20.023731),
+        DOUBLE_SS_CONE(21.452280),
         DOUBLE_SS_CUBE(0),
         AUTO_SHOT(0),
         IDLE(0);
@@ -68,37 +69,47 @@ public class Elevator extends SubsystemBase {
         rightMotor.follow(leftMotor, true);
 
         PID = new PIDController(P, I, D);
-        PID.setTolerance(0.1);
     }
 
     @Override
     public void periodic() {
         double speed;
-        if (controlMode == ControlMode.PID) speed = PID.calculate(encoder.getPosition());
+        if (controlMode == ControlMode.PID)
+            speed = PID.calculate(encoder.getPosition());
         else {
             speed = this.speed;
         }
 
-        SmartDashboard.putNumber("Elevator position", encoder.getPosition());
-        SmartDashboard.putNumber("Elevator speed", speed);
-
-        // if ((Math.signum(speed) == -1) && !limit.get()) {
-        // speed = 0;
-        // }
-
-        leftMotor.set(speed /*- Math.pow(((0.171 * encoder.getPosition()) / -4.547614) + 0.04, 2)()*/);
-    }
-
-    public void setNextScoringHeight(State nextScoringHeight) {
-        this.nextScoringHeight = nextScoringHeight;
+        SmartDashboard.putNumber("Elevator Position", encoder.getPosition());
+        SmartDashboard.putData(this);
+        
+        SmartDashboard.putBoolean("Elevator at setpoint", atSetpoint());
+        leftMotor.set(speed /*- Math.pow(((0.171 * encoder.getPosition()) / -4.547614) + 0.04, 2)*/);
     }
 
     public State getNextScoringPosition() {
-        return nextScoringHeight;
+        switch (RobotState.getInstance().getNextScoringHeight()) {
+            case LOW:
+                if (RobotState.getInstance().inConeMode()) {
+                    return State.LOW_CONE;
+                }
+                return State.LOW_CUBE;
+            case MID:
+                if (RobotState.getInstance().inConeMode()) {
+                    return State.MID_CONE;
+                }
+                return State.MID_CUBE;
+            case TOP:
+                if (RobotState.getInstance().inConeMode()) {
+                    return State.TOP_CONE;
+                }
+                return State.TOP_CUBE;
+            default:
+                return State.IDLE;
+        }
     }
 
     public void setState(State state) {
-        SmartDashboard.putNumber("Elevator setpoint", state.setpoint);
         setControlMode(ControlMode.PID);
         PID.setSetpoint(state.setpoint);
     }
@@ -118,7 +129,6 @@ public class Elevator extends SubsystemBase {
     public void resetEncoder() {
         encoder.setPosition(0);
     }
-
 
     private static Elevator instance;
 

@@ -5,6 +5,7 @@ import com.ctre.phoenix.sensors.CANCoder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -27,7 +28,6 @@ import static org.team498.C2023.Ports.Drivetrain.*;
 
 public class Drivetrain extends SubsystemBase {
     // Profiled controller for the rotation of the robot
-    // TODO see if the profiled controller here causes the robot to turn on startup
     private final ProfiledPIDController angleController = new ProfiledPIDController(AngleConstants.P,
                                                                                     AngleConstants.I,
                                                                                     AngleConstants.D,
@@ -68,8 +68,8 @@ public class Drivetrain extends SubsystemBase {
 
         angleController.enableContinuousInput(-180, 180);
         angleController.setTolerance(AngleConstants.EPSILON);
-        xController.setTolerance(PoseConstants.EPSILON);
-        yController.setTolerance(PoseConstants.EPSILON);
+        xController.setTolerance(0);
+        yController.setTolerance(0);
 
         // Set up the kinematics
         double moduleDistance = Units.inchesToMeters(SWERVE_MODULE_DISTANCE_FROM_CENTER);
@@ -93,7 +93,6 @@ public class Drivetrain extends SubsystemBase {
 
         SmartDashboard.putData(this);
         SmartDashboard.putNumber("Gyro", getYaw());
-        SmartDashboard.putNumber("Angle Setpoint", angleController.getGoal().position);
 
         Robot.field.setRobotPose(getPose());
     }
@@ -124,10 +123,13 @@ public class Drivetrain extends SubsystemBase {
     public void setOdometry(Pose2d pose) {
         odometry.resetPosition(Rotation2d.fromDegrees(gyro.getYaw()), getModulePositions(), pose);
     }
+    public void setOdometry(Pose3d pose) {
+        odometry.resetPosition(Rotation2d.fromDegrees(gyro.getYaw() ), getModulePositions(), new Pose2d(pose.getX(), pose.getY(), Rotation2d.fromDegrees(gyro.getYaw() + 180)));
+    }
 
     /** @return true if all three swerve controllers have reached their position goals (x pos, y pos, angle) */
     public boolean atPositionGoals() {
-        return xController.atSetpoint() && yController.atSetpoint() && atAngleGoal();
+        return (Math.abs(xController.getPositionError()) < PoseConstants.EPSILON) && (Math.abs(yController.getPositionError()) < PoseConstants.EPSILON) && atAngleGoal();
     }
 
     /** Sets the position goals of the swerve drive. */

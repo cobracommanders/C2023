@@ -9,7 +9,7 @@ public class RotateToDoubleSSPosition extends CommandBase {
 
     @Override
     public void initialize() {
-        if (RobotState.getInstance().hasCone()) {
+        if (RobotState.getInstance().inConeMode()) {
             wrist.setState(Wrist.State.COLLECT_CONE_SUBSTATION);
         } else {
             wrist.setState(Wrist.State.COLLECT_CUBE_SUBSTATION);

@@ -12,7 +12,7 @@ public class MoveToScoringPosition extends CommandBase {
     }
 
     @Override
-    public void end(boolean interrupted) {
-        elevator.atSetpoint();
+    public boolean isFinished() {
+        return elevator.atSetpoint();
     }
 }

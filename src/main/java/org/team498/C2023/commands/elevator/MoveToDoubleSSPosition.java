@@ -9,7 +9,7 @@ public class MoveToDoubleSSPosition extends CommandBase {
 
     @Override
     public void initialize() {
-        if (RobotState.getInstance().hasCone()) {
+        if (RobotState.getInstance().inConeMode()) {
             elevator.setState(Elevator.State.DOUBLE_SS_CONE);
         } else {
             elevator.setState(Elevator.State.DOUBLE_SS_CUBE);
@@ -17,7 +17,7 @@ public class MoveToDoubleSSPosition extends CommandBase {
     }
 
     @Override
-    public void end(boolean interrupted) {
-        elevator.atSetpoint();
+    public boolean isFinished() {
+        return elevator.atSetpoint();
     }
 }

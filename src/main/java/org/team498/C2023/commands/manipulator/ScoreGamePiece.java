@@ -10,7 +10,7 @@ public class ScoreGamePiece extends InstantCommand {
 
     @Override
     public void initialize() {
-        if (RobotState.getInstance().hasCone()) {
+        if (RobotState.getInstance().inConeMode()) {
             manipulator.setState(Manipulator.State.SCORE_CONE);
         } else {
             manipulator.setState(Manipulator.State.SCORE_CUBE);

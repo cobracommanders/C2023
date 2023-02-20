@@ -9,8 +9,10 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+
 import org.team498.C2023.subsystems.Drivetrain;
 import org.team498.C2023.subsystems.Manipulator;
+import org.team498.C2023.subsystems.Photonvision;
 import org.team498.C2023.subsystems.Vision;
 import org.team498.lib.drivers.Gyro;
 
@@ -26,6 +28,7 @@ public class Robot extends TimedRobot {
     private final Vision vision = Vision.getInstance();
     private final Drivetrain drivetrain = Drivetrain.getInstance();
     private final Gyro gyro = Gyro.getInstance();
+    private final Photonvision photonvision = Photonvision.getInstance();
 
     @Override
     public void robotInit() {
@@ -47,23 +50,27 @@ public class Robot extends TimedRobot {
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
 
-        SmartDashboard.putNumber("Tag ID", vision.getTargetedTag());
+        SmartDashboard.putNumber("Targeted Tag ID", vision.getTargetedTag());
 
-        vision.getRobotPose().ifPresent(drivetrain::setOdometry);
+        photonvision.getEstimatedGlobalPose(drivetrain.getPose()).ifPresent(pose -> {
+            drivetrain.setOdometry(pose.estimatedPose);
+        });
 
         if (RobotPositions.inCommunity()) {
-            if (RobotState.getInstance().hasCone()) {
-                field.getObject("Scoring Targets").setPoses(RobotPositions.getRightPosition(), RobotPositions.getLeftPosition());
+            if (RobotState.getInstance().inConeMode()) {
+                field.getObject("Scoring Targets").setPoses(RobotPositions.getRightScoringPosition(), RobotPositions.getLeftScoringPosition());
             } else {
-                field.getObject("Scoring Targets").setPose(RobotPositions.getCenterPosition());
+                field.getObject("Scoring Targets").setPose(RobotPositions.getCenterScoringPosition());
             }
-        } else {
+        }  else if (RobotPositions.inLoadingZone()) {
+            field.getObject("Scoring Targets").setPoses(RobotPositions.getLeftSubstationPosition(), RobotPositions.getRightSubstationPosition(), RobotPositions.getSingleSubstationPosition());
+        }
+        else {
             field.getObject("Scoring Targets").setPose(new Pose2d(-1, -1, new Rotation2d()));
         }
 
-        SmartDashboard.putBoolean("In Community", RobotPositions.inCommunity());
-
         SmartDashboard.putBoolean("Manipulator Stalling", Manipulator.getInstance().isStalling());
+
 
         //TODO: Check if alliance is actually invalid when the FMS is not connected
         if (alliance == Alliance.Invalid) {
@@ -78,17 +85,19 @@ public class Robot extends TimedRobot {
                              : 180;
         }
     }
+
     @Override
     public void disabledPeriodic() {
         alliance = DriverStation.getAlliance();
-        // This reverses the coordinates/direction of the drive commands on the red alliance
+        // This reverses the coordinates/direction of the drive commands on the red
+        // alliance
         coordinateFlip = alliance == Alliance.Blue
-                         ? 1
-                         : -1;
+                ? 1
+                : -1;
         // Add 180 degrees to all teleop rotation setpoints while on the red alliance
         rotationOffset = alliance == Alliance.Blue
-                         ? 0
-                         : 180;
+                ? 0
+                : 180;
     }
 
     @Override
