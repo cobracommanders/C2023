@@ -14,6 +14,7 @@ import org.team498.C2023.commands.manipulator.ScoreGamePiece;
 import org.team498.C2023.commands.manipulator.StopManipulator;
 import org.team498.C2023.commands.robot.AlignAndScore;
 import org.team498.C2023.commands.robot.CollectFromDoubleSS;
+import org.team498.C2023.commands.robot.LowerElevator;
 import org.team498.C2023.commands.wrist.ManualWrist;
 import org.team498.C2023.commands.wrist.RotateToDoubleSSPosition;
 import org.team498.C2023.commands.wrist.RotateToScoringPosition;
@@ -98,8 +99,9 @@ public class RobotContainer {
 
     private void configureOperatorCommands() {
         operator.Y().onTrue(new InstantCommand(() -> robotState.setNextScoringHeight(ScoringHeight.TOP)));
-        operator.X().onTrue(new InstantCommand(() -> robotState.setNextScoringHeight(ScoringHeight.MID)));
+        operator.B().onTrue(new InstantCommand(() -> robotState.setNextScoringHeight(ScoringHeight.MID)));
         operator.A().onTrue(new InstantCommand(() -> robotState.setNextScoringHeight(ScoringHeight.LOW)));
+        operator.X().onTrue(new LowerElevator());
 
         // Left bumper sets the current game piece to a cone, right bumper sets it to a cube
         operator.leftBumper().onTrue(new InstantCommand(() -> robotState.setCurrentGameMode(GamePiece.CONE)));

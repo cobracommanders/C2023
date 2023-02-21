@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 import org.team498.C2023.subsystems.Drivetrain;
+import org.team498.C2023.subsystems.Elevator;
 import org.team498.C2023.subsystems.Manipulator;
 import org.team498.C2023.subsystems.Photonvision;
 import org.team498.C2023.subsystems.Vision;
@@ -44,6 +45,7 @@ public class Robot extends TimedRobot {
 
         SmartDashboard.putData(field);
         FieldPositions.displayAll();
+
     }
 
     @Override

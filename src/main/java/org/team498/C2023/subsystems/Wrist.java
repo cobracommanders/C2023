@@ -4,14 +4,21 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycle;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static org.team498.C2023.Constants.WristConstants.*;
 import static org.team498.C2023.Ports.Wrist.ENCODER_PORT;
 import static org.team498.C2023.Ports.Wrist.WRIST;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.team498.C2023.RobotState;
 
@@ -23,6 +30,24 @@ public class Wrist extends SubsystemBase {
 
     private ControlMode controlMode;
     private double speed = 0;
+
+    private final ShuffleboardLayout tab = Shuffleboard.getTab("Tuning").getLayout("Wrist Tuning", BuiltInLayouts.kList);
+    private final Map<State, GenericEntry> entries = new LinkedHashMap<>();
+    private final GenericEntry error = Shuffleboard.getTab("Tuning").add("Wrist Error", 0).getEntry();
+    private final GenericEntry setpoint = Shuffleboard.getTab("Tuning").add("Wrist Setpoint", 0).getEntry();
+    private final GenericEntry position = Shuffleboard.getTab("Tuning").add("Wrist Position", 0).getEntry();
+
+    public void initShuffleboard() {
+        for (State state : State.values()) {
+            entries.put(state, tab.addPersistent(state.name(), state.setpoint).getEntry());
+        }
+    }
+
+    public void updateFromShuffleboard() {
+        for (State state : State.values()) {
+            state.setpoint = entries.get(state).get().getDouble();
+        }
+    }
 
     public enum State {
         COLLECT_CONE_CONEARISER(0),
@@ -41,10 +66,10 @@ public class Wrist extends SubsystemBase {
         AUTO_SHOT(0),
         IDLE(-(1.0 / 12.0));
 
-        private final double position;
+        private double setpoint;
 
-        State(double position) {
-            this.position = position;
+        State(double setpoint) {
+            this.setpoint = setpoint;
         }
     }
 
@@ -67,6 +92,7 @@ public class Wrist extends SubsystemBase {
         encoder = new DutyCycle(new DigitalInput(ENCODER_PORT));
 
         setState(State.IDLE);
+        initShuffleboard();
     }
 
     @Override
@@ -82,6 +108,11 @@ public class Wrist extends SubsystemBase {
         SmartDashboard.putNumber("Wrist encoder", getAngle());
         SmartDashboard.putData(this);
 
+        error.setDouble(PID.getPositionError());
+        setpoint.setDouble(PID.getSetpoint());
+        position.setDouble(encoder.getOutput());
+
+        updateFromShuffleboard();
     }
 
     public void setControlMode(ControlMode mode) {
@@ -124,7 +155,7 @@ public class Wrist extends SubsystemBase {
 
     public void setState(State state) {
         setControlMode(ControlMode.PID);
-        PID.setSetpoint(state.position);
+        PID.setSetpoint(state.setpoint);
     }
 
     private static Wrist instance;
