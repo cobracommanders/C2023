@@ -21,7 +21,9 @@ import org.team498.C2023.subsystems.*;
 import org.team498.lib.drivers.Gyro;
 import org.team498.lib.drivers.Xbox;
 
-import static org.team498.C2023.RobotState.ScoringHeight.*;
+import static org.team498.C2023.RobotState.ScoringHeight.TOP;
+import static org.team498.C2023.RobotState.ScoringHeight.MID;
+import static org.team498.C2023.RobotState.ScoringHeight.LOW;
 
 public class RobotContainer {
     public final Xbox driver = new Xbox(OIConstants.DRIVER_CONTROLLER_ID);
@@ -99,9 +101,9 @@ public class RobotContainer {
     }
 
     private void configureOperatorCommands() {
-        operator.Y().onTrue(new InstantCommand(() -> RobotState.getInstance().setNextScoringHeight(TOP)));
-        operator.B().onTrue(new InstantCommand(() -> RobotState.getInstance().setNextScoringHeight(MID)));
-        operator.A().onTrue(new InstantCommand(() -> RobotState.getInstance().setNextScoringHeight(LOW)));
+        operator.Y().onTrue(new InstantCommand(() -> robotState.setNextScoringHeight(TOP)));
+        operator.B().onTrue(new InstantCommand(() -> robotState.setNextScoringHeight(MID)));
+        operator.A().onTrue(new InstantCommand(() -> robotState.setNextScoringHeight(LOW)));
         operator.X().onTrue(new LowerElevator());
 
         // Left bumper sets the current game piece to a cone, right bumper sets it to a cube
