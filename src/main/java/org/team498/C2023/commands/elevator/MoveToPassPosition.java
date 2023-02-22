@@ -9,6 +9,7 @@ public class MoveToPassPosition extends CommandBase {
 
     @Override
     public void initialize() {
+        RobotState.getInstance().setNextScoringHeight(PASS_MODE);
         if (RobotState.getInstance().inConeMode()) {
             elevator.setState(Elevator.State.PASS_CONE);
         } else {

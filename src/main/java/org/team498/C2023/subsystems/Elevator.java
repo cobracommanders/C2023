@@ -6,17 +6,14 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.team498.C2023.RobotState;
 
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.Map;
 
 import static org.team498.C2023.Constants.ElevatorConstants.*;
@@ -24,6 +21,9 @@ import static org.team498.C2023.Ports.Elevator.L_ELEVATOR_ID;
 import static org.team498.C2023.Ports.Elevator.R_ELEVATOR_ID;
 
 public class Elevator extends SubsystemBase {
+
+    private static Elevator instance;
+
     private final CANSparkMax leftMotor;
     private final CANSparkMax rightMotor;
     private final RelativeEncoder encoder;
@@ -33,25 +33,7 @@ public class Elevator extends SubsystemBase {
     private final GenericEntry setpoint = Shuffleboard.getTab("Tuning").add("Elevator Setpoint", 0).getEntry();
     private final GenericEntry position = Shuffleboard.getTab("Tuning").add("Elevator Position", 0).getEntry();
 
-
-
-    private final PIDController PID;
-    private ControlMode controlMode;
-    private double speed = 0;
-
-    public void initShuffleboard() {
-        for (State state : State.values()) {
-            entries.put(state, tab.addPersistent(state.name(), state.setpoint).getEntry());
-        }
-    }
-
-    public void updateFromShuffleboard() {
-        for (State state : State.values()) {
-            state.setpoint = entries.get(state).get().getDouble();
-        }
-    }
-
-    public enum State {
+    private enum State {
         LOW_CONE(0),
         LOW_CUBE(0),
         MID_CONE(21),
@@ -78,6 +60,22 @@ public class Elevator extends SubsystemBase {
         MANUAL
     }
 
+    private final PIDController PID;
+    private ControlMode controlMode;
+    private double speed = 0;
+
+    private void initShuffleboard() {
+        for (State state : State.values()) {
+            entries.put(state, tab.addPersistent(state.name(), state.setpoint).getEntry());
+        }
+    }
+
+    private void updateFromShuffleboard() {
+        for (State state : State.values()) {
+            state.setpoint = entries.get(state).get().getDouble();
+        }
+    }
+
     private Elevator() {
         controlMode = ControlMode.MANUAL;
 
@@ -100,10 +98,14 @@ public class Elevator extends SubsystemBase {
 
 
     @Override
+    // Periodically check the setpoint of the current desired scoring position, and adjust
+    //the elevator height if it does not match the current elevator height.
     public void periodic() {
         double speed;
         if (controlMode == ControlMode.PID) {
-            speed = PID.calculate(encoder.getPosition());
+            //get the setpoint of the current scoring position, set speed based on our
+            //current position
+            speed = PID.calculate(encoder.getPosition(), getNextScoringPositionSetPoint());
         } else {
             speed = this.speed;
         }
@@ -123,31 +125,31 @@ public class Elevator extends SubsystemBase {
         updateFromShuffleboard();
     }
 
-    public State getNextScoringPosition() {
-        switch (RobotState.getInstance().getNextScoringHeight()) {
+    private double getNextScoringPositionSetPoint() {
+        switch (RobotState.getInstance().getCurrentScoringHeight()) {
             case LOW:
                 if (RobotState.getInstance().inConeMode()) {
-                    return State.LOW_CONE;
+                    return State.LOW_CONE.setpoint;
                 }
-                return State.LOW_CUBE;
+                return State.LOW_CUBE.setpoint;
             case MID:
                 if (RobotState.getInstance().inConeMode()) {
-                    return State.MID_CONE;
+                    return State.MID_CONE.setpoint;
                 }
-                return State.MID_CUBE;
+                return State.MID_CUBE.setpoint;
             case TOP:
                 if (RobotState.getInstance().inConeMode()) {
-                    return State.TOP_CONE;
+                    return State.TOP_CONE.setpoint;
                 }
-                return State.TOP_CUBE;
+                return State.TOP_CUBE.setpoint;
+            case DOUBLE_SS:
+                if (RobotState.getInstance().inConeMode()) {
+                    return State.DOUBLE_SS_CONE.setpoint;
+                }
+                return State.DOUBLE_SS_CUBE.setpoint;
             default:
-                return State.IDLE;
+                return State.IDLE.setpoint;
         }
-    }
-
-    public void setState(State state) {
-        setControlMode(ControlMode.PID);
-        PID.setSetpoint(state.setpoint);
     }
 
     public void setControlMode(ControlMode mode) {
@@ -162,17 +164,10 @@ public class Elevator extends SubsystemBase {
         return PID.getPositionError() < 0.5;
     }
 
-    public void resetEncoder() {
-        encoder.setPosition(0);
-    }
-
-    private static Elevator instance;
-
     public static Elevator getInstance() {
         if (instance == null) {
             instance = new Elevator();
         }
-
         return instance;
     }
 

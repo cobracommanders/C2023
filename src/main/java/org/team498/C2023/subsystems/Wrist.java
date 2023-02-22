@@ -12,15 +12,14 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-import static org.team498.C2023.Constants.WristConstants.*;
-import static org.team498.C2023.Ports.Wrist.ENCODER_PORT;
-import static org.team498.C2023.Ports.Wrist.WRIST;
+import org.team498.C2023.RobotState;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.team498.C2023.RobotState;
+import static org.team498.C2023.Constants.WristConstants.*;
+import static org.team498.C2023.Ports.Wrist.ENCODER_PORT;
+import static org.team498.C2023.Ports.Wrist.WRIST;
 
 public class Wrist extends SubsystemBase {
     private final CANSparkMax wrist;
@@ -128,7 +127,7 @@ public class Wrist extends SubsystemBase {
     }
 
     public State getNextScoringPosition() {
-        switch (RobotState.getInstance().getNextScoringHeight()) {
+        switch (RobotState.getInstance().getCurrentScoringHeight()) {
             case LOW:
                 if (RobotState.getInstance().inConeMode()) {
                     return State.LOW_CONE;
