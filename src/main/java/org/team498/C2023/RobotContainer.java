@@ -4,7 +4,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import org.team498.C2023.Constants.OIConstants;
 import org.team498.C2023.RobotState.GamePiece;
-import org.team498.C2023.RobotState.ScoringHeight;
 import org.team498.C2023.commands.drivetrain.*;
 import org.team498.C2023.commands.elevator.ManualElevator;
 import org.team498.C2023.commands.elevator.MoveToDoubleSSPosition;
@@ -21,6 +20,10 @@ import org.team498.C2023.commands.wrist.RotateToScoringPosition;
 import org.team498.C2023.subsystems.*;
 import org.team498.lib.drivers.Gyro;
 import org.team498.lib.drivers.Xbox;
+
+import static org.team498.C2023.RobotState.ScoringHeight.TOP;
+import static org.team498.C2023.RobotState.ScoringHeight.MID;
+import static org.team498.C2023.RobotState.ScoringHeight.LOW;
 
 public class RobotContainer {
     public final Xbox driver = new Xbox(OIConstants.DRIVER_CONTROLLER_ID);
@@ -98,9 +101,9 @@ public class RobotContainer {
     }
 
     private void configureOperatorCommands() {
-        operator.Y().onTrue(new InstantCommand(() -> robotState.setNextScoringHeight(ScoringHeight.TOP)));
-        operator.B().onTrue(new InstantCommand(() -> robotState.setNextScoringHeight(ScoringHeight.MID)));
-        operator.A().onTrue(new InstantCommand(() -> robotState.setNextScoringHeight(ScoringHeight.LOW)));
+        operator.Y().onTrue(new InstantCommand(() -> robotState.setNextScoringHeight(TOP)));
+        operator.B().onTrue(new InstantCommand(() -> robotState.setNextScoringHeight(MID)));
+        operator.A().onTrue(new InstantCommand(() -> robotState.setNextScoringHeight(LOW)));
         operator.X().onTrue(new LowerElevator());
 
         // Left bumper sets the current game piece to a cone, right bumper sets it to a cube
