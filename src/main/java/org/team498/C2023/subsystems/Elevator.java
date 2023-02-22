@@ -64,18 +64,6 @@ public class Elevator extends SubsystemBase {
     private ControlMode controlMode;
     private double speed = 0;
 
-    private void initShuffleboard() {
-        for (State state : State.values()) {
-            entries.put(state, tab.addPersistent(state.name(), state.setpoint).getEntry());
-        }
-    }
-
-    private void updateFromShuffleboard() {
-        for (State state : State.values()) {
-            state.setpoint = entries.get(state).get().getDouble();
-        }
-    }
-
     private Elevator() {
         controlMode = ControlMode.MANUAL;
 
@@ -94,6 +82,30 @@ public class Elevator extends SubsystemBase {
         PID = new PIDController(P, I, D);
 
         initShuffleboard();
+    }
+
+    private void initShuffleboard() {
+        for (State state : State.values()) {
+            entries.put(state, tab.addPersistent(state.name(), state.setpoint).getEntry());
+        }
+    }
+
+    private void updateFromShuffleboard() {
+        for (State state : State.values()) {
+            state.setpoint = entries.get(state).get().getDouble();
+        }
+    }
+
+    public void setControlMode(ControlMode mode) {
+        this.controlMode = mode;
+    }
+
+    public void setSpeed(double speed) {
+        this.speed = speed;
+    }
+
+    public boolean atSetpoint() {
+        return PID.getPositionError() < 0.5;
     }
 
 
@@ -155,18 +167,6 @@ public class Elevator extends SubsystemBase {
             default:
                 return State.IDLE.setpoint;
         }
-    }
-
-    public void setControlMode(ControlMode mode) {
-        this.controlMode = mode;
-    }
-
-    public void setSpeed(double speed) {
-        this.speed = speed;
-    }
-
-    public boolean atSetpoint() {
-        return PID.getPositionError() < 0.5;
     }
 
     public static Elevator getInstance() {
