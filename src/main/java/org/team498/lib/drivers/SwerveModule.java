@@ -77,7 +77,7 @@ public class SwerveModule extends SubsystemBase {
         steerMotor.set(ControlMode.Position, Falcon500Conversions.degreesToFalcon(angle /*- angleOffset*/, MK4I_STEER_REDUCTION_L2));
 
         lastAngle = (getState().angle.getDegrees() - angleOffset);
-    }     
+    }
 
     /** Get the velocity of the wheel in meters per second */
     private double getVelocityMPS() {

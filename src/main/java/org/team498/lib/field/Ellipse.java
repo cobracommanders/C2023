@@ -25,7 +25,7 @@ public class Ellipse extends Ellipse2D.Double implements BaseRegion {
      */
     @Override
     public void displayOnDashboard(String name) {
-        LinkedList<Pose2d> allPoses = new LinkedList<Pose2d>();
+        LinkedList<Pose2d> allPoses = new LinkedList<>();
 
         // Number of lines to draw the ellipse with, must be less than 85 for it to draw the whole thing
         double lines = 25;

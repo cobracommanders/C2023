@@ -9,6 +9,7 @@ public class SetIntake extends CommandBase {
 
     public SetIntake(Intake.State state) {
         this.state = state;
+        addRequirements(intake);
     }
 
     @Override

@@ -3,15 +3,14 @@ package org.team498.C2023.commands.manipulator;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import org.team498.C2023.subsystems.Manipulator;
 
-public class SetManipulatorState extends InstantCommand {
+public class SetManipulatorToNextState extends InstantCommand {
     private final Manipulator manipulator = Manipulator.getInstance();
-    private final Manipulator.State state;
-    public SetManipulatorState(Manipulator.State state) {
-        this.state = state;
+    public SetManipulatorToNextState() {
+        addRequirements(manipulator);
     }
 
     @Override
     public void initialize() {
-        manipulator.setState(state);
+        manipulator.setToNextState();
     }
 }

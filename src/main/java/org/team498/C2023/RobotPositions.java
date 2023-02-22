@@ -26,11 +26,6 @@ public class RobotPositions {
     private static final Point singleSubstationBlue = new Point(0, 0);
     private static final Point singleSubstationRed = FieldPositions.flip(singleSubstationBlue);
 
-    public enum Direction {
-        LEFT,
-        RIGHT
-    }
-
     public static boolean inLoadingZone() {
         return drivetrain.isInRegion(Robot.alliance == Alliance.Blue
                                      ? FieldPositions.blueLoadingZone
@@ -45,55 +40,41 @@ public class RobotPositions {
 
     public static Pose2d getLeftScoringPosition() {
         Pose2d pose = getClosestGrid().getNodePoints()[2][0].toPose2d();
-        if (Robot.alliance == Alliance.Blue) {
-            return pose.plus(new Transform2d(new Translation2d(scoringOffset, 0), Rotation2d.fromDegrees(180)));
-        } else {
-            return pose.plus(new Transform2d(new Translation2d(-scoringOffset, 0), Rotation2d.fromDegrees(0)));
-        }
-
-        //        return getClosestGrid().getNodePoints()[2][0].toPose2d().plus(new Transform2d(new Translation2d(scoringOffset * Robot.coordinateFlip, 0), Rotation2d.fromDegrees(180 - Robot.rotationDirection)));
+        return Robot.alliance == Alliance.Blue
+               ? pose.plus(new Transform2d(new Translation2d(scoringOffset, 0), Rotation2d.fromDegrees(180)))
+               : pose.plus(new Transform2d(new Translation2d(-scoringOffset, 0), Rotation2d.fromDegrees(0)));
     }
 
     public static Pose2d getCenterScoringPosition() {
         Pose2d pose = getClosestGrid().getNodePoints()[2][1].toPose2d();
-        if (Robot.alliance == Alliance.Blue) {
-            return pose.plus(new Transform2d(new Translation2d(scoringOffset, 0), Rotation2d.fromDegrees(180)));
-        } else {
-            return pose.plus(new Transform2d(new Translation2d(-scoringOffset, 0), Rotation2d.fromDegrees(0)));
-        }
+        return Robot.alliance == Alliance.Blue
+               ? pose.plus(new Transform2d(new Translation2d(scoringOffset, 0), Rotation2d.fromDegrees(180)))
+               : pose.plus(new Transform2d(new Translation2d(-scoringOffset, 0), Rotation2d.fromDegrees(0)));
     }
 
     public static Pose2d getRightScoringPosition() {
         Pose2d pose = getClosestGrid().getNodePoints()[2][2].toPose2d();
-        if (Robot.alliance == Alliance.Blue) {
-            return pose.plus(new Transform2d(new Translation2d(scoringOffset, 0), Rotation2d.fromDegrees(180)));
-        } else {
-            return pose.plus(new Transform2d(new Translation2d(-scoringOffset, 0), Rotation2d.fromDegrees(0)));
-        }
+        return Robot.alliance == Alliance.Blue
+               ? pose.plus(new Transform2d(new Translation2d(scoringOffset, 0), Rotation2d.fromDegrees(180)))
+               : pose.plus(new Transform2d(new Translation2d(-scoringOffset, 0), Rotation2d.fromDegrees(0)));
     }
 
     public static Pose2d getRightSubstationPosition() {
-        if (Robot.alliance == Alliance.Blue) {
-            return rightDoubleSubstationBlue.toPose2d();
-        } else {
-            return rightDoubleSubstationRed.toPose2d();
-        }
+        return Robot.alliance == Alliance.Blue
+               ? rightDoubleSubstationBlue.toPose2d()
+               : rightDoubleSubstationRed.toPose2d();
     }
 
     public static Pose2d getLeftSubstationPosition() {
-        if (Robot.alliance == Alliance.Blue) {
-            return leftDoubleSubstationBlue.toPose2d();
-        } else {
-            return leftDoubleSubstationRed.toPose2d();
-        }
+        return Robot.alliance == Alliance.Blue
+               ? leftDoubleSubstationBlue.toPose2d()
+               : leftDoubleSubstationRed.toPose2d();
     }
 
     public static Pose2d getSingleSubstationPosition() {
-        if (Robot.alliance == Alliance.Blue) {
-            return singleSubstationBlue.toPose2d();
-        } else {
-            return singleSubstationRed.toPose2d();
-        }
+        return Robot.alliance == Alliance.Blue
+               ? singleSubstationBlue.toPose2d()
+               : singleSubstationRed.toPose2d();
     }
 
     private static Grid getClosestGrid() {

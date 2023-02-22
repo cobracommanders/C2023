@@ -30,7 +30,7 @@ public class OffenseDrive extends CommandBase {
 
     @Override
     public void initialize() {
-        Robot.robotContainer.driver.setRightStickLastAngle(drivetrain.getYaw() + Robot.rotationOffset);
+        Robot.controls.driver.setRightStickLastAngle(drivetrain.getYaw() + Robot.rotationOffset);
     }
 
     @Override

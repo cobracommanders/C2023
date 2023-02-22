@@ -18,23 +18,26 @@ public class Simulation {
     private final Wrist wrist = Wrist.getInstance();
     private final Mechanism2d mechanism2d = new Mechanism2d(Units.inchesToMeters(35), Units.inchesToMeters(65));
     private final MechanismRoot2d root = mechanism2d.getRoot("Root", Units.inchesToMeters(1), Units.inchesToMeters(1));
-    
+
     private final MechanismLigament2d drivetrain = root.append(new MechanismLigament2d("Drivetrain", Units.inchesToMeters(28), 0));
     private final MechanismLigament2d elevatorBase = root.append(new MechanismLigament2d("Elevator Base", Units.inchesToMeters(3), 90));
     private final MechanismLigament2d elevatorBase2 = elevatorBase.append(new MechanismLigament2d("Elevator", Units.inchesToMeters(4), -30));
-    
+
 
     /* ELEVATOR */
     private final ElevatorSim elevatorSim = new ElevatorSim(DCMotor.getNEO(2),
                                                             5,
                                                             5.36781211,
-                                                            Units.inchesToMeters(0.703 * 2),
+                                                            Units.inchesToMeters(1.273),
                                                             0,
-                                                            Units.inchesToMeters(9999),
-                                                            true,
-                                                            VecBuilder.fill(0.01)
+                                                            1.5,
+                                                            false,
+                                                            VecBuilder.fill(0.00)
     );
-    private final MechanismLigament2d elevatorMechanism = elevatorBase2.append(new MechanismLigament2d("Elevator", elevatorSim.getPositionMeters(), 0));
+    private final MechanismLigament2d elevatorMechanism = elevatorBase2.append(new MechanismLigament2d("Elevator",
+                                                                                                       elevatorSim.getPositionMeters(),
+                                                                                                       0
+    ));
 
 
     /* WRIST */
@@ -44,12 +47,13 @@ public class Simulation {
                                                                          10.75,
                                                                          Math.toRadians(-30),
                                                                          Math.toRadians(200),
-                                                                         false,
-                                                                         VecBuilder.fill(0.01)
+                                                                         true,
+                                                                         VecBuilder.fill(0.00)
     );
-    private final MechanismLigament2d wristMechanism = elevatorMechanism.append(new MechanismLigament2d("Wrist", Units.inchesToMeters(10.75), wristSim.getAngleRads()));
-
-   
+    private final MechanismLigament2d wristMechanism = elevatorMechanism.append(new MechanismLigament2d("Wrist",
+                                                                                                        Units.inchesToMeters(10.75),
+                                                                                                        wristSim.getAngleRads()
+    ));
 
 
     public Simulation() {
@@ -59,8 +63,8 @@ public class Simulation {
     public void update() {
         elevatorSim.setInput(elevator.getPower() * RobotController.getBatteryVoltage());
         elevatorSim.update(Robot.kDefaultPeriod);
-        elevator.setEncoderPosition(elevatorSim.getPositionMeters());
-        elevatorMechanism.setLength((elevator.getPosition() / 22));
+        elevator.setEncoderPosition(elevatorSim.getPositionMeters() * Constants.ElevatorConstants.MOTOR_ROTATION_TO_METERS);
+        elevatorMechanism.setLength(elevator.getPosition());
 
         wristSim.setInput(wrist.getPower() * RobotController.getBatteryVoltage());
         wristSim.update(Robot.kDefaultPeriod);

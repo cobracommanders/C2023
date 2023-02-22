@@ -38,7 +38,7 @@ public class FollowTrajectory extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return timer.get() > trajectory.getTotalTimeSeconds() || Robot.robotContainer.driver.isStickActive();
+        return timer.get() > trajectory.getTotalTimeSeconds() || Robot.controls.driver.isStickActive();
     }
 
     @Override
