@@ -6,17 +6,14 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.team498.C2023.RobotState;
 
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.Map;
 
 import static org.team498.C2023.Constants.ElevatorConstants.*;
@@ -32,7 +29,6 @@ public class Elevator extends SubsystemBase {
     private final GenericEntry error = Shuffleboard.getTab("Tuning").add("Elevator Error", 0).getEntry();
     private final GenericEntry setpoint = Shuffleboard.getTab("Tuning").add("Elevator Setpoint", 0).getEntry();
     private final GenericEntry position = Shuffleboard.getTab("Tuning").add("Elevator Position", 0).getEntry();
-
 
 
     private final PIDController PID;
@@ -91,13 +87,13 @@ public class Elevator extends SubsystemBase {
         rightMotor.setIdleMode(IdleMode.kBrake);
 
         encoder = leftMotor.getEncoder();
-        rightMotor.follow(leftMotor, true);
+        // rightMotor.follow(leftMotor, true);
 
         PID = new PIDController(P, I, D);
 
+
         initShuffleboard();
     }
-
 
     @Override
     public void periodic() {
@@ -119,9 +115,11 @@ public class Elevator extends SubsystemBase {
         error.setDouble(PID.getPositionError());
         setpoint.setDouble(PID.getSetpoint());
         position.setDouble(encoder.getPosition());
-    
-        updateFromShuffleboard();
+
+        //updateFromShuffleboard();
+
     }
+
 
     public State getNextScoringPosition() {
         switch (RobotState.getInstance().getNextScoringHeight()) {
@@ -162,9 +160,18 @@ public class Elevator extends SubsystemBase {
         return PID.getPositionError() < 0.5;
     }
 
-    public void resetEncoder() {
-        encoder.setPosition(0);
+    public double getPower() {
+        return leftMotor.get();
     }
+
+    public void setEncoderPosition(double position) {
+        encoder.setPosition(position);
+    }
+
+    public double getPosition() {
+        return encoder.getPosition();
+    }
+
 
     private static Elevator instance;
 

@@ -17,6 +17,8 @@ import org.team498.C2023.subsystems.Photonvision;
 import org.team498.C2023.subsystems.Vision;
 import org.team498.lib.drivers.Gyro;
 
+import com.revrobotics.REVPhysicsSim;
+
 public class Robot extends TimedRobot {
     public static int rotationFlip = -1;
     public static int coordinateFlip = 1;
@@ -46,6 +48,11 @@ public class Robot extends TimedRobot {
         SmartDashboard.putData(field);
         FieldPositions.displayAll();
 
+    }
+
+    @Override
+    public void simulationPeriodic() {
+        Simulation.getInstance().update();
     }
 
     @Override

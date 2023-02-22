@@ -12,15 +12,15 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-import static org.team498.C2023.Constants.WristConstants.*;
-import static org.team498.C2023.Ports.Wrist.ENCODER_PORT;
-import static org.team498.C2023.Ports.Wrist.WRIST;
+import org.team498.C2023.Robot;
+import org.team498.C2023.RobotState;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.team498.C2023.RobotState;
+import static org.team498.C2023.Constants.WristConstants.*;
+import static org.team498.C2023.Ports.Wrist.ENCODER_PORT;
+import static org.team498.C2023.Ports.Wrist.WRIST;
 
 public class Wrist extends SubsystemBase {
     private final CANSparkMax wrist;
@@ -36,6 +36,8 @@ public class Wrist extends SubsystemBase {
     private final GenericEntry error = Shuffleboard.getTab("Tuning").add("Wrist Error", 0).getEntry();
     private final GenericEntry setpoint = Shuffleboard.getTab("Tuning").add("Wrist Setpoint", 0).getEntry();
     private final GenericEntry position = Shuffleboard.getTab("Tuning").add("Wrist Position", 0).getEntry();
+    private double simAngle = 0;
+
 
     public void initShuffleboard() {
         for (State state : State.values()) {
@@ -97,7 +99,7 @@ public class Wrist extends SubsystemBase {
 
     @Override
     public void periodic() {
-        double speed = 0;
+        double speed;
         if (controlMode == ControlMode.PID) {
             speed = PID.calculate(getAngle());
         } else {
@@ -120,7 +122,9 @@ public class Wrist extends SubsystemBase {
     }
 
     public double getAngle() {
-        return encoder.getOutput() - 0.261493;
+        return Robot.isReal()
+               ? encoder.getOutput() - 0.261493
+               : simAngle;
     }
 
     public void setSpeed(double speed) {
@@ -157,6 +161,15 @@ public class Wrist extends SubsystemBase {
         setControlMode(ControlMode.PID);
         PID.setSetpoint(state.setpoint);
     }
+
+    public double getPower() {
+        return wrist.get();
+    }
+
+    public void setSimAngle(double position) {
+        simAngle = (position / 360);
+    }
+
 
     private static Wrist instance;
 
