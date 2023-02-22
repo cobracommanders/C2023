@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -17,6 +18,7 @@ import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.team498.C2023.Robot;
+import org.team498.C2023.Constants.DrivetrainConstants;
 import org.team498.lib.drivers.Gyro;
 import org.team498.lib.drivers.SwerveModule;
 import org.team498.lib.field.Point;
@@ -35,8 +37,10 @@ public class Drivetrain extends SubsystemBase {
     );
     // Profiled controller for the x position of the robot
     private final PIDController xController = new PIDController(PoseConstants.P, PoseConstants.I, PoseConstants.D);
+    private static SlewRateLimiter xLimiter = new SlewRateLimiter(DrivetrainConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     // Profiled controller for the y position of the robot
     private final PIDController yController = new PIDController(PoseConstants.P, PoseConstants.I, PoseConstants.D);
+    private static SlewRateLimiter yLimiter = new SlewRateLimiter(DrivetrainConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
 
     private final SwerveModule[] swerveModules;
     private final SwerveDriveKinematics kinematics;
@@ -70,6 +74,8 @@ public class Drivetrain extends SubsystemBase {
         angleController.setTolerance(AngleConstants.EPSILON);
         xController.setTolerance(0);
         yController.setTolerance(0);
+        xLimiter.reset(0);
+        yLimiter.reset(0);
 
         // Set up the kinematics
         double moduleDistance = Units.inchesToMeters(SWERVE_MODULE_DISTANCE_FROM_CENTER);
@@ -186,7 +192,8 @@ public class Drivetrain extends SubsystemBase {
      * @param rotation      a {@link Translation2d} representing the distance from the center of the robot to the desired center of rotation
      */
     public void drive(ChassisSpeeds chassisSpeeds, Translation2d rotation) {
-        setModuleStates(kinematics.toSwerveModuleStates(chassisSpeeds, rotation), false);
+        ChassisSpeeds limited = limitChassisSpeeds(chassisSpeeds);
+        setModuleStates(kinematics.toSwerveModuleStates(limited, rotation), false);
     }
 
     /**
@@ -202,7 +209,7 @@ public class Drivetrain extends SubsystemBase {
         for (int i = 0; i < swerveModules.length; i++) {
             swerveModules[i].setState(moduleStates[i], force);
         }
-
+        
         currentSpeeds = ChassisSpeeds.toFieldRelativeSpeeds(kinematics.toChassisSpeeds(moduleStates), Rotation2d.fromDegrees(getYaw()));
     }
 
@@ -227,7 +234,12 @@ public class Drivetrain extends SubsystemBase {
     public boolean isNear(Pose2d pose, double epsilon) {
         return Math.hypot(getPose().getX() - pose.getX(), getPose().getY() - pose.getY()) < epsilon;
     }
-
+    public static ChassisSpeeds limitChassisSpeeds(ChassisSpeeds unlimited) {
+        double x = xLimiter.calculate(unlimited.vxMetersPerSecond);
+        double y = yLimiter.calculate(unlimited.vyMetersPerSecond);
+        double r = unlimited.omegaRadiansPerSecond;
+        return new ChassisSpeeds(x, y, r);
+    }
 
     private static Drivetrain instance;
 

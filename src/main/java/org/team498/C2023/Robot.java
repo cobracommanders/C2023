@@ -18,7 +18,7 @@ import org.team498.C2023.subsystems.Vision;
 import org.team498.lib.drivers.Gyro;
 
 public class Robot extends TimedRobot {
-    public static int rotationFlip = -1;
+    public static int rotationFlip = 1;
     public static int coordinateFlip = 1;
     public static int rotationOffset = 0;
 
