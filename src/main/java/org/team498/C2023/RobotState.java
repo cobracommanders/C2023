@@ -5,7 +5,6 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.team498.C2023.subsystems.Drivetrain;
-import org.team498.C2023.subsystems.Elevator;
 import org.team498.C2023.subsystems.Vision;
 
 //TODO: Can this whole class just have static methods instead of a static instance
@@ -22,7 +21,7 @@ public class RobotState extends SubsystemBase {
         LOW, MID, TOP, DOUBLE_SS, PASS_MODE
     }
 
-    private ScoringHeight currentScoringHeight = ScoringHeight.LOW;
+    private ScoringHeight targetScoringHeight = ScoringHeight.LOW;
 
 
     private RobotState() {
@@ -31,12 +30,12 @@ public class RobotState extends SubsystemBase {
     }
 
     public void setNextScoringHeight(ScoringHeight nextScoringHeight) {
-        currentScoringHeight = nextScoringHeight;
+        targetScoringHeight = nextScoringHeight;
         SmartDashboard.putString("Scoring Target", nextScoringHeight.name());
     }
 
-    public ScoringHeight getCurrentScoringHeight() {
-        return currentScoringHeight;
+    public ScoringHeight getTargetScoringHeight() {
+        return targetScoringHeight;
     }
 
     public void setCurrentGameMode(GamePiece gamePiece) {

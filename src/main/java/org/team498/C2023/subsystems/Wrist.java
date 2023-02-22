@@ -127,7 +127,7 @@ public class Wrist extends SubsystemBase {
     }
 
     public State getNextScoringPosition() {
-        switch (RobotState.getInstance().getCurrentScoringHeight()) {
+        switch (RobotState.getInstance().getTargetScoringHeight()) {
             case LOW:
                 if (RobotState.getInstance().inConeMode()) {
                     return State.LOW_CONE;

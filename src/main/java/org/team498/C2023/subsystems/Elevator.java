@@ -138,7 +138,7 @@ public class Elevator extends SubsystemBase {
     }
 
     private double getNextScoringPositionSetPoint() {
-        switch (RobotState.getInstance().getCurrentScoringHeight()) {
+        switch (RobotState.getInstance().getTargetScoringHeight()) {
             case LOW:
                 if (RobotState.getInstance().inConeMode()) {
                     return State.LOW_CONE.setpoint;
