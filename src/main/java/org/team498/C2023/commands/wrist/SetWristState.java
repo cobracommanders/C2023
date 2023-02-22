@@ -9,7 +9,6 @@ public class SetWristState extends CommandBase {
 
     public SetWristState(Wrist.State state) {
         this.state = state;
-
         addRequirements(wrist);
     }
 

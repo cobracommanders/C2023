@@ -5,8 +5,8 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import static org.team498.C2023.Ports.ConeARiser.FRONTBACK;
-import static org.team498.C2023.Ports.ConeARiser.LEFTRIGHT;
+import static org.team498.C2023.Ports.ConeARiser.FRONT_BACK;
+import static org.team498.C2023.Ports.ConeARiser.LEFT_RIGHT;
 
 public class ConeARiser extends SubsystemBase {
     private final CANSparkMax frontBack;
@@ -27,8 +27,8 @@ public class ConeARiser extends SubsystemBase {
     }
 
     private ConeARiser() {
-        frontBack = new CANSparkMax(FRONTBACK, MotorType.kBrushless);
-        leftRight = new CANSparkMax(LEFTRIGHT, MotorType.kBrushless);
+        frontBack = new CANSparkMax(FRONT_BACK, MotorType.kBrushless);
+        leftRight = new CANSparkMax(LEFT_RIGHT, MotorType.kBrushless);
 
         frontBack.restoreFactoryDefaults();
         leftRight.restoreFactoryDefaults();
