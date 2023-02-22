@@ -4,6 +4,8 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
+
+import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -12,6 +14,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.ProfiledPIDCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.team498.C2023.RobotState;
 
@@ -32,8 +35,6 @@ public class Elevator extends SubsystemBase {
     private final GenericEntry error = Shuffleboard.getTab("Tuning").add("Elevator Error", 0).getEntry();
     private final GenericEntry setpoint = Shuffleboard.getTab("Tuning").add("Elevator Setpoint", 0).getEntry();
     private final GenericEntry position = Shuffleboard.getTab("Tuning").add("Elevator Position", 0).getEntry();
-
-
 
     private final PIDController PID;
     private ControlMode controlMode;
