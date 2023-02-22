@@ -147,6 +147,11 @@ public class Elevator extends SubsystemBase {
                     return State.DOUBLE_SS_CONE.setpoint;
                 }
                 return State.DOUBLE_SS_CUBE.setpoint;
+            case PASS_MODE:
+                if (RobotState.getInstance().inConeMode()) {
+                    return State.PASS_CONE.setpoint;
+                }
+                return State.PASS_CUBE.setpoint;
             default:
                 return State.IDLE.setpoint;
         }
