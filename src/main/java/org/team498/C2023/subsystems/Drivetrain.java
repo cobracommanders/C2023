@@ -5,6 +5,7 @@ import com.ctre.phoenix.sensors.CANCoder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -27,8 +28,11 @@ import static org.team498.C2023.Ports.Drivetrain.*;
 
 public class Drivetrain extends SubsystemBase {
     // Profiled controller for the rotation of the robot
-    // TODO see if the profiled controller here causes the robot to turn on startup
-    private final ProfiledPIDController angleController = new ProfiledPIDController(AngleConstants.P, AngleConstants.I, AngleConstants.D, AngleConstants.CONTROLLER_CONSTRAINTS);
+    private final ProfiledPIDController angleController = new ProfiledPIDController(AngleConstants.P,
+                                                                                    AngleConstants.I,
+                                                                                    AngleConstants.D,
+                                                                                    AngleConstants.CONTROLLER_CONSTRAINTS
+    );
     // Profiled controller for the x position of the robot
     private final PIDController xController = new PIDController(PoseConstants.P, PoseConstants.I, PoseConstants.D);
     // Profiled controller for the y position of the robot
@@ -41,31 +45,31 @@ public class Drivetrain extends SubsystemBase {
     public ChassisSpeeds currentSpeeds = new ChassisSpeeds();
 
     private Drivetrain() {
-        TalonFX FL_Drive = new TalonFX(FL_DRIVE_ID);
-        TalonFX FR_Drive = new TalonFX(FR_DRIVE_ID);
-        TalonFX BL_Drive = new TalonFX(BL_DRIVE_ID);
-        TalonFX BR_Drive = new TalonFX(BR_DRIVE_ID);
-        TalonFX FL_Steer = new TalonFX(FL_STEER_ID);
-        TalonFX FR_Steer = new TalonFX(FR_STEER_ID);
-        TalonFX BL_Steer = new TalonFX(BL_STEER_ID);
-        TalonFX BR_Steer = new TalonFX(BR_STEER_ID);
-        CANCoder FL_CANCoder = new CANCoder(FL_CANCODER_ID);
-        CANCoder FR_CANCoder = new CANCoder(FR_CANCODER_ID);
-        CANCoder BL_CANCoder = new CANCoder(BL_CANCODER_ID);
-        CANCoder BR_CANCoder = new CANCoder(BR_CANCODER_ID);
+        TalonFX FL_Drive = new TalonFX(FL_DRIVE);
+        TalonFX FR_Drive = new TalonFX(FR_DRIVE);
+        TalonFX BL_Drive = new TalonFX(BL_DRIVE);
+        TalonFX BR_Drive = new TalonFX(BR_DRIVE);
+        TalonFX FL_Steer = new TalonFX(FL_STEER);
+        TalonFX FR_Steer = new TalonFX(FR_STEER);
+        TalonFX BL_Steer = new TalonFX(BL_STEER);
+        TalonFX BR_Steer = new TalonFX(BR_STEER);
+        CANCoder FL_CANCoder = new CANCoder(FL_CANCODER);
+        CANCoder FR_CANCoder = new CANCoder(FR_CANCODER);
+        CANCoder BL_CANCoder = new CANCoder(BL_CANCODER);
+        CANCoder BR_CANCoder = new CANCoder(BR_CANCODER);
 
-        SwerveModule FL_Module = new SwerveModule(FL_Drive, FL_Steer, FL_CANCoder, FL_MODULE_OFFSET);
-        SwerveModule FR_Module = new SwerveModule(FR_Drive, FR_Steer, FR_CANCoder, FR_MODULE_OFFSET);
-        SwerveModule BL_Module = new SwerveModule(BL_Drive, BL_Steer, BL_CANCoder, BL_MODULE_OFFSET);
-        SwerveModule BR_Module = new SwerveModule(BR_Drive, BR_Steer, BR_CANCoder, BR_MODULE_OFFSET);
+        SwerveModule FL_Module = new SwerveModule("FL", FL_Drive, FL_Steer, FL_CANCoder, FL_MODULE_OFFSET);
+        SwerveModule FR_Module = new SwerveModule("FR", FR_Drive, FR_Steer, FR_CANCoder, FR_MODULE_OFFSET);
+        SwerveModule BL_Module = new SwerveModule("BL", BL_Drive, BL_Steer, BL_CANCoder, BL_MODULE_OFFSET);
+        SwerveModule BR_Module = new SwerveModule("BR", BR_Drive, BR_Steer, BR_CANCoder, BR_MODULE_OFFSET);
 
         // Put all the swerve modules in an array to make using them easier
         swerveModules = new SwerveModule[] {FL_Module, FR_Module, BL_Module, BR_Module};
 
         angleController.enableContinuousInput(-180, 180);
         angleController.setTolerance(AngleConstants.EPSILON);
-        xController.setTolerance(PoseConstants.EPSILON);
-        yController.setTolerance(PoseConstants.EPSILON);
+        xController.setTolerance(0);
+        yController.setTolerance(0);
 
         // Set up the kinematics
         double moduleDistance = Units.inchesToMeters(SWERVE_MODULE_DISTANCE_FROM_CENTER);
@@ -89,7 +93,6 @@ public class Drivetrain extends SubsystemBase {
 
         SmartDashboard.putData(this);
         SmartDashboard.putNumber("Gyro", getYaw());
-        SmartDashboard.putNumber("Angle Setpoint", angleController.getGoal().position);
 
         Robot.field.setRobotPose(getPose());
     }
@@ -117,9 +120,16 @@ public class Drivetrain extends SubsystemBase {
         gyro.setAngleOffset(pose.getRotation().getDegrees());
     }
 
+    public void setOdometry(Pose2d pose) {
+        odometry.resetPosition(Rotation2d.fromDegrees(gyro.getYaw()), getModulePositions(), pose);
+    }
+    public void setOdometry(Pose3d pose) {
+        odometry.resetPosition(Rotation2d.fromDegrees(gyro.getYaw() ), getModulePositions(), new Pose2d(pose.getX(), pose.getY(), Rotation2d.fromDegrees(gyro.getYaw() + 180)));
+    }
+
     /** @return true if all three swerve controllers have reached their position goals (x pos, y pos, angle) */
     public boolean atPositionGoals() {
-        return xController.atSetpoint() && yController.atSetpoint() && atAngleGoal();
+        return (Math.abs(xController.getPositionError()) < PoseConstants.EPSILON) && (Math.abs(yController.getPositionError()) < PoseConstants.EPSILON) && atAngleGoal();
     }
 
     /** Sets the position goals of the swerve drive. */
@@ -180,7 +190,8 @@ public class Drivetrain extends SubsystemBase {
     }
 
     /**
-     * Set the swerve modules to the desired states. Under normal operation, the angle will not change unless the robot is moving, however this can be overridden by setting 'force' to true.
+     * Set the swerve modules to the desired states. Under normal operation, the angle will not change unless the robot is moving, however this can be
+     * overridden by setting 'force' to true.
      *
      * @param moduleStates an array of {@link SwerveModuleState module states} to set the swerve to
      * @param force        if set to true, the module states will be set even if the robot is not moving
@@ -211,6 +222,10 @@ public class Drivetrain extends SubsystemBase {
 
     public boolean isInRegion(Region region) {
         return region.contains(Point.fromPose2d(getPose()));
+    }
+
+    public boolean isNear(Pose2d pose, double epsilon) {
+        return Math.hypot(getPose().getX() - pose.getX(), getPose().getY() - pose.getY()) < epsilon;
     }
 
 

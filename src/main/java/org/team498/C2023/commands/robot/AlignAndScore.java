@@ -8,7 +8,8 @@ import java.util.function.Supplier;
 
 public class AlignAndScore extends SequentialCommandGroup {
     public AlignAndScore(Supplier<Pose2d> scoringPosition) {
-        addCommands(new DriveToPosition(scoringPosition),
-                    new ScoreGamePiece());
+        super(new DriveToPosition(scoringPosition),
+              new Score()
+              );
     }
 }

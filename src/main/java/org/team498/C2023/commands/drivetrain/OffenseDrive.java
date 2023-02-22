@@ -16,7 +16,10 @@ public class OffenseDrive extends CommandBase {
     private final DoubleSupplier rotationSupplier;
     private final BooleanSupplier slowDriveSupplier;
 
-    public OffenseDrive(DoubleSupplier xTranslationSupplier, DoubleSupplier yTranslationSupplier, DoubleSupplier rotationSupplier, BooleanSupplier slowDriveSupplier) {
+    public OffenseDrive(DoubleSupplier xTranslationSupplier,
+                        DoubleSupplier yTranslationSupplier,
+                        DoubleSupplier rotationSupplier,
+                        BooleanSupplier slowDriveSupplier) {
         this.xTranslationSupplier = xTranslationSupplier;
         this.yTranslationSupplier = yTranslationSupplier;
         this.rotationSupplier = rotationSupplier;

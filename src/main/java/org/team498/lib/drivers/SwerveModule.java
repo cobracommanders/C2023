@@ -21,10 +21,12 @@ public class SwerveModule extends SubsystemBase {
     private final TalonFX steerMotor;
     private final CANCoder encoder;
     private final double angleOffset;
+    private final String name;
 
     private double lastAngle;
 
-    public SwerveModule(TalonFX driveMotor, TalonFX steerMotor, CANCoder CANCoder, double angleOffset) {
+    public SwerveModule(String name, TalonFX driveMotor, TalonFX steerMotor, CANCoder CANCoder, double angleOffset) {
+        this.name = name;
         this.driveMotor = driveMotor;
         this.steerMotor = steerMotor;
         this.encoder = CANCoder;
@@ -41,7 +43,9 @@ public class SwerveModule extends SubsystemBase {
 
     /** Matches the integrated encoder to the reading from the CANCoder */
     public void matchEncoders() {
-        steerMotor.setSelectedSensorPosition(Falcon500Conversions.degreesToFalcon(encoder.getAbsolutePosition() - angleOffset, MK4I_STEER_REDUCTION_L2));
+        steerMotor.setSelectedSensorPosition(Falcon500Conversions.degreesToFalcon(encoder.getAbsolutePosition() - angleOffset,
+                                                                                  MK4I_STEER_REDUCTION_L2
+        ));
     }
 
     /** Return the position of the wheel based on the integrated motor encoder */
@@ -70,15 +74,18 @@ public class SwerveModule extends SubsystemBase {
         double angle = (Math.abs(velocity) <= MAX_VELOCITY_METERS_PER_SECOND * 0.01) && !forcedAngle
                        ? lastAngle
                        : currentAngleTarget;
-        steerMotor.set(ControlMode.Position, Falcon500Conversions.degreesToFalcon(angle - angleOffset, MK4I_STEER_REDUCTION_L2));
+        steerMotor.set(ControlMode.Position, Falcon500Conversions.degreesToFalcon(angle /*- angleOffset*/, MK4I_STEER_REDUCTION_L2));
 
-        lastAngle = getState().angle.getDegrees();
-    }
+        lastAngle = (getState().angle.getDegrees() - angleOffset);
+    }     
 
     /** Get the velocity of the wheel in meters per second */
     private double getVelocityMPS() {
         // Convert the value returned by the sensor (rotations per 100ms) to rotations per second
-        return Falcon500Conversions.falconToMPS(driveMotor.getSelectedSensorVelocity(), Units.inchesToMeters(DRIVE_WHEEL_CIRCUMFERENCE), MK4I_DRIVE_REDUCTION_L2);
+        return Falcon500Conversions.falconToMPS(driveMotor.getSelectedSensorVelocity(),
+                                                Units.inchesToMeters(DRIVE_WHEEL_CIRCUMFERENCE),
+                                                MK4I_DRIVE_REDUCTION_L2
+        );
     }
 
     /** Get the current state of the swerve module as a {@link SwerveModuleState} */
@@ -87,7 +94,8 @@ public class SwerveModule extends SubsystemBase {
                 // Velocity of the wheel
                 getVelocityMPS(),
                 // The value of the steering encoder
-                Rotation2d.fromDegrees(getSteerEncoder()));
+                Rotation2d.fromDegrees(getSteerEncoder())
+        );
     }
 
     public SwerveModulePosition getPosition() {
@@ -95,7 +103,8 @@ public class SwerveModule extends SubsystemBase {
     }
 
     private double getPositionMeters() {
-        return Falcon500Conversions.falconToDegrees(driveMotor.getSelectedSensorPosition(), MK4I_DRIVE_REDUCTION_L2) / 360 * Units.inchesToMeters(DRIVE_WHEEL_CIRCUMFERENCE);
+        return Falcon500Conversions.falconToDegrees(driveMotor.getSelectedSensorPosition(), MK4I_DRIVE_REDUCTION_L2) / 360 * Units.inchesToMeters(
+                DRIVE_WHEEL_CIRCUMFERENCE);
     }
 
     // Custom optimize method by team 364
@@ -186,6 +195,11 @@ public class SwerveModule extends SubsystemBase {
 
         // Set the encoder to return values from 0 to 360 instead of -180 to +180
         CANCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
+        if (name.equals("FL")) {
+            CANCoder.configMagnetOffset(angleOffset);
+        } else {
+            CANCoder.configMagnetOffset(angleOffset + 180);
+        }
     }
 
 }

@@ -1,0 +1,410 @@
+[
+  {
+    "name": "/Shuffleboard/Tuning/Elevator Tuning/LOW_CONE",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Elevator Tuning/LOW_CUBE",
+    "type": "double",
+    "value": 2.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Elevator Tuning/MID_CONE",
+    "type": "double",
+    "value": 21.095142,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Elevator Tuning/MID_CUBE",
+    "type": "double",
+    "value": 7.047628,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Elevator Tuning/TOP_CONE",
+    "type": "double",
+    "value": 28.833111,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Elevator Tuning/TOP_CUBE",
+    "type": "double",
+    "value": 17.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Elevator Tuning/PASS_CONE",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Elevator Tuning/PASS_CUBE",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Elevator Tuning/DOUBLE_SS_CONE",
+    "type": "double",
+    "value": 21.45228,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Elevator Tuning/DOUBLE_SS_CUBE",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Elevator Tuning/AUTO_SHOT",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Elevator Tuning/IDLE",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Wrist Tuning/COLLECT_CONE_CONEARISER",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Wrist Tuning/COLLECT_CUBE_CONEARISER",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Wrist Tuning/COLLECT_CONE_SUBSTATION",
+    "type": "double",
+    "value": 0.102522,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Wrist Tuning/COLLECT_CUBE_SUBSTATION",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Wrist Tuning/PASS_CONE",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Wrist Tuning/PASS_CUBE",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Wrist Tuning/LOW_CONE",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Wrist Tuning/LOW_CUBE",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Wrist Tuning/MID_CONE",
+    "type": "double",
+    "value": 0.122934,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Wrist Tuning/MID_CUBE",
+    "type": "double",
+    "value": 0.056553,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Wrist Tuning/TOP_CONE",
+    "type": "double",
+    "value": 0.218485,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Wrist Tuning/TOP_CUBE",
+    "type": "double",
+    "value": 0.031152,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Wrist Tuning/UP",
+    "type": "double",
+    "value": 0.25,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Wrist Tuning/AUTO_SHOT",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Wrist Tuning/IDLE",
+    "type": "double",
+    "value": -0.08333333333333333,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Elevator States/LOW_CONE",
+    "type": "double",
+    "value": 5432.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Elevator States/LOW_CUBE",
+    "type": "double",
+    "value": 5432.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Elevator States/MID_CONE",
+    "type": "double",
+    "value": 5432.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Elevator States/MID_CUBE",
+    "type": "double",
+    "value": 5432.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Elevator States/TOP_CONE",
+    "type": "double",
+    "value": 5432.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Elevator States/TOP_CUBE",
+    "type": "double",
+    "value": 5432.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Elevator States/PASS_CONE",
+    "type": "double",
+    "value": 5432.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Elevator States/PASS_CUBE",
+    "type": "double",
+    "value": 5432.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Elevator States/DOUBLE_SS_CONE",
+    "type": "double",
+    "value": 5432.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Elevator States/DOUBLE_SS_CUBE",
+    "type": "double",
+    "value": 5432.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Elevator States/AUTO_SHOT",
+    "type": "double",
+    "value": 5432.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Elevator States/IDLE",
+    "type": "double",
+    "value": 5432.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Elevator/LOW_CONE",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Elevator/LOW_CUBE",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Elevator/MID_CONE",
+    "type": "double",
+    "value": 21.095142,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Elevator/MID_CUBE",
+    "type": "double",
+    "value": 7.047628,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Elevator/TOP_CONE",
+    "type": "double",
+    "value": 28.833111,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Elevator/TOP_CUBE",
+    "type": "double",
+    "value": 17.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Elevator/PASS_CONE",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Elevator/PASS_CUBE",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Elevator/DOUBLE_SS_CONE",
+    "type": "double",
+    "value": 21.45228,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Elevator/DOUBLE_SS_CUBE",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Elevator/AUTO_SHOT",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Shuffleboard/Tuning/Elevator/IDLE",
+    "type": "double",
+    "value": 0.0,
+    "properties": {
+      "persistent": true
+    }
+  }
+]

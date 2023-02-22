@@ -1,6 +1,5 @@
 package org.team498.C2023.commands.elevator;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import org.team498.C2023.subsystems.Elevator;
 
@@ -22,8 +21,7 @@ public class ManualElevator extends CommandBase {
 
     @Override
     public void execute() {
-        elevator.setSpeed(speedSupplier.getAsDouble());
-        SmartDashboard.putNumber("Elevator Power", speedSupplier.getAsDouble());
+        elevator.setSpeed(speedSupplier.getAsDouble());        
     }
 
     @Override

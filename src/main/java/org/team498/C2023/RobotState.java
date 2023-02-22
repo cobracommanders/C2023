@@ -11,12 +11,15 @@ import org.team498.C2023.subsystems.Vision;
 public class RobotState extends SubsystemBase {
     private final Vision vision;
     private final Drivetrain drivetrain;
-    private GamePiece currentGamePiece = GamePiece.CONE;
+    private GamePiece currentGameMode = GamePiece.CONE;
+    private ScoringHeight nextScoringHeight = ScoringHeight.LOW;
 
     public enum GamePiece {
-        CUBE,
-        CONE,
-        EMPTY
+        CUBE, CONE
+    }
+
+    public enum ScoringHeight {
+        LOW, MID, TOP
     }
 
     private RobotState() {
@@ -24,13 +27,22 @@ public class RobotState extends SubsystemBase {
         this.drivetrain = Drivetrain.getInstance();
     }
 
-    public void setCurrentGamePiece(GamePiece gamePiece) {
-        currentGamePiece = gamePiece;
-        SmartDashboard.putString("Current Game Piece", gamePiece.name());
+    public void setCurrentGameMode(GamePiece gamePiece) {
+        currentGameMode = gamePiece;
+        SmartDashboard.putBoolean("Current Game Piece", gamePiece == GamePiece.CONE);
     }
 
-    public boolean hasCube() {return currentGamePiece == GamePiece.CUBE;}
-    public boolean hasCone() {return currentGamePiece == GamePiece.CONE;}
+    public ScoringHeight getNextScoringHeight() {
+        return nextScoringHeight;
+    }
+
+    public void setNextScoringHeight(ScoringHeight nextScoringHeight) {
+        this.nextScoringHeight = nextScoringHeight;
+        SmartDashboard.putString("Scoring Target", nextScoringHeight.name());
+    }
+
+    public boolean inCubeMode() {return currentGameMode == GamePiece.CUBE;}
+    public boolean inConeMode() {return currentGameMode == GamePiece.CONE;}
 
     public Transform2d getRobotToField() {
         return toTransform2d(drivetrain.getPose());
