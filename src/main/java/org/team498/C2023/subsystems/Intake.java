@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static org.team498.C2023.Constants.IntakeConstants.*;
 import static org.team498.C2023.Ports.Intake.*;
 
+//TODO Update to add tricks
 public class Intake extends SubsystemBase {
     private final CANSparkMax rollers;
     private final CANSparkMax leftWrist;

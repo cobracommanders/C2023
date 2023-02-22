@@ -22,8 +22,8 @@ public final class Constants {
 
         public static final double FL_MODULE_OFFSET = 28 - 45;//360 - 312.4 - 45; //28.0 137.1
         public static final double FR_MODULE_OFFSET = 28 - 75;//270 - 137.1; //137.1 312.4
-        public static final double BL_MODULE_OFFSET = 28-45;//180 + 28.0 - 45; //312.4 74.5
-        public static final double BR_MODULE_OFFSET = 28-45 + 90 - 45;//74.5 - 45 - 180; //74.5 28.0
+        public static final double BL_MODULE_OFFSET = 28 - 45;//180 + 28.0 - 45; //312.4 74.5
+        public static final double BR_MODULE_OFFSET = 28 - 45 + 90 - 45;//74.5 - 45 - 180; //74.5 28.0
 
         public static final double ROBOT_WIDTH = 26.5 + 6; // Robot width with bumpers, in inches
 
@@ -55,9 +55,15 @@ public final class Constants {
     }
 
     public static final class ElevatorConstants {
-        public static final double P = 0.4;
+        public static final double MOTOR_ROTATION_TO_METERS = (1.273 * 2 * Math.PI) * 5;
+
+        public static final double P = 5;
         public static final double I = 0;
-        public static final double D = 0.02;
+        public static final double D = 0;
+
+        public static final double S = 0;
+        public static final double G = 0;
+        public static final double V = 0;
     }
 
     public static final class IntakeConstants {
@@ -66,12 +72,6 @@ public final class Constants {
         public static final double D = 0;
 
         public static final double F = 0;
-    }
-
-    public static final class ManipulatorConstants {
-        public static final double P = 0.1;
-        public static final double I = 0;
-        public static final double D = 0;
     }
 
     public static final class WristConstants {

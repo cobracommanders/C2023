@@ -1,19 +1,18 @@
 package org.team498.C2023.commands.elevator;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import org.team498.C2023.RobotState;
 import org.team498.C2023.subsystems.Elevator;
 
-public class MoveToDoubleSSPosition extends CommandBase {
+public class SetElevatorToPassPosition extends CommandBase {
     private final Elevator elevator = Elevator.getInstance();
+
+    public SetElevatorToPassPosition() {
+        addRequirements(elevator);
+    }
 
     @Override
     public void initialize() {
-        if (RobotState.getInstance().inConeMode()) {
-            elevator.setState(Elevator.State.DOUBLE_SS_CONE);
-        } else {
-            elevator.setState(Elevator.State.DOUBLE_SS_CUBE);
-        }
+        elevator.setState(Elevator.State.CONEARISER);
     }
 
     @Override

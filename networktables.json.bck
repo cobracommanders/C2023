@@ -210,7 +210,7 @@
   {
     "name": "/Shuffleboard/Tuning/Wrist Tuning/IDLE",
     "type": "double",
-    "value": -0.08333333333333333,
+    "value": -0.083333333333333,
     "properties": {
       "persistent": true
     }

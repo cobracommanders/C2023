@@ -6,10 +6,9 @@ import org.team498.C2023.commands.drivetrain.DriveToPosition;
 
 import java.util.function.Supplier;
 
-public class AlignAndScore extends SequentialCommandGroup {
-    public AlignAndScore(Supplier<Pose2d> scoringPosition) {
-        super(new DriveToPosition(scoringPosition),
-              new Score()
-              );
+public class AlignAndExecute extends SequentialCommandGroup {
+    public AlignAndExecute(Supplier<Pose2d> targetPosition) {
+        super(new DriveToPosition(targetPosition),
+              new ExecuteNextState());
     }
 }

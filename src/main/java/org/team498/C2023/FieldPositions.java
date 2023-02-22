@@ -36,8 +36,10 @@ public class FieldPositions {
                                                          flip(new Rectangle(1.37, 0, 3.54, 4.0337))
     );
 
-    public static final Point[] stagingMarkers = new Point[] {new Point(7.0775, height - 7.085), new Point(7.0775, height - 5.862), new Point(7.0775, height - 4.6396
-    ), new Point(7.0775, height - 3.4219), flip(new Point(7.0775, height - 7.085)), flip(new Point(7.0775, height - 5.862)), flip(new Point(7.0775, height - 4.6396
+    public static final Point[] stagingMarkers = new Point[] {new Point(7.0775, height - 7.085), new Point(7.0775, height - 5.862), new Point(7.0775,
+                                                                                                                                              height - 4.6396
+    ), new Point(7.0775, height - 3.4219), flip(new Point(7.0775, height - 7.085)), flip(new Point(7.0775, height - 5.862)), flip(new Point(7.0775,
+                                                                                                                                            height - 4.6396
     )), flip(new Point(7.0775, height - 3.4219)),};
 
     public static class Grid {
@@ -77,16 +79,16 @@ public class FieldPositions {
         return new Rectangle(midline + (midline - input.width - input.x), input.y, input.width, input.height);
     }
 
-    public static Grid blueLeft = new Grid(new Point(0.3657, height - 7.5033), Alliance.Blue);
-    public static Grid blueCoOp = new Grid(new Point(0.3657, height - 5.8233), Alliance.Blue);
-    public static Grid blueRight = new Grid(new Point(0.3657, height - 4.1503), Alliance.Blue);
+    public static final Grid blueLeft = new Grid(new Point(0.3657, height - 7.5033), Alliance.Blue);
+    public static final Grid blueCoOp = new Grid(new Point(0.3657, height - 5.8233), Alliance.Blue);
+    public static final Grid blueRight = new Grid(new Point(0.3657, height - 4.1503), Alliance.Blue);
 
-    public static Grid redLeft = new Grid(flip(new Point(0.3657, height - 7.5033)), Alliance.Red);
-    public static Grid redCoOp = new Grid(flip(new Point(0.3657, height - 5.8233)), Alliance.Red);
-    public static Grid redRight = new Grid(flip(new Point(0.3657, height - 4.1503)), Alliance.Red);
+    public static final Grid redLeft = new Grid(flip(new Point(0.3657, height - 7.5033)), Alliance.Red);
+    public static final Grid redCoOp = new Grid(flip(new Point(0.3657, height - 5.8233)), Alliance.Red);
+    public static final Grid redRight = new Grid(flip(new Point(0.3657, height - 4.1503)), Alliance.Red);
 
-    public static LinkedList<Grid> redGrids = new LinkedList<>(List.of(redLeft, redCoOp, redRight));
-    public static LinkedList<Grid> blueGrids = new LinkedList<>(List.of(blueLeft, blueCoOp, blueRight));
+    public static final LinkedList<Grid> redGrids = new LinkedList<>(List.of(redLeft, redCoOp, redRight));
+    public static final LinkedList<Grid> blueGrids = new LinkedList<>(List.of(blueLeft, blueCoOp, blueRight));
 
     public static void displayAll() {
         redLoadingZone.displayOnDashboard("Red Loading Zone");

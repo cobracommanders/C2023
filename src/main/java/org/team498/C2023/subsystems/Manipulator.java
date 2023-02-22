@@ -3,9 +3,8 @@ package org.team498.C2023.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.team498.C2023.RobotState;
 
 import static org.team498.C2023.Ports.Manipulator.ROLLERS;
 
@@ -13,27 +12,32 @@ public class Manipulator extends SubsystemBase {
     private final CANSparkMax rollers;
 
     public enum State {
-        COLLECT_CONE(1),
-        COLLECT_CUBE(-0.45),
-        SCORE_CONE(-1),
-        SCORE_CUBE(0.75),
-        AUTO_SHOT(0.5),
-        IDLE(0);
+        COLLECT(1, -0.45),
+        SCORE(-1, 0.75),
+        AUTO_SHOT(-1, 0.5),
+        IDLE(0, 0);
 
-        private final double rollerSpeed;
+        private final double speedCone;
+        private final double speedCube;
 
-        State(double rollerSpeed) {
-            this.rollerSpeed = rollerSpeed;
+        State(double speedCone, double speedCube) {
+            this.speedCone = speedCone;
+            this.speedCube = speedCube;
         }
     }
 
     private Manipulator() {
         rollers = new CANSparkMax(ROLLERS, MotorType.kBrushless);
-
         rollers.restoreFactoryDefaults();
         rollers.setInverted(true);
         rollers.setIdleMode(IdleMode.kBrake);
-        setState(State.IDLE);
+    }
+
+    public State getNextState() {
+        return switch (RobotState.getInstance().getNextHeight()) {
+            case LOW, MID, TOP -> State.SCORE;
+            case DOUBLE_SS, SINGLE_SS -> State.COLLECT;
+        };
     }
 
     public boolean isStalling() {
@@ -41,8 +45,13 @@ public class Manipulator extends SubsystemBase {
     }
 
     public void setState(State state) {
-        rollers.set(state.rollerSpeed);
-        SmartDashboard.putString("Manipulator Setting", state.name());
+        rollers.set(RobotState.getInstance().inConeMode()
+                    ? state.speedCone
+                    : state.speedCube);
+    }
+
+    public void setToNextState() {
+        setState(getNextState());
     }
 
 

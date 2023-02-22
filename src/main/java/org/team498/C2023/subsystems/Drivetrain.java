@@ -126,11 +126,11 @@ public class Drivetrain extends SubsystemBase {
         gyro.setAngleOffset(pose.getRotation().getDegrees());
     }
 
-    public void setOdometry(Pose2d pose) {
-        odometry.resetPosition(Rotation2d.fromDegrees(gyro.getYaw()), getModulePositions(), pose);
-    }
     public void setOdometry(Pose3d pose) {
-        odometry.resetPosition(Rotation2d.fromDegrees(gyro.getYaw() ), getModulePositions(), new Pose2d(pose.getX(), pose.getY(), Rotation2d.fromDegrees(gyro.getYaw() + 180)));
+        odometry.resetPosition(Rotation2d.fromDegrees(gyro.getYaw()),
+                               getModulePositions(),
+                               new Pose2d(pose.getX(), pose.getY(), Rotation2d.fromDegrees(gyro.getYaw() + 180))
+        );
     }
 
     /** @return true if all three swerve controllers have reached their position goals (x pos, y pos, angle) */
@@ -227,10 +227,23 @@ public class Drivetrain extends SubsystemBase {
         return gyro.getYaw();
     }
 
+    /**
+     * Checks if the drivetrain is in a region on the field
+     *
+     * @param region the region to check
+     * @return true if in the region
+     */
     public boolean isInRegion(Region region) {
         return region.contains(Point.fromPose2d(getPose()));
     }
 
+    /**
+     * Checks if the drivetrain is near a pose on the field
+     *
+     * @param pose    the pose to test
+     * @param epsilon maximum distance to the pose
+     * @return true if distance to the pose is less than the provided epsilon
+     */
     public boolean isNear(Pose2d pose, double epsilon) {
         return Math.hypot(getPose().getX() - pose.getX(), getPose().getY() - pose.getY()) < epsilon;
     }

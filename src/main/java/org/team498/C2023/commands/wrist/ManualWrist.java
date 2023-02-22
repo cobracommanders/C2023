@@ -1,10 +1,9 @@
 package org.team498.C2023.commands.wrist;
 
-import java.util.function.DoubleSupplier;
-
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import org.team498.C2023.subsystems.Wrist;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import java.util.function.DoubleSupplier;
 
 public class ManualWrist extends CommandBase {
     private final Wrist wrist = Wrist.getInstance();
@@ -16,13 +15,8 @@ public class ManualWrist extends CommandBase {
     }
 
     @Override
-    public void initialize() {
-        wrist.setControlMode(Wrist.ControlMode.MANUAL);
-    }
-
-    @Override
     public void execute() {
-        wrist.setSpeed(speedSupplier.getAsDouble());        
+        wrist.setSpeed(speedSupplier.getAsDouble());
     }
 
     @Override

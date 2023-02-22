@@ -5,25 +5,26 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.team498.C2023.subsystems.Drivetrain;
-import org.team498.C2023.subsystems.Vision;
 
-//TODO: Can this whole class just have static methods instead of a static instance
 public class RobotState extends SubsystemBase {
-    private final Vision vision;
     private final Drivetrain drivetrain;
     private GamePiece currentGameMode = GamePiece.CONE;
-    private ScoringHeight nextScoringHeight = ScoringHeight.LOW;
+    private Height nextHeight = Height.LOW;
 
     public enum GamePiece {
-        CUBE, CONE
+        CUBE,
+        CONE
     }
 
-    public enum ScoringHeight {
-        LOW, MID, TOP
+    public enum Height {
+        LOW,
+        MID,
+        TOP,
+        DOUBLE_SS,
+        SINGLE_SS
     }
 
     private RobotState() {
-        this.vision = Vision.getInstance();
         this.drivetrain = Drivetrain.getInstance();
     }
 
@@ -32,13 +33,13 @@ public class RobotState extends SubsystemBase {
         SmartDashboard.putBoolean("Current Game Piece", gamePiece == GamePiece.CONE);
     }
 
-    public ScoringHeight getNextScoringHeight() {
-        return nextScoringHeight;
+    public Height getNextHeight() {
+        return nextHeight;
     }
 
-    public void setNextScoringHeight(ScoringHeight nextScoringHeight) {
-        this.nextScoringHeight = nextScoringHeight;
-        SmartDashboard.putString("Scoring Target", nextScoringHeight.name());
+    public void setNextHeight(Height nextHeight) {
+        this.nextHeight = nextHeight;
+        SmartDashboard.putString("Scoring Target", nextHeight.name());
     }
 
     public boolean inCubeMode() {return currentGameMode == GamePiece.CUBE;}
@@ -48,17 +49,17 @@ public class RobotState extends SubsystemBase {
         return toTransform2d(drivetrain.getPose());
     }
 
-    public Transform2d getRobotToTarget() {
-        return getVisionToTarget().plus(getVisionToRobot().inverse());
-    }
+    // public Transform2d getRobotToTarget() {
+    //     return getVisionToTarget().plus(getVisionToRobot().inverse());
+    // }
 
     public Transform2d getRobotToPoint(Pose2d target) {
         return new Transform2d(drivetrain.getPose(), target);
     }
 
-    public Transform2d getVisionToTarget() {
-        return toTransform2d(vision.pose);
-    }
+    // public Transform2d getVisionToTarget() {
+    //     return toTransform2d(vision.getEstimatedGlobalPose(drivetrain.getPose()).get().estimatedPose);
+    // }
 
     public Transform2d getVisionToRobot() {
         return new Transform2d();
@@ -75,6 +76,7 @@ public class RobotState extends SubsystemBase {
     public Pose2d toPose2d(Transform2d pose) {
         return new Pose2d(pose.getX(), pose.getY(), pose.getRotation());
     }
+
 
     private static RobotState instance;
 

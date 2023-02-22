@@ -4,72 +4,46 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycle;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.team498.C2023.Robot;
+import org.team498.C2023.RobotState;
 
 import static org.team498.C2023.Constants.WristConstants.*;
 import static org.team498.C2023.Ports.Wrist.ENCODER_PORT;
 import static org.team498.C2023.Ports.Wrist.WRIST;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import org.team498.C2023.RobotState;
-
 public class Wrist extends SubsystemBase {
     private final CANSparkMax wrist;
+    private final DutyCycle encoder;
 
     private final PIDController PID;
-    private final DutyCycle encoder;
 
     private ControlMode controlMode;
     private double speed = 0;
 
-    private final ShuffleboardLayout tab = Shuffleboard.getTab("Tuning").getLayout("Wrist Tuning", BuiltInLayouts.kList);
-    private final Map<State, GenericEntry> entries = new LinkedHashMap<>();
-    private final GenericEntry error = Shuffleboard.getTab("Tuning").add("Wrist Error", 0).getEntry();
-    private final GenericEntry setpoint = Shuffleboard.getTab("Tuning").add("Wrist Setpoint", 0).getEntry();
-    private final GenericEntry position = Shuffleboard.getTab("Tuning").add("Wrist Position", 0).getEntry();
-
-    public void initShuffleboard() {
-        for (State state : State.values()) {
-            entries.put(state, tab.addPersistent(state.name(), state.setpoint).getEntry());
-        }
-    }
-
-    public void updateFromShuffleboard() {
-        for (State state : State.values()) {
-            state.setpoint = entries.get(state).get().getDouble();
-        }
-    }
+    private double simAngle = 0;
 
     public enum State {
-        COLLECT_CONE_CONEARISER(0),
-        COLLECT_CUBE_CONEARISER(0),
-        COLLECT_CONE_SUBSTATION(0.102522),
-        COLLECT_CUBE_SUBSTATION(0),
-        PASS_CONE(0),
-        PASS_CUBE(0),
-        LOW_CONE(0),
-        LOW_CUBE(0),
-        MID_CONE(0.122934),
-        MID_CUBE(0.056553),
-        TOP_CONE(0.218485),
-        TOP_CUBE(0.031152),
-        UP(0.25),
-        AUTO_SHOT(0),
-        IDLE(-(1.0 / 12.0));
+        CONEARISER(0, 0),
+        SINGLE_SS(0.10252, 0),
+        DOUBLE_SS(0, 0),
 
-        private double setpoint;
+        LOW(0, 0),
+        MID(0.12293, 0.05655),
+        TOP(0.21848, 0.03115),
 
-        State(double setpoint) {
-            this.setpoint = setpoint;
+        AUTO_SHOT(0, 0),
+        IDLE(-0.08333, -0.08333);
+
+        private final double setpointCone;
+        private final double setpointCube;
+
+        State(double setpointCone, double setpointCube) {
+            this.setpointCone = setpointCone;
+            this.setpointCube = setpointCube;
         }
     }
 
@@ -87,76 +61,71 @@ public class Wrist extends SubsystemBase {
 
         wrist.setInverted(true);
 
-        PID = new PIDController(P, I, D);
-
         encoder = new DutyCycle(new DigitalInput(ENCODER_PORT));
 
-        setState(State.IDLE);
-        initShuffleboard();
+        PID = new PIDController(P, I, D);
     }
 
     @Override
     public void periodic() {
-        double speed = 0;
+        double speed;
         if (controlMode == ControlMode.PID) {
             speed = PID.calculate(getAngle());
         } else {
             speed = this.speed;
         }
         wrist.set(speed);
-        // wrist.set(PID.calculate(getAngle())/*+ (Math.cos(Math.toRadians(getAngle())) * F)*/);
-        SmartDashboard.putNumber("Wrist encoder", getAngle());
+
         SmartDashboard.putData(this);
-
-        error.setDouble(PID.getPositionError());
-        setpoint.setDouble(PID.getSetpoint());
-        position.setDouble(encoder.getOutput());
-
-        updateFromShuffleboard();
+        SmartDashboard.putNumber("Wrist Angle", getAngle());
+        SmartDashboard.putBoolean("Wrist at Setpoint", atSetpoint());
+        SmartDashboard.putNumber("Wrist Error", PID.getPositionError());
     }
 
-    public void setControlMode(ControlMode mode) {
-        this.controlMode = mode;
+    public State getNextState() {
+        return switch (RobotState.getInstance().getNextHeight()) {
+            case LOW -> State.LOW;
+            case MID -> State.MID;
+            case TOP -> State.TOP;
+            case DOUBLE_SS -> State.DOUBLE_SS;
+            case SINGLE_SS -> State.SINGLE_SS;
+        };
     }
 
-    public double getAngle() {
-        return encoder.getOutput() - 0.261493;
+    public void setState(State state) {
+        this.controlMode = ControlMode.PID;
+        PID.setSetpoint(RobotState.getInstance().inConeMode()
+                        ? state.setpointCone
+                        : state.setpointCube);
     }
 
     public void setSpeed(double speed) {
+        this.controlMode = ControlMode.MANUAL;
         this.speed = speed;
     }
 
-    public State getNextScoringPosition() {
-        switch (RobotState.getInstance().getNextScoringHeight()) {
-            case LOW:
-                if (RobotState.getInstance().inConeMode()) {
-                    return State.LOW_CONE;
-                }
-                return State.LOW_CUBE;
-            case MID:
-                if (RobotState.getInstance().inConeMode()) {
-                    return State.MID_CONE;
-                }
-                return State.MID_CUBE;
-            case TOP:
-                if (RobotState.getInstance().inConeMode()) {
-                    return State.TOP_CONE;
-                }
-                return State.TOP_CUBE;
-            default:
-                return State.IDLE;
-        }
+    public double getAngle() {
+        return Robot.isReal()
+               ? encoder.getOutput() - 0.261493
+               : simAngle;
     }
 
     public boolean atSetpoint() {
         return PID.atSetpoint();
     }
 
-    public void setState(State state) {
-        setControlMode(ControlMode.PID);
-        PID.setSetpoint(state.setpoint);
+    public double getPower() {
+        return wrist.get();
     }
+
+    public void setSimAngle(double position) {
+        simAngle = (position / 360);
+    }
+
+    public void setToNextState() {
+        setState(getNextState());
+    }
+
 
     private static Wrist instance;
 

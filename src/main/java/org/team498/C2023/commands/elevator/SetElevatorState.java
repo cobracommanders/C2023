@@ -9,7 +9,6 @@ public class SetElevatorState extends CommandBase {
 
     public SetElevatorState(Elevator.State state) {
         this.state = state;
-
         addRequirements(elevator);
     }
 

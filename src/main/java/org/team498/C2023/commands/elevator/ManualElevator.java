@@ -15,11 +15,6 @@ public class ManualElevator extends CommandBase {
     }
 
     @Override
-    public void initialize() {
-        elevator.setControlMode(Elevator.ControlMode.MANUAL);
-    }
-
-    @Override
     public void execute() {
         elevator.setSpeed(speedSupplier.getAsDouble());        
     }
