@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static org.team498.C2023.Ports.ConeARiser.FRONT_BACK;
 import static org.team498.C2023.Ports.ConeARiser.LEFT_RIGHT;
 
+import org.team498.C2023.RobotState;
+
 public class ConeARiser extends SubsystemBase {
     private final CANSparkMax frontBack;
     private final CANSparkMax leftRight;
@@ -33,10 +35,23 @@ public class ConeARiser extends SubsystemBase {
         frontBack.restoreFactoryDefaults();
         leftRight.restoreFactoryDefaults();
 
+        frontBack.setSmartCurrentLimit(20);
+        leftRight.setSmartCurrentLimit(20);
+
         frontBack.setIdleMode(IdleMode.kCoast);
         leftRight.setIdleMode(IdleMode.kCoast);
     }
 
+    public State getNextState() {
+        return switch (RobotState.getInstance().getNextHeight()) {
+            case LOW, MID, TOP -> State.REJECT;
+            case DOUBLE_SS, SINGLE_SS -> State.COLLECT;
+        };
+    }
+
+    public void setToNextState() {
+        setState(getNextState());
+    }
 
     public void setState(State state) {
         frontBack.set(state.frontBackSpeed);

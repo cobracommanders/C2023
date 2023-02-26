@@ -12,8 +12,8 @@ public class Manipulator extends SubsystemBase {
     private final CANSparkMax rollers;
 
     public enum State {
-        COLLECT(1, -0.45),
-        SCORE(-1, 0.75),
+        COLLECT(1, -1),
+        SCORE(-1, 1),
         AUTO_SHOT(-1, 0.5),
         IDLE(0, 0);
 
@@ -30,7 +30,7 @@ public class Manipulator extends SubsystemBase {
         rollers = new CANSparkMax(ROLLERS, MotorType.kBrushless);
         rollers.restoreFactoryDefaults();
         rollers.setInverted(true);
-        rollers.setIdleMode(IdleMode.kBrake);
+        rollers.setIdleMode(IdleMode.kCoast);
     }
 
     public State getNextState() {

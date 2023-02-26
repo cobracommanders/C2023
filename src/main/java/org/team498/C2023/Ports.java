@@ -22,15 +22,16 @@ public final class Ports {
     }
 
     public static class Intake {
-        public static final int ROLLERS = 20;
+        public static final int BOTTOM_ROLLER = 20;
         public static final int L_WRIST = 21;
         public static final int R_WRIST = 22;
-        public static final int ENCODER_PORT = 2; // DIO
+        public static final int TOP_ROLLER = 23;
+        public static final int ENCODER_PORT = 6; // DIO
     }
 
     public static class Elevator {
-        public static final int L_ELEVATOR_ID = 30;
-        public static final int R_ELEVATOR_ID = 31;
+        public static final int F_ELEVATOR_ID = 30;
+        public static final int B_ELEVATOR_ID = 31;
     }
 
     public static class Manipulator {
@@ -45,5 +46,9 @@ public final class Ports {
     public static class ConeARiser {
         public static final int FRONT_BACK = 60;
         public static final int LEFT_RIGHT = 61;
+    }
+
+    public static class Accessories {
+        public static final int BLINKIN = 9;
     }
 }

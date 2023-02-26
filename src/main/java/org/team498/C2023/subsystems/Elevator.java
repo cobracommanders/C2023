@@ -13,8 +13,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.team498.C2023.RobotState;
 
 import static org.team498.C2023.Constants.ElevatorConstants.*;
-import static org.team498.C2023.Ports.Elevator.L_ELEVATOR_ID;
-import static org.team498.C2023.Ports.Elevator.R_ELEVATOR_ID;
+import static org.team498.C2023.Ports.Elevator.F_ELEVATOR_ID;
+import static org.team498.C2023.Ports.Elevator.B_ELEVATOR_ID;
 
 public class Elevator extends SubsystemBase {
     private final CANSparkMax leftMotor;
@@ -30,11 +30,11 @@ public class Elevator extends SubsystemBase {
 
     public enum State {
         CONEARISER(0, 0),
-        SINGLE_SS(0, 0),
-        DOUBLE_SS(0, 0),
+        SINGLE_SS(0.506641, 0.07977),
+        DOUBLE_SS(0.66, 0),
 
         LOW(0, 0),
-        MID(0.5, 0.3),
+        MID(0.766209, 0.3),
         TOP(0.6, 0.5),
 
         AUTO_SHOT(0, 0),
@@ -55,8 +55,8 @@ public class Elevator extends SubsystemBase {
     }
 
     private Elevator() {
-        leftMotor = new CANSparkMax(L_ELEVATOR_ID, MotorType.kBrushless);
-        rightMotor = new CANSparkMax(R_ELEVATOR_ID, MotorType.kBrushless);
+        leftMotor = new CANSparkMax(F_ELEVATOR_ID, MotorType.kBrushless);
+        rightMotor = new CANSparkMax(B_ELEVATOR_ID, MotorType.kBrushless);
 
         leftMotor.restoreFactoryDefaults();
         rightMotor.restoreFactoryDefaults();
@@ -64,16 +64,26 @@ public class Elevator extends SubsystemBase {
         leftMotor.setIdleMode(IdleMode.kBrake);
         rightMotor.setIdleMode(IdleMode.kBrake);
 
-        rightMotor.follow(leftMotor, true);
+        leftMotor.setInverted(true);
+        rightMotor.setInverted(true);
+
+        rightMotor.follow(leftMotor, false);
 
         encoder = leftMotor.getEncoder();
 
-        PID = new ProfiledPIDController(P, I, D, new TrapezoidProfile.Constraints(.5, 1));
+
+        PID = new ProfiledPIDController(P, I, D, new TrapezoidProfile.Constraints(4.5, 1.5));
         PID.reset(0);
+        PID.setTolerance(0);
+
+        SmartDashboard.putNumber("Elevator PID1", 0);
     }
 
     @Override
     public void periodic() {
+        this.controlMode= ControlMode.PID;
+
+        // PID.setGoal(SmartDashboard.getNumber("Elevator PID1", 0));
         double speed;
         if (controlMode == ControlMode.PID) {
             speed = PID.calculate(getPosition());
@@ -85,7 +95,7 @@ public class Elevator extends SubsystemBase {
         SmartDashboard.putData(this);
         SmartDashboard.putNumber("Elevator Position", getPosition());
         SmartDashboard.putBoolean("Elevator at Setpoint", atSetpoint());
-        SmartDashboard.putNumber("Elevator Error", PID.getPositionError());
+        SmartDashboard.putNumber("Elevator Error", PID.getGoal().position - getPosition());
     }
 
     public State getNextState() {
@@ -115,7 +125,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public boolean atSetpoint() {
-        return PID.getPositionError() < 0.05;
+        return Math.abs(PID.getGoal().position -getPosition()) < 0.025;
     }
 
     public double getPower() {

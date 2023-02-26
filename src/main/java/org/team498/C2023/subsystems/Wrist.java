@@ -27,13 +27,15 @@ public class Wrist extends SubsystemBase {
     private double simAngle = 0;
 
     public enum State {
-        CONEARISER(0, 0),
-        SINGLE_SS(0.10252, 0),
-        DOUBLE_SS(0, 0),
+        CONEARISER(0, -0.038142),
+        SINGLE_SS(0, 0.042812),
+        DOUBLE_SS(0.109352, 0),
 
         LOW(0, 0),
-        MID(0.12293, 0.05655),
+        MID(0.147331, 0.05655),
         TOP(0.21848, 0.03115),
+
+        TRAVEL(0.041067, 0.041067),
 
         AUTO_SHOT(0, 0),
         IDLE(-0.08333, -0.08333);
@@ -64,10 +66,14 @@ public class Wrist extends SubsystemBase {
         encoder = new DutyCycle(new DigitalInput(ENCODER_PORT));
 
         PID = new PIDController(P, I, D);
+
+        SmartDashboard.putNumber("Wrist PID4", 0);
     }
 
     @Override
     public void periodic() {
+        this.controlMode= ControlMode.PID;
+        // PID.setSetpoint(SmartDashboard.getNumber("Wrist PID4", 0));
         double speed;
         if (controlMode == ControlMode.PID) {
             speed = PID.calculate(getAngle());
@@ -75,6 +81,7 @@ public class Wrist extends SubsystemBase {
             speed = this.speed;
         }
         wrist.set(speed);
+        
 
         SmartDashboard.putData(this);
         SmartDashboard.putNumber("Wrist Angle", getAngle());

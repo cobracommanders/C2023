@@ -10,6 +10,7 @@ import org.team498.C2023.Constants.DrivetrainConstants;
 import org.team498.C2023.FieldPositions.Grid;
 import org.team498.C2023.subsystems.Drivetrain;
 import org.team498.lib.field.Point;
+import org.team498.lib.field.Rectangle;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -26,6 +27,9 @@ public class RobotPositions {
     private static final Point singleSubstationBlue = new Point(0, 0);
     private static final Point singleSubstationRed = FieldPositions.flip(singleSubstationBlue);
 
+    private static final Rectangle blueSSPickupArea = new Rectangle(0, 0, 0, 0);
+    private static final Rectangle redSSPickupArea = FieldPositions.flip(blueSSPickupArea);
+
     public static boolean inLoadingZone() {
         return drivetrain.isInRegion(Robot.alliance == Alliance.Blue
                                      ? FieldPositions.blueLoadingZone
@@ -36,6 +40,12 @@ public class RobotPositions {
         return drivetrain.isInRegion(Robot.alliance == Alliance.Blue
                                      ? FieldPositions.blueCommunity
                                      : FieldPositions.redCommunity);
+    }
+
+    public static boolean inSSPickupArea() {
+        return drivetrain.isInRegion(Robot.alliance == Alliance.Blue
+                                     ? blueSSPickupArea
+                                     : redSSPickupArea);
     }
 
     public static Pose2d getLeftScoringPosition() {

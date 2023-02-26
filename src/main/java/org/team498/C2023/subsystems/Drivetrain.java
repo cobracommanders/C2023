@@ -21,8 +21,8 @@ import org.team498.C2023.Robot;
 import org.team498.C2023.Constants.DrivetrainConstants;
 import org.team498.lib.drivers.Gyro;
 import org.team498.lib.drivers.SwerveModule;
+import org.team498.lib.field.BaseRegion;
 import org.team498.lib.field.Point;
-import org.team498.lib.field.Region;
 import org.team498.lib.wpilib.ChassisSpeeds;
 
 import static org.team498.C2023.Constants.DrivetrainConstants.*;
@@ -233,7 +233,7 @@ public class Drivetrain extends SubsystemBase {
      * @param region the region to check
      * @return true if in the region
      */
-    public boolean isInRegion(Region region) {
+    public boolean isInRegion(BaseRegion region) {
         return region.contains(Point.fromPose2d(getPose()));
     }
 

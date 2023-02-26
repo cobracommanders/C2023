@@ -12,7 +12,9 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.team498.C2023.subsystems.Drivetrain;
 import org.team498.C2023.subsystems.Manipulator;
 import org.team498.C2023.subsystems.Photonvision;
+import org.team498.lib.drivers.Blinkin;
 import org.team498.lib.drivers.Gyro;
+import org.team498.lib.drivers.Blinkin.Color;
 
 
 public class Robot extends TimedRobot {
@@ -27,6 +29,7 @@ public class Robot extends TimedRobot {
     private final Drivetrain drivetrain = Drivetrain.getInstance();
     private final Gyro gyro = Gyro.getInstance();
     private final Photonvision photonvision = Photonvision.getInstance();
+    private final Blinkin blinkin = Blinkin.getInstance();
 
     @Override
     public void robotInit() {
@@ -65,7 +68,6 @@ public class Robot extends TimedRobot {
             field.getObject("Scoring Targets").setPose(new Pose2d(-1, -1, new Rotation2d()));
         }
 
-        SmartDashboard.putBoolean("Manipulator Stalling", Manipulator.getInstance().isStalling());
 
 
         //TODO: Check if alliance is actually invalid when the FMS is not connected
@@ -84,6 +86,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic() {
+        blinkin.setColor(Color.WHITE);
+
         alliance = DriverStation.getAlliance();
         // This reverses the coordinates/direction of the drive commands on the red alliance
         coordinateFlip = alliance == Alliance.Blue
@@ -93,6 +97,15 @@ public class Robot extends TimedRobot {
         rotationOffset = alliance == Alliance.Blue
                          ? 0
                          : 180;
+    }
+
+    @Override
+    public void teleopPeriodic() {
+        if (RobotPositions.inSSPickupArea()) {
+            blinkin.setColor(Blinkin.Color.GREEN);
+        } else {
+            blinkin.setColor(RobotState.getInstance().inConeMode() ? Blinkin.Color.YELLOW : Blinkin.Color.PURPLE);
+        }
     }
 
     @Override

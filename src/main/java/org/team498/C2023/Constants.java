@@ -62,12 +62,12 @@ public final class Constants {
         public static final double D = 0;
 
         public static final double S = 0;
-        public static final double G = 0;
+        public static final double G = 0.075;
         public static final double V = 0;
     }
 
     public static final class IntakeConstants {
-        public static final double P = 0;
+        public static final double P = 2.5;
         public static final double I = 0;
         public static final double D = 0;
 
@@ -75,7 +75,7 @@ public final class Constants {
     }
 
     public static final class WristConstants {
-        public static final double P = 3;
+        public static final double P = 4;
         public static final double I = 0;
         public static final double D = 0;
 
