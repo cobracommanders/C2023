@@ -41,6 +41,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class Photonvision {
@@ -80,9 +81,10 @@ public class Photonvision {
             return Optional.empty();
         }
         PhotonPipelineResult result = photonCamera.getLatestResult();
-        for (PhotonTrackedTarget tag : result.getTargets()) {
-            if (tag.getBestCameraToTarget().getTranslation().getNorm() >= 3) {
-                result.getTargets().remove(tag);
+        List<PhotonTrackedTarget> tags = result.targets;
+        for (PhotonTrackedTarget tag : tags) {
+            if (Math.abs(tag.getBestCameraToTarget().getTranslation().getNorm()) >= 3) {
+                tags.remove(tag);
             }
         }
         photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
