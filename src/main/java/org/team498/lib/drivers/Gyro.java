@@ -14,8 +14,8 @@ public class Gyro extends Pigeon2 {
     @Override
     public synchronized double getYaw() {
         return RobotBase.isReal()
-               ? RotationUtil.toSignedDegrees(super.getYaw() + angleOffset)
-               : -RotationUtil.toSignedDegrees(simAngle + angleOffset);
+               ? RotationUtil.toSignedDegrees(super.getYaw() + angleOffset )
+               : -RotationUtil.toSignedDegrees(simAngle + angleOffset );
     }
 
 

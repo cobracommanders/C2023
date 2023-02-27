@@ -89,7 +89,7 @@ public class Drivetrain extends SubsystemBase {
 
     @Override
     public void periodic() {
-        if (Robot.isReal()) odometry.update(Rotation2d.fromDegrees(getYaw()), getModulePositions());
+        if (Robot.isReal()) odometry.update(Rotation2d.fromDegrees(getYaw()+180), getModulePositions());
 
         if (RobotState.isDisabled()) {
             for (SwerveModule swerveModule : swerveModules) {
@@ -129,7 +129,7 @@ public class Drivetrain extends SubsystemBase {
     public void setOdometry(Pose3d pose) {
         odometry.resetPosition(Rotation2d.fromDegrees(gyro.getYaw()),
                                getModulePositions(),
-                               new Pose2d(pose.getX(), pose.getY(), Rotation2d.fromDegrees(gyro.getYaw() + 180))
+                               new Pose2d(pose.getX(), pose.getY(), Rotation2d.fromDegrees(gyro.getYaw()))
         );
     }
 
@@ -253,6 +253,7 @@ public class Drivetrain extends SubsystemBase {
         double r = unlimited.omegaRadiansPerSecond;
         return new ChassisSpeeds(x, y, r);
     }
+
 
     private static Drivetrain instance;
 

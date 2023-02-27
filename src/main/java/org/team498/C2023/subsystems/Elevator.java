@@ -8,7 +8,6 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.ProfiledPIDCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.team498.C2023.RobotState;
 
@@ -30,12 +29,12 @@ public class Elevator extends SubsystemBase {
 
     public enum State {
         CONEARISER(0, 0),
-        SINGLE_SS(0.506641, 0.07977),
+        SINGLE_SS(0.506641, 0.1),
         DOUBLE_SS(0.66, 0),
 
         LOW(0, 0),
-        MID(0.766209, 0.3),
-        TOP(0.6, 0.5),
+        MID(0.95, 0.6),
+        TOP(0.95, 0.95),
 
         AUTO_SHOT(0, 0),
         IDLE(0, 0);
@@ -72,18 +71,18 @@ public class Elevator extends SubsystemBase {
         encoder = leftMotor.getEncoder();
 
 
-        PID = new ProfiledPIDController(P, I, D, new TrapezoidProfile.Constraints(4.5, 1.5));
+        PID = new ProfiledPIDController(P, I, D, new TrapezoidProfile.Constraints(5, 4));
         PID.reset(0);
         PID.setTolerance(0);
 
-        SmartDashboard.putNumber("Elevator PID1", 0);
+        SmartDashboard.putNumber("Elevator PID", 0);
     }
 
     @Override
     public void periodic() {
         this.controlMode= ControlMode.PID;
 
-        // PID.setGoal(SmartDashboard.getNumber("Elevator PID1", 0));
+        // PID.setGoal(SmartDashboard.getNumber("Elevator PID", 0));
         double speed;
         if (controlMode == ControlMode.PID) {
             speed = PID.calculate(getPosition());
@@ -106,6 +105,10 @@ public class Elevator extends SubsystemBase {
             case DOUBLE_SS -> State.DOUBLE_SS;
             case SINGLE_SS -> State.SINGLE_SS;
         };
+    }
+
+    public boolean aboveIntakeHeight() {
+        return getPosition() > 0.4;
     }
 
     public void setState(State state) {

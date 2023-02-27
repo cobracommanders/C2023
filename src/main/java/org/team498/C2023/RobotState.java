@@ -5,13 +5,11 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.team498.C2023.subsystems.Drivetrain;
-import org.team498.lib.drivers.Blinkin;
 
 public class RobotState extends SubsystemBase {
     private final Drivetrain drivetrain;
     private GamePiece currentGameMode = GamePiece.CONE;
     private Height nextHeight = Height.LOW;
-    private final Blinkin blinkin;
 
     public enum GamePiece {
         CUBE,
@@ -28,7 +26,6 @@ public class RobotState extends SubsystemBase {
 
     private RobotState() {
         this.drivetrain = Drivetrain.getInstance();
-        this.blinkin = Blinkin.getInstance();
     }
 
     public void setCurrentGameMode(GamePiece gamePiece) {

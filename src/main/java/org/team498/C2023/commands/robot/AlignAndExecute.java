@@ -9,6 +9,6 @@ import java.util.function.Supplier;
 public class AlignAndExecute extends SequentialCommandGroup {
     public AlignAndExecute(Supplier<Pose2d> targetPosition) {
         super(new DriveToPosition(targetPosition),
-              new ExecuteNextState());
+              new Score());
     }
 }

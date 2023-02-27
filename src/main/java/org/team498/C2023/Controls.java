@@ -5,22 +5,14 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import org.team498.C2023.Constants.OIConstants;
 import org.team498.C2023.RobotState.GamePiece;
 import org.team498.C2023.RobotState.Height;
-import org.team498.C2023.commands.coneariser.SetConeARiserState;
 import org.team498.C2023.commands.drivetrain.*;
 import org.team498.C2023.commands.elevator.ManualElevator;
-import org.team498.C2023.commands.elevator.SetElevatorToNextState;
 import org.team498.C2023.commands.intake.SetIntake;
-import org.team498.C2023.commands.manipulator.SetManipulatorToNextState;
-import org.team498.C2023.commands.manipulator.StopManipulator;
 import org.team498.C2023.commands.robot.LowerElevator;
-import org.team498.C2023.commands.robot.MoveToNextState;
-import org.team498.C2023.commands.robot.RaiseElevatorToPosition;
+import org.team498.C2023.commands.robot.CollectFromDoubleSS;
 import org.team498.C2023.commands.robot.Reset;
-import org.team498.C2023.commands.robot.AlignAndExecute;
-import org.team498.C2023.commands.robot.ExecuteNextState;
+import org.team498.C2023.commands.robot.Score;
 import org.team498.C2023.commands.wrist.ManualWrist;
-import org.team498.C2023.commands.wrist.SetWristState;
-import org.team498.C2023.commands.wrist.SetWristToNextState;
 import org.team498.C2023.subsystems.*;
 import org.team498.lib.drivers.Gyro;
 import org.team498.lib.drivers.Xbox;
@@ -54,76 +46,32 @@ public class Controls {
     }
 
     private void configureDriverCommands() {
-        //driver.start().onTrue(new PathPlannerFollower(PathLib.SingleCube.Path1));
-
-        // Align for scoring
-        // driver
-        //         .leftTrigger()
-        //         .and(RobotPositions::inCommunity)
-        //         .and(() -> RobotState.getInstance().inConeMode())
-        //         .onTrue(new AlignAndExecute(RobotPositions::getLeftScoringPosition));
-        // driver
-        //         .rightTrigger()
-        //         .and(RobotPositions::inCommunity)
-        //         .and(() -> RobotState.getInstance().inConeMode())
-        //         .onTrue(new AlignAndExecute(RobotPositions::getRightScoringPosition));
-
-        // driver
-        //         .rightTrigger()
-        //         .or(driver.leftTrigger())
-        //         .and(RobotPositions::inCommunity)
-        //         .and(() -> RobotState.getInstance().inCubeMode())
-        //         .onTrue(new AlignAndExecute(RobotPositions::getCenterScoringPosition));
-
-        // // Align for collecting from the double substation
-        // driver
-        //         .leftTrigger()
-        //         .and(RobotPositions::inLoadingZone)
-        //         .onTrue(new AlignAndExecute(RobotPositions::getLeftSubstationPosition));
-        // driver
-        //         .rightTrigger()
-        //         .and(RobotPositions::inLoadingZone)
-        //         .onTrue(new AlignAndExecute(RobotPositions::getRightSubstationPosition));
-        // driver
-        //         .X()
-        //         .and(RobotPositions::inLoadingZone)
-        //         .onTrue(new DriveToPosition(RobotPositions::getSingleSubstationPosition));
-
-        // Intake/Score
-        driver.leftBumper().onTrue(new SetManipulatorToNextState()).onFalse(new StopManipulator());
-        //run intake rollers
-        // driver.rightTrigger().onTrue(new ExecuteNextState());
-
-        driver.rightTrigger().onTrue(new MoveToNextState()).onFalse(new Reset());
-
+        driver.rightTrigger().onTrue(new Score());
+        
         driver.leftTrigger().onTrue(new SetIntake(Intake.State.INTAKE)).onFalse(new SetIntake(Intake.State.IDLE));
         driver.start().onTrue(new SetIntake(Intake.State.SPIT)).onFalse(new SetIntake((Intake.State.IDLE)));
-        // Reset gyro
+
+        // right bumper == spit through intake
         driver.A().onTrue(new InstantCommand(() -> Gyro.getInstance().setYaw(0)));
-        // Move to the next target
-        driver.B().onTrue(new RaiseElevatorToPosition());
     }
 
     private void configureOperatorCommands() {
+        operator.start().onTrue(new PathPlannerFollower(PathLib.SingleCube.Path1));
+        // operator.start().onTrue(new AlignAndExecute(RobotPositions::getLeftScoringPosition));
+
         operator.Y().onTrue(new InstantCommand(() -> robotState.setNextHeight(Height.TOP)));
         operator.B().onTrue(new InstantCommand(() -> robotState.setNextHeight(Height.MID)));
         operator.A().onTrue(new InstantCommand(() -> robotState.setNextHeight(Height.LOW)));
         operator.X().onTrue(new LowerElevator());
 
         // Left bumper sets the current game piece to a cone, right bumper sets it to a cube
-        operator.leftBumper().onTrue(new InstantCommand(() -> robotState.setCurrentGameMode(GamePiece.CONE)));
-        operator.rightBumper().onTrue(new InstantCommand(() -> robotState.setCurrentGameMode(GamePiece.CUBE)));
+        operator.rightBumper().onTrue(new InstantCommand(() -> robotState.setCurrentGameMode(GamePiece.CONE)));
+        operator.leftBumper().onTrue(new InstantCommand(() -> robotState.setCurrentGameMode(GamePiece.CUBE)));
 
-        operator.start().onTrue(new SetConeARiserState(ConeARiser.State.COLLECT)).onFalse(new SetConeARiserState(ConeARiser.State.IDLE));
+        // operator.start().onTrue(new SetConeARiserState(ConeARiser.State.COLLECT)).onFalse(new SetConeARiserState(ConeARiser.State.IDLE));
 
-        operator.rightTrigger().onTrue(new InstantCommand(() -> robotState.setNextHeight(Height.DOUBLE_SS)));
-        operator.leftTrigger().onTrue(new InstantCommand(() -> robotState.setNextHeight(Height.SINGLE_SS)));
-
-        // operator.POVMinus90().onTrue(new SetWristState(Wrist.State.TRAVEL));
-        // operator.POV0().onTrue(new SetElevatorToNextState());
-        // operator.POV90().onTrue(new SetWristToNextState());
-        operator.POV0().onTrue(new RaiseElevatorToPosition());
-        operator.POV180().onTrue(new SetWristState(Wrist.State.CONEARISER));
+        operator.rightTrigger().onTrue(new InstantCommand(() -> robotState.setNextHeight(Height.DOUBLE_SS)).alongWith(new CollectFromDoubleSS())).onFalse(new Reset());
+        operator.leftTrigger().onTrue(new InstantCommand(() -> robotState.setNextHeight(Height.SINGLE_SS)).alongWith(new CollectFromDoubleSS())).onFalse(new Reset());
 
         SmartDashboard.putData(new ManualElevator(() -> -operator.leftY()));
         SmartDashboard.putData(new ManualWrist(() -> -operator.rightY()));

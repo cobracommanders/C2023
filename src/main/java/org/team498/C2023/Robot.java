@@ -26,10 +26,13 @@ public class Robot extends TimedRobot {
     public static Alliance alliance = Alliance.Invalid;
     public static final Controls controls = new Controls();
 
+    public static boolean cameraEnabled = true;
+
     private final Drivetrain drivetrain = Drivetrain.getInstance();
     private final Gyro gyro = Gyro.getInstance();
     private final Photonvision photonvision = Photonvision.getInstance();
     private final Blinkin blinkin = Blinkin.getInstance();
+    private final RobotState robotState = RobotState.getInstance();
 
     @Override
     public void robotInit() {
@@ -51,6 +54,7 @@ public class Robot extends TimedRobot {
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
 
+        if (cameraEnabled)
         photonvision.getEstimatedGlobalPose(drivetrain.getPose()).ifPresent(pose -> drivetrain.setOdometry(pose.estimatedPose));
 
         if (RobotPositions.inCommunity()) {
@@ -86,7 +90,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic() {
-        blinkin.setColor(Color.WHITE);
+        // blinkin.setColor(Blinkin.Color.BLUE);
 
         alliance = DriverStation.getAlliance();
         // This reverses the coordinates/direction of the drive commands on the red alliance
@@ -102,9 +106,13 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
         if (RobotPositions.inSSPickupArea()) {
-            blinkin.setColor(Blinkin.Color.GREEN);
+            blinkin.setColor(Blinkin.Color.LIME);
         } else {
-            blinkin.setColor(RobotState.getInstance().inConeMode() ? Blinkin.Color.YELLOW : Blinkin.Color.PURPLE);
+            if (robotState.inConeMode() && Manipulator.getInstance().isStalling()) {
+                blinkin.setColor(Color.BLUE);
+            } else {
+                blinkin.setColor(RobotState.getInstance().inConeMode() ? Blinkin.Color.YELLOW : Blinkin.Color.PURPLE);
+            }
         }
     }
 
