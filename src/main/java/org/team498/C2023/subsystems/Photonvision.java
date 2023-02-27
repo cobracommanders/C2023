@@ -36,15 +36,19 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Optional;
 
 public class Photonvision {
     private PhotonPoseEstimator photonPoseEstimator;
+    private PhotonCamera photonCamera;
 
     private Photonvision() {
-        PhotonCamera photonCamera = new PhotonCamera("Arducam_OV9281_USB_Camera");
+        photonCamera = new PhotonCamera("Arducam_OV9281_USB_Camera");
 
         try {
             // Attempt to load the AprilTagFieldLayout that will tell us where the tags are on the field.
@@ -58,7 +62,6 @@ public class Photonvision {
                                                           ), new Rotation3d())
             );
             photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
-            photonPoseEstimator.setPrimaryStrategy(PoseStrategy.MULTI_TAG_PNP);
         } catch (IOException e) {
             // The AprilTagFieldLayout failed to load. We won't be able to estimate poses if we don't know
             // where the tags are.
@@ -76,9 +79,15 @@ public class Photonvision {
             // The field layout failed to load, so we cannot estimate poses.
             return Optional.empty();
         }
+        PhotonPipelineResult result = photonCamera.getLatestResult();
+        for (PhotonTrackedTarget tag : result.getTargets()) {
+            if (tag.getBestCameraToTarget().getTranslation().getNorm() >= 3) {
+                result.getTargets().remove(tag);
+            }
+        }
         photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
 
-        return photonPoseEstimator.update();
+        return photonPoseEstimator.update(result);
     }
 
 

@@ -57,6 +57,7 @@ public class Robot extends TimedRobot {
         if (cameraEnabled)
         photonvision.getEstimatedGlobalPose(drivetrain.getPose()).ifPresent(pose -> drivetrain.setOdometry(pose.estimatedPose));
 
+
         if (RobotPositions.inCommunity()) {
             if (RobotState.getInstance().inConeMode()) {
                 field.getObject("Scoring Targets").setPoses(RobotPositions.getRightScoringPosition(), RobotPositions.getLeftScoringPosition());
