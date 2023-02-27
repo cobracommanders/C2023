@@ -57,7 +57,8 @@ public class Photonvision {
                                                                                             Units.inchesToMeters(22)
                                                           ), new Rotation3d())
             );
-            photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.AVERAGE_BEST_TARGETS);
+            photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+            photonPoseEstimator.setPrimaryStrategy(PoseStrategy.MULTI_TAG_PNP);
         } catch (IOException e) {
             // The AprilTagFieldLayout failed to load. We won't be able to estimate poses if we don't know
             // where the tags are.
@@ -76,6 +77,7 @@ public class Photonvision {
             return Optional.empty();
         }
         photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
+
         return photonPoseEstimator.update();
     }
 

@@ -34,6 +34,7 @@ public class PathPlannerFollower extends CommandBase {
 
     @Override
     public void initialize() {
+        //Robot.cameraEnabled = false;
         trajectoryTimer.reset();
         trajectoryTimer.start();
 
@@ -51,7 +52,7 @@ public class PathPlannerFollower extends CommandBase {
 
         Robot.field.getObject("Stop Points").setPoses(markerPoses);
 
-        drivetrain.setPose(trajectory.getInitialHolonomicPose());
+        //drivetrain.setPose(trajectory.getInitialHolonomicPose());
 
         // Display the trajectory on the driver station dashboard
         List<Pose2d> poses = new LinkedList<>();
@@ -142,5 +143,6 @@ public class PathPlannerFollower extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         drivetrain.stop();
+        //Robot.cameraEnabled = true;
     }
 }
