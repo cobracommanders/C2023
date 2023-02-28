@@ -10,6 +10,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.team498.C2023.RobotState;
+import org.team498.C2023.ShooterTable;
+import org.team498.lib.util.LinearInterpolator;
 
 import static org.team498.C2023.Constants.ElevatorConstants.*;
 import static org.team498.C2023.Ports.Elevator.F_ELEVATOR_ID;
@@ -24,6 +26,8 @@ public class Elevator extends SubsystemBase {
 
     private final ElevatorFeedforward feedforward = new ElevatorFeedforward(S, G, V);
 
+    private final LinearInterpolator interpolator;
+
     private ControlMode controlMode;
     private double speed = 0;
 
@@ -37,7 +41,9 @@ public class Elevator extends SubsystemBase {
         TOP(0.95, 0.95),
 
         AUTO_SHOT(0, 0),
-        IDLE(0, 0);
+        IDLE(0, 0),
+        
+        INTERPOLATE(0, 0);
 
         private final double setpointCone;
         private final double setpointCube;
@@ -75,6 +81,8 @@ public class Elevator extends SubsystemBase {
         PID.reset(0);
         PID.setTolerance(0);
 
+        interpolator = new LinearInterpolator(ShooterTable.elevatorHeightTable);
+
         SmartDashboard.putNumber("Elevator PID", 0);
     }
 
@@ -104,6 +112,7 @@ public class Elevator extends SubsystemBase {
             case TOP -> State.TOP;
             case DOUBLE_SS -> State.DOUBLE_SS;
             case SINGLE_SS -> State.SINGLE_SS;
+            case INTERPOLATE -> State.INTERPOLATE;
         };
     }
 
@@ -113,9 +122,13 @@ public class Elevator extends SubsystemBase {
 
     public void setState(State state) {
         this.controlMode = ControlMode.PID;
-        PID.setGoal(RobotState.getInstance().inConeMode()
-                    ? state.setpointCone
-                    : state.setpointCube);
+        if (state == State.INTERPOLATE) {
+            PID.setGoal(interpolator.getInterpolatedValue(Photonvision.getInstance().distanceToClosestTag()));
+        } else {
+            PID.setGoal(RobotState.getInstance().inConeMode()
+            ? state.setpointCone
+            : state.setpointCube);
+        }
     }
 
     public void setSpeed(double speed) {

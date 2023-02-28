@@ -121,6 +121,13 @@ public class Drivetrain extends SubsystemBase {
         return odometry.getPoseMeters();
     }
 
+    public Pose2d getNextPose() {
+        double x = getPose().getX() + (currentSpeeds.vxMetersPerSecond * (Robot.kDefaultPeriod * 10));
+        double y = getPose().getY() + (currentSpeeds.vyMetersPerSecond * (Robot.kDefaultPeriod * 10));
+        double rotation = getPose().getRotation().getDegrees() + (currentSpeeds.omegaRadiansPerSecond * (Robot.kDefaultPeriod * 10));
+        return new Pose2d(x, y, Rotation2d.fromDegrees(rotation));
+    }
+
     public void setPose(Pose2d pose) {
         odometry.resetPosition(Rotation2d.fromDegrees(gyro.getYaw()), getModulePositions(), pose);
         gyro.setAngleOffset(pose.getRotation().getDegrees());

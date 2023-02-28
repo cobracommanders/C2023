@@ -47,6 +47,7 @@ import java.util.Optional;
 public class Photonvision {
     private PhotonPoseEstimator photonPoseEstimator;
     private PhotonCamera photonCamera;
+    private double distanceToTag;
 
     private Photonvision() {
         photonCamera = new PhotonCamera("Arducam_OV9281_USB_Camera");
@@ -90,6 +91,18 @@ public class Photonvision {
         photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
 
         return photonPoseEstimator.update(result);
+    }
+
+    public double distanceToClosestTag() {
+        PhotonPipelineResult result = photonCamera.getLatestResult();
+        List<PhotonTrackedTarget> tags = result.targets;
+        double minDistance = 0;
+        for (PhotonTrackedTarget tag : tags) {
+            if (Math.abs(tag.getBestCameraToTarget().getTranslation().getNorm()) <= minDistance) {
+                minDistance = tag.getBestCameraToTarget().getTranslation().getNorm();
+            }
+        }
+        return minDistance;
     }
 
 

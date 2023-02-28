@@ -21,7 +21,8 @@ public class RobotState extends SubsystemBase {
         MID,
         TOP,
         DOUBLE_SS,
-        SINGLE_SS
+        SINGLE_SS,
+        INTERPOLATE
     }
 
     private RobotState() {
