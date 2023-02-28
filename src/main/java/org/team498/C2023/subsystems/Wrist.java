@@ -109,11 +109,13 @@ public class Wrist extends SubsystemBase {
 
     public void setState(State state) {
         this.controlMode = ControlMode.PID;
-        PID.setSetpoint(RobotState.getInstance().inConeMode()
-                        ? state.setpointCone
-                        : state.setpointCube);
         if (state == State.INTERPOLATE) {
             PID.setSetpoint(interpolator.getInterpolatedValue(Photonvision.getInstance().distanceToClosestTag()));
+        }
+        else {
+            PID.setSetpoint(RobotState.getInstance().inConeMode()
+                            ? state.setpointCone
+                            : state.setpointCube);
         }
     }
 
