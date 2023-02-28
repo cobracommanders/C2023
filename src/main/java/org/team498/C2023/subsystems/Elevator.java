@@ -123,7 +123,7 @@ public class Elevator extends SubsystemBase {
     public void setState(State state) {
         this.controlMode = ControlMode.PID;
         if (state == State.INTERPOLATE) {
-            PID.setGoal(interpolator.getInterpolatedValue(Photonvision.getInstance().distanceToClosestTag()));
+            PID.setGoal(interpolator.getInterpolatedValue(Drivetrain.getInstance().getNextDistanceToTag()));
         } else {
             PID.setGoal(RobotState.getInstance().inConeMode()
             ? state.setpointCone

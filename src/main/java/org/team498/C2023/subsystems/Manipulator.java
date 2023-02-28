@@ -58,7 +58,7 @@ public class Manipulator extends SubsystemBase {
 
     public void setState(State state) {
         if (state == State.INTERPOLATE) {
-            PID.setSetpoint(interpolator.getInterpolatedValue(Photonvision.getInstance().distanceToClosestTag()));
+            PID.setSetpoint(interpolator.getInterpolatedValue(Drivetrain.getInstance().getNextDistanceToTag()));
             rollers.set(PID.calculate(getRPM()));
         }
         else {

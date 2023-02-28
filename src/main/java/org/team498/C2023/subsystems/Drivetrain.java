@@ -28,6 +28,8 @@ import org.team498.lib.wpilib.ChassisSpeeds;
 import static org.team498.C2023.Constants.DrivetrainConstants.*;
 import static org.team498.C2023.Ports.Drivetrain.*;
 
+import java.util.function.Supplier;
+
 public class Drivetrain extends SubsystemBase {
     // Profiled controller for the rotation of the robot
     private final ProfiledPIDController angleController = new ProfiledPIDController(AngleConstants.P,
@@ -126,6 +128,17 @@ public class Drivetrain extends SubsystemBase {
         double y = getPose().getY() + (currentSpeeds.vyMetersPerSecond * (Robot.kDefaultPeriod * 10));
         double rotation = getPose().getRotation().getDegrees() + (currentSpeeds.omegaRadiansPerSecond * (Robot.kDefaultPeriod * 10));
         return new Pose2d(x, y, Rotation2d.fromDegrees(rotation));
+    }
+    public Supplier<Pose2d> getNextPoseToTag() {
+        Pose3d ogPose = Photonvision.getInstance().nearestTagPose().get();
+        //TODO: since this is the tag pose, it might need to subtract the current velocity
+        double x = ogPose.getX() + (currentSpeeds.vxMetersPerSecond * (Robot.kDefaultPeriod * 10));
+        double y = ogPose.getY() + (currentSpeeds.vyMetersPerSecond * (Robot.kDefaultPeriod * 10));
+        double rotation = ogPose.getRotation().toRotation2d().getDegrees() + (currentSpeeds.omegaRadiansPerSecond * (Robot.kDefaultPeriod * 10));
+        return ()-> new Pose2d(x, y, Rotation2d.fromDegrees(rotation));
+    }
+    public double getNextDistanceToTag() {
+        return getNextPoseToTag().get().getTranslation().getNorm();
     }
 
     public void setPose(Pose2d pose) {
