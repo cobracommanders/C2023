@@ -138,7 +138,7 @@ public class Drivetrain extends SubsystemBase {
         return ()-> new Pose2d(x, y, Rotation2d.fromDegrees(rotation));
     }
     public double getNextDistanceToTag() {
-        return getNextPoseToTag().get().getTranslation().getNorm();
+        return Math.abs(getNextPoseToTag().get().getTranslation().getNorm());
     }
 
     public void setPose(Pose2d pose) {
