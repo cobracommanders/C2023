@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.team498.C2023.Robot;
 import org.team498.C2023.RobotState;
+import org.team498.C2023.ShooterTable;
+import org.team498.lib.util.LinearInterpolator;
 
 import static org.team498.C2023.Constants.WristConstants.*;
 import static org.team498.C2023.Ports.Wrist.ENCODER_PORT;
@@ -20,6 +22,8 @@ public class Wrist extends SubsystemBase {
     private final DutyCycle encoder;
 
     private final PIDController PID;
+
+    private final LinearInterpolator interpolator;
 
     private ControlMode controlMode;
     private double speed = 0;
@@ -38,7 +42,8 @@ public class Wrist extends SubsystemBase {
         TRAVEL(0.041067, 0.041067),
 
         AUTO_SHOT(0, 0),
-        IDLE(0.0, -0.08333);
+        IDLE(0.0, -0.08333),
+        INTERPOLATE(0, 0);
 
         private final double setpointCone;
         private final double setpointCube;
@@ -66,6 +71,8 @@ public class Wrist extends SubsystemBase {
         encoder = new DutyCycle(new DigitalInput(ENCODER_PORT));
 
         PID = new PIDController(P, I, D);
+
+        interpolator = new LinearInterpolator(ShooterTable.wristAngleTable);
 
         SmartDashboard.putNumber("Wrist PID", 0);
     }
@@ -96,14 +103,20 @@ public class Wrist extends SubsystemBase {
             case TOP -> State.TOP;
             case DOUBLE_SS -> State.DOUBLE_SS;
             case SINGLE_SS -> State.SINGLE_SS;
+            case INTERPOLATE -> State.INTERPOLATE;
         };
     }
 
     public void setState(State state) {
         this.controlMode = ControlMode.PID;
-        PID.setSetpoint(RobotState.getInstance().inConeMode()
-                        ? state.setpointCone
-                        : state.setpointCube);
+        if (state == State.INTERPOLATE) {
+            PID.setSetpoint(interpolator.getInterpolatedValue(Drivetrain.getInstance().getNextDistanceToTag()));
+        }
+        else {
+            PID.setSetpoint(RobotState.getInstance().inConeMode()
+                            ? state.setpointCone
+                            : state.setpointCube);
+        }
     }
 
     public void setSpeed(double speed) {

@@ -1,6 +1,7 @@
 package org.team498.C2023.commands.drivetrain;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import org.team498.C2023.Robot;
@@ -8,6 +9,7 @@ import org.team498.C2023.subsystems.Drivetrain;
 import org.team498.lib.util.RotationUtil;
 
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import static org.team498.C2023.Constants.DrivetrainConstants.MAX_VELOCITY_METERS_PER_SECOND;
 
@@ -15,9 +17,9 @@ public class TargetDrive extends CommandBase {
     private final Drivetrain drivetrain = Drivetrain.getInstance();
     private final DoubleSupplier xTranslationSupplier;
     private final DoubleSupplier yTranslationSupplier;
-    private final Pose2d target;
+    private final Supplier<Pose3d> target;
 
-    public TargetDrive(DoubleSupplier xTranslationSupplier, DoubleSupplier yTranslationSupplier, Pose2d target) {
+    public TargetDrive(DoubleSupplier xTranslationSupplier, DoubleSupplier yTranslationSupplier, Supplier<Pose3d> target) {
         this.xTranslationSupplier = xTranslationSupplier;
         this.yTranslationSupplier = yTranslationSupplier;
         this.target = target;
@@ -31,13 +33,18 @@ public class TargetDrive extends CommandBase {
         double yTranslation = yTranslationSupplier.getAsDouble() * MAX_VELOCITY_METERS_PER_SECOND;
 
         // Set the target of the PID controller
-        drivetrain.setAngleGoal(calculateDegreesToTarget(target));
+        drivetrain.setAngleGoal(calculateDegreesToTarget(targetPose(target.get())));
 
         // Calculate the rotational speed from the pid controller, unless it's already at the goal
         double rotationalSpeed = drivetrain.calculateRotationalSpeed();
 
         // Set the robot to drive in field relative mode, with the rotation controlled by the snap controller
         drivetrain.drive(xTranslation, yTranslation, rotationalSpeed * Robot.rotationFlip, true);
+    }
+
+    public Pose2d targetPose(Pose3d suppliedPose) {
+        //we can change this translation to accomodate low/high node. We just have to translate the +- X Value
+        return new Pose2d(suppliedPose.getX(), suppliedPose.getY(), suppliedPose.getRotation().toRotation2d());
     }
 
     public double calculateDegreesToTarget(Pose2d target) {

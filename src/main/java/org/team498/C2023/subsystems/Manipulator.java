@@ -3,19 +3,27 @@ package org.team498.C2023.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.team498.C2023.RobotState;
+import org.team498.C2023.ShooterTable;
+import org.team498.lib.util.LinearInterpolator;
 
 import static org.team498.C2023.Ports.Manipulator.ROLLERS;
 
 public class Manipulator extends SubsystemBase {
     private final CANSparkMax rollers;
 
+    private final PIDController PID;
+    private final LinearInterpolator interpolator;
+
     public enum State {
         COLLECT(1, -1),
         SCORE(-1, 1),
         AUTO_SHOT(-1, 0.5),
-        IDLE(0, 0);
+        IDLE(0, 0),
+        INTERPOLATE(0, 0);
 
         private final double speedCone;
         private final double speedCube;
@@ -31,12 +39,16 @@ public class Manipulator extends SubsystemBase {
         rollers.restoreFactoryDefaults();
         rollers.setInverted(true);
         rollers.setIdleMode(IdleMode.kCoast);
+
+        PID = new PIDController(0, 0, 0);
+        interpolator = new LinearInterpolator(ShooterTable.shooterRPMTable);
     }
 
     public State getNextState() {
         return switch (RobotState.getInstance().getNextHeight()) {
             case LOW, MID, TOP -> State.SCORE;
             case DOUBLE_SS, SINGLE_SS -> State.COLLECT;
+            case INTERPOLATE -> State.INTERPOLATE;
         };
     }
 
@@ -45,13 +57,23 @@ public class Manipulator extends SubsystemBase {
     }
 
     public void setState(State state) {
-        rollers.set(RobotState.getInstance().inConeMode()
-                    ? state.speedCone
-                    : state.speedCube);
+        if (state == State.INTERPOLATE) {
+            PID.setSetpoint(interpolator.getInterpolatedValue(Drivetrain.getInstance().getNextDistanceToTag()));
+            rollers.set(PID.calculate(getRPM()));
+        }
+        else {
+            rollers.set(RobotState.getInstance().inConeMode()
+            ? state.speedCone
+            : state.speedCube);
+        }
     }
 
     public void setToNextState() {
         setState(getNextState());
+    }
+
+    public double getRPM() {
+        return rollers.getEncoder().getVelocity();
     }
 
 

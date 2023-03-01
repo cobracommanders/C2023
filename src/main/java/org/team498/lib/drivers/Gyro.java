@@ -17,6 +17,10 @@ public class Gyro extends Pigeon2 {
                ? RotationUtil.toSignedDegrees(super.getYaw() + angleOffset )
                : -RotationUtil.toSignedDegrees(simAngle + angleOffset );
     }
+    
+    public double getPitch() {
+        return super.getPitch();
+    }
 
 
     /** @return the rotation offset of the gyro */

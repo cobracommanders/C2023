@@ -27,6 +27,7 @@ package org.team498.C2023.subsystems;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -38,15 +39,18 @@ import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
+import org.team498.C2023.FieldPositions;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public class Photonvision {
     private PhotonPoseEstimator photonPoseEstimator;
     private PhotonCamera photonCamera;
+    private double distanceToTag;
 
     private Photonvision() {
         photonCamera = new PhotonCamera("Arducam_OV9281_USB_Camera");
@@ -90,6 +94,33 @@ public class Photonvision {
         photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
 
         return photonPoseEstimator.update(result);
+    }
+
+    public double distanceToClosestTag() {
+        PhotonPipelineResult result = photonCamera.getLatestResult();
+        List<PhotonTrackedTarget> tags = result.targets;
+        double minDistance = 0;
+        for (PhotonTrackedTarget tag : tags) {
+            if (Math.abs(tag.getBestCameraToTarget().getTranslation().getNorm()) <= minDistance) {
+                minDistance = tag.getBestCameraToTarget().getTranslation().getNorm();
+            }
+        }
+        return minDistance;
+    }
+
+    public Supplier<Pose3d> nearestTagPose() {
+        PhotonPipelineResult result = photonCamera.getLatestResult();
+        List<PhotonTrackedTarget> tags = result.targets;
+        double minDistance = 0;
+        int closestTag = 0;
+        for (PhotonTrackedTarget tag : tags) {
+            if (Math.abs(tag.getBestCameraToTarget().getTranslation().getNorm()) <= minDistance) {
+                minDistance = tag.getBestCameraToTarget().getTranslation().getNorm();
+                closestTag = tag.getFiducialId();
+            }
+        }
+        final int tag = closestTag;
+        return ()-> FieldPositions.aprilTags.get(tag);
     }
 
 
