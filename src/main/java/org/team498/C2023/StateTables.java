@@ -1,6 +1,6 @@
 package org.team498.C2023;
 
-public class ShooterTable {
+public class StateTables {
     public static final double[][] shooterRPMTable = {
         { 62, 1800 },
         { 95, 2000 },
