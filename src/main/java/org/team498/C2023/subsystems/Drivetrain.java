@@ -91,6 +91,8 @@ public class Drivetrain extends SubsystemBase {
 
     @Override
     public void periodic() {
+        SmartDashboard.putNumber("Pitch", gyro.getPitch());
+        SmartDashboard.putNumber("Roll", gyro.getRoll());
         if (Robot.isReal()) odometry.update(Rotation2d.fromDegrees(getYaw()+180), getModulePositions());
 
         if (RobotState.isDisabled()) {

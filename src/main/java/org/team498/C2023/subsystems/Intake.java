@@ -1,5 +1,10 @@
 package org.team498.C2023.subsystems;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenixpro.controls.NeutralOut;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -7,6 +12,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycle;
+import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -15,8 +21,8 @@ import static org.team498.C2023.Ports.Intake.*;
 
 //TODO Update to add tricks
 public class Intake extends SubsystemBase {
-    private final CANSparkMax bottomRoller;
-    private final CANSparkMax topRoller;
+    private final TalonFX bottomRoller;
+    private final TalonFX topRoller;
     private final CANSparkMax leftWrist;
     private final CANSparkMax rightWrist;
 
@@ -25,7 +31,7 @@ public class Intake extends SubsystemBase {
     private final DutyCycle encoder;
 
     public enum State {
-        INTAKE(0, 1, 1),
+        INTAKE(0, 0.7, 0.7),
         SPIT(0, 1, -1),
         IDLE(0.353, 0, 0);
 
@@ -41,8 +47,8 @@ public class Intake extends SubsystemBase {
     }
 
     private Intake() {
-        bottomRoller = new CANSparkMax(BOTTOM_ROLLER, MotorType.kBrushless);
-        topRoller = new CANSparkMax(TOP_ROLLER, MotorType.kBrushless);
+        bottomRoller = new TalonFX(BOTTOM_ROLLER);
+        topRoller = new TalonFX(TOP_ROLLER);
         leftWrist = new CANSparkMax(L_WRIST, MotorType.kBrushless);
         rightWrist = new CANSparkMax(R_WRIST, MotorType.kBrushless);
         configRollerMotor(bottomRoller);
@@ -65,10 +71,9 @@ public class Intake extends SubsystemBase {
 
         setState(State.IDLE);
     }
-    private void configRollerMotor(CANSparkMax motor) {
-        motor.restoreFactoryDefaults();
-        motor.setIdleMode(IdleMode.kCoast);
-        motor.setSmartCurrentLimit(35);
+    private void configRollerMotor(TalonFX motor) {
+        motor.configFactoryDefault();
+        motor.setNeutralMode(NeutralMode.Coast);
     }
 
     @Override
@@ -86,8 +91,8 @@ public class Intake extends SubsystemBase {
     }
 
     public void setRollers(State state) {
-        bottomRoller.set(state.bottomRollerSpeed);
-        topRoller.set(state.topRollerSpeed);
+        bottomRoller.set(TalonFXControlMode.PercentOutput, state.bottomRollerSpeed);
+        topRoller.set(TalonFXControlMode.PercentOutput, state.topRollerSpeed);
     }
 
     public void setState(State state) {

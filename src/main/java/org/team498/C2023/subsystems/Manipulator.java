@@ -7,7 +7,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.team498.C2023.RobotState;
-import org.team498.C2023.ShooterTable;
+import org.team498.C2023.StateTables;
 import org.team498.lib.util.LinearInterpolator;
 
 import static org.team498.C2023.Ports.Manipulator.ROLLERS;
@@ -41,13 +41,13 @@ public class Manipulator extends SubsystemBase {
         rollers.setIdleMode(IdleMode.kCoast);
 
         PID = new PIDController(0, 0, 0);
-        interpolator = new LinearInterpolator(ShooterTable.shooterRPMTable);
+        interpolator = new LinearInterpolator(StateTables.shooterRPMTable);
     }
 
     public State getNextState() {
         return switch (RobotState.getInstance().getNextHeight()) {
             case LOW, MID, TOP -> State.SCORE;
-            case DOUBLE_SS, SINGLE_SS -> State.COLLECT;
+            case DOUBLE_SS, SINGLE_SS, INTAKE -> State.COLLECT;
             case INTERPOLATE -> State.INTERPOLATE;
         };
     }

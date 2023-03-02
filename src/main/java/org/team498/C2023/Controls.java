@@ -5,14 +5,19 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import org.team498.C2023.Constants.OIConstants;
 import org.team498.C2023.RobotState.GamePiece;
 import org.team498.C2023.RobotState.Height;
+import org.team498.C2023.commands.auto.CubeEngage;
 import org.team498.C2023.commands.drivetrain.*;
 import org.team498.C2023.commands.elevator.ManualElevator;
 import org.team498.C2023.commands.intake.SetIntake;
+import org.team498.C2023.commands.manipulator.StopManipulator;
 import org.team498.C2023.commands.robot.LowerElevator;
+import org.team498.C2023.commands.robot.MoveToNextState;
 import org.team498.C2023.commands.robot.CollectFromDoubleSS;
+import org.team498.C2023.commands.robot.IntakeCommand;
 import org.team498.C2023.commands.robot.Reset;
 import org.team498.C2023.commands.robot.Score;
 import org.team498.C2023.commands.wrist.ManualWrist;
+import org.team498.C2023.commands.wrist.SetWristState;
 import org.team498.C2023.subsystems.*;
 import org.team498.lib.drivers.Gyro;
 import org.team498.lib.drivers.Xbox;
@@ -47,10 +52,8 @@ public class Controls {
 
     private void configureDriverCommands() {
         driver.rightTrigger().onTrue(new Score());
-        
-        driver.leftTrigger().onTrue(new SetIntake(Intake.State.INTAKE)).onFalse(new SetIntake(Intake.State.IDLE));
-        driver.start().onTrue(new SetIntake(Intake.State.SPIT)).onFalse(new SetIntake((Intake.State.IDLE)));
-
+        driver.B().onTrue(new CubeEngage());
+        driver.leftTrigger().onTrue(new IntakeCommand()).onFalse(new Reset());
         // right bumper == spit through intake
         driver.A().onTrue(new InstantCommand(() -> Gyro.getInstance().setYaw(0)));
     }
