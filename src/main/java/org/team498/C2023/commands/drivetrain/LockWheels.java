@@ -2,10 +2,11 @@ package org.team498.C2023.commands.drivetrain;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+
 import org.team498.C2023.subsystems.Drivetrain;
 
-public class LockWheels extends CommandBase {
+public class LockWheels extends InstantCommand {
     private final Drivetrain drivetrain = Drivetrain.getInstance();
 
     private final SwerveModuleState[] lockedStates = new SwerveModuleState[] {
@@ -23,7 +24,7 @@ public class LockWheels extends CommandBase {
     }
 
     @Override
-    public void execute() {
+    public void initialize() {
         drivetrain.setModuleStates(lockedStates, true);
     }
 }

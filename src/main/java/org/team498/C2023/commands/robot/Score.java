@@ -22,29 +22,29 @@ import org.team498.C2023.subsystems.Elevator;
 import org.team498.C2023.subsystems.Manipulator;
 import org.team498.C2023.subsystems.Wrist;
 
-public class Score extends ParallelRaceGroup {
+public class Score extends SequentialCommandGroup {
     public Score() {
         super(
                 new LockWheels(),
-                new SequentialCommandGroup(
-                        new SetConeARiserToNextState(),
-                        new SetWristState(Wrist.State.TRAVEL),
-                        new ConditionalCommand(new SetManipulatorState(Manipulator.State.COLLECT),
-                                new InstantCommand(), () -> RobotState.getInstance().inConeMode()),
-                        new ParallelRaceGroup(
-                                new SetElevatorToNextState(),
-                                new SequentialCommandGroup(
-                                        new WaitUntilCommand(() -> Elevator.getInstance().aboveIntakeHeight()),
-                                        new SetWristToNextState()),
-                                new WaitCommand(Double.MAX_VALUE)),
-                        new SetWristToNextState(),
-                        new SetConeARiserState(ConeARiser.State.IDLE),
-                        new ConditionalCommand(new WaitCommand(1), new WaitCommand(0.5),
-                                () -> RobotState.getInstance().inConeMode()),
-                        new SetManipulatorToNextState(),
-                        new WaitCommand(0.5),
-                        new StopManipulator(),
-                        new LowerElevator(),
-                        new SetManipulatorState(Manipulator.State.IDLE)));
+                new SetConeARiserToNextState(),
+                new SetWristState(Wrist.State.TRAVEL),
+                new ConditionalCommand(new SetManipulatorState(Manipulator.State.COLLECT),
+                        new InstantCommand(), () -> RobotState.getInstance().inConeMode()),
+                new ParallelRaceGroup(
+                        new SetElevatorToNextState(),
+                        new SequentialCommandGroup(
+                                new WaitUntilCommand(() -> Elevator.getInstance()
+                                        .aboveIntakeHeight()),
+                                new SetWristToNextState()),
+                        new WaitCommand(Double.MAX_VALUE)),
+                new SetWristToNextState(),
+                new SetConeARiserState(ConeARiser.State.IDLE),
+                new ConditionalCommand(new WaitCommand(1), new WaitCommand(0.5),
+                        () -> RobotState.getInstance().inConeMode()),
+                new SetManipulatorToNextState(),
+                new WaitCommand(0.5),
+                new StopManipulator(),
+                new LowerElevator(),
+                new SetManipulatorState(Manipulator.State.IDLE));
     }
 }

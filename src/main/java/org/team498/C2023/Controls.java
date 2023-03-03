@@ -8,11 +8,14 @@ import org.team498.C2023.RobotState.Height;
 import org.team498.C2023.commands.drivetrain.*;
 import org.team498.C2023.commands.elevator.ManualElevator;
 import org.team498.C2023.commands.intake.SetIntake;
+import org.team498.C2023.commands.intake.Shoot;
+import org.team498.C2023.commands.manipulator.SetManipulatorState;
 import org.team498.C2023.commands.robot.LowerElevator;
 import org.team498.C2023.commands.robot.CollectFromDoubleSS;
 import org.team498.C2023.commands.robot.Reset;
 import org.team498.C2023.commands.robot.Score;
 import org.team498.C2023.commands.wrist.ManualWrist;
+import org.team498.C2023.commands.wrist.SetWristState;
 import org.team498.C2023.subsystems.*;
 import org.team498.lib.drivers.Gyro;
 import org.team498.lib.drivers.Xbox;
@@ -46,17 +49,21 @@ public class Controls {
     }
 
     private void configureDriverCommands() {
+
+        driver.leftTrigger().onTrue(new SetIntake(Intake.State.INTAKE).alongWith(new SetWristState(Wrist.State.CONEARISER)).alongWith(new SetManipulatorState(Manipulator.State.COLLECT))).onFalse(new SetIntake(Intake.State.IDLE).alongWith(new SetWristState(Wrist.State.SPIT)).alongWith(new SetManipulatorState(Manipulator.State.IDLE)));
+        // driver.leftTrigger().onTrue(new Shoot());
+
+        // driver.leftBumper().onTrue(new InstantCommand(() -> robotState.setCurrentGameMode(GamePiece.CUBE)));
+
         driver.rightTrigger().onTrue(new Score());
         
-        driver.leftTrigger().onTrue(new SetIntake(Intake.State.INTAKE)).onFalse(new SetIntake(Intake.State.IDLE));
         driver.start().onTrue(new SetIntake(Intake.State.SPIT)).onFalse(new SetIntake((Intake.State.IDLE)));
 
-        // right bumper == spit through intake
         driver.A().onTrue(new InstantCommand(() -> Gyro.getInstance().setYaw(0)));
     }
 
     private void configureOperatorCommands() {
-        operator.start().onTrue(new PathPlannerFollower(PathLib.SingleCube.Path1));
+        operator.start().onTrue(new PathPlannerFollower(PathLib.singleCubeTaxi));
         // operator.start().onTrue(new AlignAndExecute(RobotPositions::getLeftScoringPosition));
 
         operator.Y().onTrue(new InstantCommand(() -> robotState.setNextHeight(Height.TOP)));

@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+
+import org.team498.C2023.commands.auto.PreloadAndTaxi;
 import org.team498.C2023.subsystems.Drivetrain;
 import org.team498.C2023.subsystems.Manipulator;
 import org.team498.C2023.subsystems.Photonvision;
@@ -115,6 +117,11 @@ public class Robot extends TimedRobot {
                 blinkin.setColor(RobotState.getInstance().inConeMode() ? Blinkin.Color.YELLOW : Blinkin.Color.PURPLE);
             }
         }
+    }
+
+    @Override
+    public void autonomousInit() {
+        new PreloadAndTaxi().schedule();
     }
 
     @Override

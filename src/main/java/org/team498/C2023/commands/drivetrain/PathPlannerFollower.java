@@ -52,7 +52,7 @@ public class PathPlannerFollower extends CommandBase {
 
         Robot.field.getObject("Stop Points").setPoses(markerPoses);
 
-        //drivetrain.setPose(trajectory.getInitialHolonomicPose());
+        drivetrain.setPose(trajectory.getInitialHolonomicPose());
 
         // Display the trajectory on the driver station dashboard
         List<Pose2d> poses = new LinkedList<>();

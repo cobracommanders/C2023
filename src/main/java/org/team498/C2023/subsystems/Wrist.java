@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.team498.C2023.Robot;
 import org.team498.C2023.RobotState;
-import org.team498.C2023.ShooterTable;
+import org.team498.C2023.StateTables;
 import org.team498.lib.util.LinearInterpolator;
 
 import static org.team498.C2023.Constants.WristConstants.*;
@@ -43,7 +43,9 @@ public class Wrist extends SubsystemBase {
 
         AUTO_SHOT(0, 0),
         IDLE(0.0, -0.08333),
-        INTERPOLATE(0, 0);
+        INTERPOLATE(0, 0),
+
+        SPIT(0, -0.038142);
 
         private final double setpointCone;
         private final double setpointCube;
@@ -72,7 +74,7 @@ public class Wrist extends SubsystemBase {
 
         PID = new PIDController(P, I, D);
 
-        interpolator = new LinearInterpolator(ShooterTable.wristAngleTable);
+        interpolator = new LinearInterpolator(StateTables.wristAngleTable);
 
         SmartDashboard.putNumber("Wrist PID", 0);
     }

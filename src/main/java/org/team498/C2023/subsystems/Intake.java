@@ -1,5 +1,8 @@
 package org.team498.C2023.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -15,8 +18,8 @@ import static org.team498.C2023.Ports.Intake.*;
 
 //TODO Update to add tricks
 public class Intake extends SubsystemBase {
-    private final CANSparkMax bottomRoller;
-    private final CANSparkMax topRoller;
+    private final TalonFX bottomRoller;
+    private final TalonFX topRoller;
     private final CANSparkMax leftWrist;
     private final CANSparkMax rightWrist;
 
@@ -25,9 +28,9 @@ public class Intake extends SubsystemBase {
     private final DutyCycle encoder;
 
     public enum State {
-        INTAKE(0, 1, 1),
-        SPIT(0, 1, -1),
-        IDLE(0.353, 0, 0);
+        INTAKE(0, 0.5, 0.5),
+        SPIT(0.25, 1, -1),
+        IDLE(0.364811, 0, 0);
 
         private final double position;
         private final double bottomRollerSpeed;
@@ -41,12 +44,14 @@ public class Intake extends SubsystemBase {
     }
 
     private Intake() {
-        bottomRoller = new CANSparkMax(BOTTOM_ROLLER, MotorType.kBrushless);
-        topRoller = new CANSparkMax(TOP_ROLLER, MotorType.kBrushless);
+        bottomRoller = new TalonFX(BOTTOM_ROLLER);
+        topRoller = new TalonFX(TOP_ROLLER);
         leftWrist = new CANSparkMax(L_WRIST, MotorType.kBrushless);
         rightWrist = new CANSparkMax(R_WRIST, MotorType.kBrushless);
-        configRollerMotor(bottomRoller);
-        configRollerMotor(topRoller);
+
+        bottomRoller.setNeutralMode(NeutralMode.Coast);
+        topRoller.setNeutralMode(NeutralMode.Coast);
+
         bottomRoller.setInverted(true);
         topRoller.setInverted(false);
 
@@ -65,11 +70,6 @@ public class Intake extends SubsystemBase {
 
         setState(State.IDLE);
     }
-    private void configRollerMotor(CANSparkMax motor) {
-        motor.restoreFactoryDefaults();
-        motor.setIdleMode(IdleMode.kCoast);
-        motor.setSmartCurrentLimit(35);
-    }
 
     @Override
     public void periodic() {
@@ -82,12 +82,14 @@ public class Intake extends SubsystemBase {
     }
 
     public double getAngle() {
-        return encoder.getOutput() - 0.210628;
+        double angle = encoder.getOutput() + 0.5;
+        if (angle > 1) angle -= 1;
+        return angle - 0.438619;
     }
 
     public void setRollers(State state) {
-        bottomRoller.set(state.bottomRollerSpeed);
-        topRoller.set(state.topRollerSpeed);
+        bottomRoller.set(ControlMode.PercentOutput, state.bottomRollerSpeed);
+        topRoller.set(ControlMode.PercentOutput, state.topRollerSpeed);
     }
 
     public void setState(State state) {

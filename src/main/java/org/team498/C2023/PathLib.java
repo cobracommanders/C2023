@@ -9,6 +9,9 @@ public class PathLib {
     public static final PathPlannerTrajectory pathPlannerTrajectory = Trajectories.getPathPlannerTrajectory("New Path");
 
     public static final class SingleCube {
-        public static final PathPlannerTrajectory Path1 = Trajectories.getPathPlannerTrajectory("camera");
+        public static final PathPlannerTrajectory Path1 = Trajectories.getPathPlannerTrajectory("3 Cone");
     }
+
+    public static final PathPlannerTrajectory singleCubeTaxi = Trajectories.getPathPlannerTrajectory("Single Cube Taxi");
+
 }
