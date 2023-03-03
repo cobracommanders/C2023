@@ -86,11 +86,11 @@ public class Photonvision {
         }
         PhotonPipelineResult result = photonCamera.getLatestResult();
         List<PhotonTrackedTarget> tags = result.targets;
-        for (PhotonTrackedTarget tag : tags) {
-            if (Math.abs(tag.getBestCameraToTarget().getTranslation().getNorm()) >= 3) {
-                tags.remove(tag);
-            }
-        }
+        // for (PhotonTrackedTarget tag : tags) {
+        //     if (Math.abs(tag.getBestCameraToTarget().getTranslation().getNorm()) >= 3) {
+        //         tags.remove(tag);
+        //     }
+        // }
         photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
 
         return photonPoseEstimator.update(result);

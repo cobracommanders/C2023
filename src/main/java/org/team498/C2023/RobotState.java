@@ -22,6 +22,7 @@ public class RobotState extends SubsystemBase {
         TOP,
         DOUBLE_SS,
         SINGLE_SS,
+        INTAKE,
         INTERPOLATE
     }
 

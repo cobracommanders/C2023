@@ -3,6 +3,9 @@ package org.team498.C2023.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
+import com.ctre.phoenixpro.controls.NeutralOut;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -10,6 +13,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycle;
+import edu.wpi.first.wpilibj.motorcontrol.Talon;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -28,9 +32,9 @@ public class Intake extends SubsystemBase {
     private final DutyCycle encoder;
 
     public enum State {
-        INTAKE(0, 0.5, 0.5),
-        SPIT(0.25, 1, -1),
-        IDLE(0.364811, 0, 0);
+        INTAKE(0, 0.7, 0.7),
+        SPIT(0, 1, -1),
+        IDLE(0.353, 0, 0);
 
         private final double position;
         private final double bottomRollerSpeed;

@@ -107,7 +107,7 @@ public class Elevator extends SubsystemBase {
 
     public State getNextState() {
         return switch (RobotState.getInstance().getNextHeight()) {
-            case LOW -> State.LOW;
+            case LOW, INTAKE -> State.LOW;
             case MID -> State.MID;
             case TOP -> State.TOP;
             case DOUBLE_SS -> State.DOUBLE_SS;

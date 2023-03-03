@@ -40,6 +40,7 @@ public class Wrist extends SubsystemBase {
         TOP(0.2, -0.05),
 
         TRAVEL(0.041067, 0.041067),
+        INTAKE(0, -0.05),
 
         AUTO_SHOT(0, 0),
         IDLE(0.0, -0.08333),
@@ -105,6 +106,7 @@ public class Wrist extends SubsystemBase {
             case TOP -> State.TOP;
             case DOUBLE_SS -> State.DOUBLE_SS;
             case SINGLE_SS -> State.SINGLE_SS;
+            case INTAKE -> State.INTAKE;
             case INTERPOLATE -> State.INTERPOLATE;
         };
     }

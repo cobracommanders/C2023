@@ -1,0 +1,22 @@
+package org.team498.C2023.commands.drivetrain;
+
+import org.team498.C2023.subsystems.Drivetrain;
+import org.team498.lib.drivers.Gyro;
+
+import edu.wpi.first.wpilibj2.command.CommandBase;
+
+public class Tip extends CommandBase {
+    private final Drivetrain drivetrain;
+    private final Gyro gyro;
+
+    double deadzone;
+    public Tip() {
+        drivetrain = Drivetrain.getInstance();
+        gyro = Gyro.getInstance();
+        deadzone = 
+    }
+    @Override
+    public boolean isFinished() {
+        return 
+    }
+}

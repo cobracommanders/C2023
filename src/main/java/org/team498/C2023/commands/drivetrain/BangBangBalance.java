@@ -14,7 +14,8 @@ public class BangBangBalance extends CommandBase {
 
     public BangBangBalance() {
         deadzone = 8;
-        speed = 2;
+        speed = 1;
+        addRequirements(drivetrain);
     }
 
     @Override
@@ -25,8 +26,12 @@ public class BangBangBalance extends CommandBase {
     @Override
     public void execute() {
         double angle = gyro.getPitch();
-        if (Math.abs(angle) > deadzone || !isTipped) {
+        if (Math.abs(angle) > deadzone) {
+            isTipped = true;
             drivetrain.drive(Math.copySign(speed, angle), 0, 0, true);
+        } else if (!isTipped) {
+            //isTipped = true;
+            drivetrain.drive(speed, 0, 0, true);
         } else {
             drivetrain.drive(0, 0, 0, true);
         }

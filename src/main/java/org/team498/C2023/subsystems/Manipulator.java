@@ -47,7 +47,7 @@ public class Manipulator extends SubsystemBase {
     public State getNextState() {
         return switch (RobotState.getInstance().getNextHeight()) {
             case LOW, MID, TOP -> State.SCORE;
-            case DOUBLE_SS, SINGLE_SS -> State.COLLECT;
+            case DOUBLE_SS, SINGLE_SS, INTAKE -> State.COLLECT;
             case INTERPOLATE -> State.INTERPOLATE;
         };
     }

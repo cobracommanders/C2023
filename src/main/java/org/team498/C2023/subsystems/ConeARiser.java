@@ -44,7 +44,7 @@ public class ConeARiser extends SubsystemBase {
 
     public State getNextState() {
         return switch (RobotState.getInstance().getNextHeight()) {
-            case LOW, MID, TOP, INTERPOLATE -> State.REJECT;
+            case LOW, MID, TOP, INTAKE, INTERPOLATE -> State.REJECT;
             case DOUBLE_SS, SINGLE_SS -> State.COLLECT;
         };
     }
