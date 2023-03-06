@@ -20,10 +20,10 @@ public final class Constants {
         public static final double DRIVE_WHEEL_DIAMETER = 4;
         public static final double DRIVE_WHEEL_CIRCUMFERENCE = DRIVE_WHEEL_DIAMETER * Math.PI;
 
-        public static final double FL_MODULE_OFFSET = 28 - 45;//360 - 312.4 - 45; //28.0 137.1
-        public static final double FR_MODULE_OFFSET = 28 - 75;//270 - 137.1; //137.1 312.4
-        public static final double BL_MODULE_OFFSET = 28 - 45;//180 + 28.0 - 45; //312.4 74.5
-        public static final double BR_MODULE_OFFSET = 28 - 45 + 90 - 45;//74.5 - 45 - 180; //74.5 28.0
+        public static final double FL_MODULE_OFFSET = 226.225781 - 180;
+        public static final double FR_MODULE_OFFSET = 80.940234;
+        public static final double BL_MODULE_OFFSET = 302.695312 - 360;
+        public static final double BR_MODULE_OFFSET = 296.715234 - 360;
 
         public static final double ROBOT_WIDTH = 26.5 + 6; // Robot width with bumpers, in inches
 

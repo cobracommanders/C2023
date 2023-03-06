@@ -32,21 +32,23 @@ public class Wrist extends SubsystemBase {
 
     public enum State {
         CONEARISER(0, -0.038142),
-        SINGLE_SS(0, 0.05),
+        SINGLE_SS(0, 0.06),
         DOUBLE_SS(0.109352, 0),
 
         LOW(0, 0),
-        MID(0.075, -0.05),
-        TOP(0.2, -0.05),
+        MID(0.1, -0.04),
+        TOP(0.25, -0.02),
 
         TRAVEL(0.041067, 0.041067),
         INTAKE(0, -0.05),
 
         AUTO_SHOT(0, 0),
-        IDLE(0.0, -0.08333),
+        IDLE(-0.065, -0.08333),
         INTERPOLATE(0, 0),
 
-        SPIT(0, -0.038142);
+        SPIT(0, -0.038142),
+
+        UNSTICK_CUBE(0, -0.065);
 
         private final double setpointCone;
         private final double setpointCube;
@@ -78,6 +80,7 @@ public class Wrist extends SubsystemBase {
         interpolator = new LinearInterpolator(StateTables.wristAngleTable);
 
         SmartDashboard.putNumber("Wrist PID", 0);
+
     }
 
     @Override
@@ -129,9 +132,13 @@ public class Wrist extends SubsystemBase {
     }
 
     public double getAngle() {
-        return Robot.isReal()
-               ? encoder.getOutput() - 0.261493
+        double angle = Robot.isReal()
+               ? encoder.getOutput() + 0.5
                : simAngle;
+
+        if (angle < 1) angle += 1;
+
+        return angle - 1.370912;
     }
 
     public boolean atSetpoint() {

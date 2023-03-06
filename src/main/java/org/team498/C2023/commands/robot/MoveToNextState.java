@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 public class MoveToNextState extends SequentialCommandGroup {
     public MoveToNextState() {
         super(new ParallelCommandGroup(
-            new CollectFromDoubleSS()),
+            new CollectFromSS()),
           new WaitCommand(0.5),
           new SetManipulatorToNextState());
     }

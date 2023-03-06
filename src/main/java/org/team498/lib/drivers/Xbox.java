@@ -149,7 +149,7 @@ public class Xbox {
     public double leftY() {return getAxis(Axis.LeftY);}
 
     /** @return the controller's right X axis */
-    public double rightX() {return getAxis(Axis.RightX);}
+    public double rightX() {return -getAxis(Axis.RightX);}
 
     /** @return the controller's right Y axis */
     public double rightY() {return getAxis(Axis.RightY);}

@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.team498.lib.util.Falcon500Conversions;
 
@@ -70,13 +71,14 @@ public class SwerveModule extends SubsystemBase {
         double velocity = Falcon500Conversions.MPSToFalcon(currentSpeedTarget, Units.inchesToMeters(DRIVE_WHEEL_DIAMETER), MK4I_DRIVE_REDUCTION_L2);
         driveMotor.set(ControlMode.Velocity, velocity);
 
-
         double angle = (Math.abs(velocity) <= MAX_VELOCITY_METERS_PER_SECOND * 0.01) && !forcedAngle
                        ? lastAngle
                        : currentAngleTarget;
         steerMotor.set(ControlMode.Position, Falcon500Conversions.degreesToFalcon(angle /*- angleOffset*/, MK4I_STEER_REDUCTION_L2));
 
         lastAngle = (getState().angle.getDegrees() - angleOffset);
+
+        SmartDashboard.putNumber(name, getSteerEncoder());
     }
 
     /** Get the velocity of the wheel in meters per second */
@@ -157,6 +159,7 @@ public class SwerveModule extends SubsystemBase {
         motor.configAllSettings(currentLimitConfig);
 
         motor.setNeutralMode(NeutralMode.Brake);
+
         motor.configOpenloopRamp(1);
         motor.setSelectedSensorPosition(0);
 
@@ -196,10 +199,11 @@ public class SwerveModule extends SubsystemBase {
         // Set the encoder to return values from 0 to 360 instead of -180 to +180
         CANCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
         if (name.equals("FL")) {
-            CANCoder.configMagnetOffset(angleOffset);
-        } else {
             CANCoder.configMagnetOffset(angleOffset + 180);
+        } else {
+            CANCoder.configMagnetOffset(angleOffset);
         }
+
     }
 
 }

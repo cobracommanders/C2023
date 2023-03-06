@@ -7,20 +7,23 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
+import org.team498.C2023.commands.auto.CubeEngage;
+import org.team498.C2023.commands.auto.JustScore;
 import org.team498.C2023.commands.auto.PreloadAndTaxi;
+import org.team498.C2023.commands.auto.ScoreAndTaxi;
 import org.team498.C2023.subsystems.Drivetrain;
 import org.team498.C2023.subsystems.Manipulator;
-import org.team498.C2023.subsystems.Photonvision;
 import org.team498.lib.drivers.Blinkin;
 import org.team498.lib.drivers.Gyro;
 import org.team498.lib.drivers.Blinkin.Color;
 
 
 public class Robot extends TimedRobot {
-    public static int rotationFlip = 1;
     public static int coordinateFlip = 1;
     public static int rotationOffset = 0;
 
@@ -32,9 +35,12 @@ public class Robot extends TimedRobot {
 
     private final Drivetrain drivetrain = Drivetrain.getInstance();
     private final Gyro gyro = Gyro.getInstance();
-    private final Photonvision photonvision = Photonvision.getInstance();
+    // private final Photonvision photonvision = Photonvision.getInstance();
     private final Blinkin blinkin = Blinkin.getInstance();
     private final RobotState robotState = RobotState.getInstance();
+
+    private final SendableChooser<Command> autoChooser = new SendableChooser<Command>();
+
 
     @Override
     public void robotInit() {
@@ -45,6 +51,16 @@ public class Robot extends TimedRobot {
 
         SmartDashboard.putData(field);
         FieldPositions.displayAll();
+
+        autoChooser.setDefaultOption("Score", new JustScore());
+        autoChooser.addOption("Cube Engage", new CubeEngage());
+        autoChooser.addOption("Preload and Taxi", new PreloadAndTaxi());
+
+        controls.configureDefaultCommands();
+        controls.configureDriverCommands();
+        controls.configureOperatorCommands();
+
+        SmartDashboard.putData(autoChooser);
     }
 
     @Override
@@ -56,8 +72,8 @@ public class Robot extends TimedRobot {
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
 
-        if (cameraEnabled)
-        photonvision.getEstimatedGlobalPose(drivetrain.getPose()).ifPresent(pose -> drivetrain.setOdometry(pose.estimatedPose));
+        //if (cameraEnabled)
+        //photonvision.getEstimatedGlobalPose(drivetrain.getPose()).ifPresent(pose -> drivetrain.setOdometry(pose.estimatedPose));
 
 
         if (RobotPositions.inCommunity()) {
@@ -121,7 +137,10 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-        new PreloadAndTaxi().schedule();
+        // autoChooser.getSelected().schedule();
+        Drivetrain.getInstance().setPose(new Pose2d(0, 0, Rotation2d.fromDegrees(Robot.alliance == Alliance.Blue ? 0 : 180)));
+        new CubeEngage().schedule();
+        // new JustScore().schedule();
     }
 
     @Override

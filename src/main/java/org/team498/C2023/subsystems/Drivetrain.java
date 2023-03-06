@@ -93,7 +93,7 @@ public class Drivetrain extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber("Pitch", gyro.getPitch());
         SmartDashboard.putNumber("Roll", gyro.getRoll());
-        if (Robot.isReal()) odometry.update(Rotation2d.fromDegrees(getYaw()+180), getModulePositions());
+        if (Robot.isReal()) odometry.update(Rotation2d.fromDegrees(getYaw() + 180), getModulePositions());
 
         if (RobotState.isDisabled()) {
             for (SwerveModule swerveModule : swerveModules) {
@@ -131,14 +131,16 @@ public class Drivetrain extends SubsystemBase {
         double rotation = getPose().getRotation().getDegrees() + (currentSpeeds.omegaRadiansPerSecond * (Robot.kDefaultPeriod * 10));
         return new Pose2d(x, y, Rotation2d.fromDegrees(rotation));
     }
+
     public Supplier<Pose2d> getNextPoseToTag() {
         Pose3d ogPose = Photonvision.getInstance().nearestTagPose().get();
         //TODO: since this is the tag pose, it might need to subtract the current velocity
         double x = ogPose.getX() + (currentSpeeds.vxMetersPerSecond * (Robot.kDefaultPeriod * 10));
         double y = ogPose.getY() + (currentSpeeds.vyMetersPerSecond * (Robot.kDefaultPeriod * 10));
         double rotation = ogPose.getRotation().toRotation2d().getDegrees() + (currentSpeeds.omegaRadiansPerSecond * (Robot.kDefaultPeriod * 10));
-        return ()-> new Pose2d(x, y, Rotation2d.fromDegrees(rotation));
+        return () -> new Pose2d(x, y, Rotation2d.fromDegrees(rotation));
     }
+
     public double getNextDistanceToTag() {
         return Math.abs(getNextPoseToTag().get().getTranslation().getNorm());
     }
@@ -187,7 +189,7 @@ public class Drivetrain extends SubsystemBase {
         double xAdjustment = xController.calculate(getPose().getX());
         double yAdjustment = yController.calculate(getPose().getY());
         double angleAdjustment = -angleController.calculate(getYaw());
-        drive(xAdjustment, yAdjustment, angleAdjustment * Robot.rotationFlip, true);
+        drive(xAdjustment, yAdjustment, angleAdjustment, true);
     }
 
     /**
@@ -270,6 +272,7 @@ public class Drivetrain extends SubsystemBase {
     public boolean isNear(Pose2d pose, double epsilon) {
         return Math.hypot(getPose().getX() - pose.getX(), getPose().getY() - pose.getY()) < epsilon;
     }
+
     public static ChassisSpeeds limitChassisSpeeds(ChassisSpeeds unlimited) {
         double x = xLimiter.calculate(unlimited.vxMetersPerSecond);
         double y = yLimiter.calculate(unlimited.vyMetersPerSecond);

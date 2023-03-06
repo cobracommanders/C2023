@@ -2,15 +2,12 @@ package org.team498.C2023.commands.robot;
 
 import java.util.function.DoubleSupplier;
 
-import org.team498.C2023.Robot;
 import org.team498.C2023.RobotState;
 import org.team498.C2023.commands.drivetrain.TargetDrive;
-import org.team498.C2023.commands.manipulator.SetManipulatorState;
 import org.team498.C2023.subsystems.Photonvision;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 

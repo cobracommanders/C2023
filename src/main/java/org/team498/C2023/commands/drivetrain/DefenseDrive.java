@@ -40,7 +40,7 @@ public class DefenseDrive extends CommandBase {
         double rotation = rotationSupplier.getAsDouble() * MAX_ANGULAR_SPEED_DEGREES_PER_SECOND * speed;
 
         // Set the robot to drive in field relative mode, with the rotation controlled by the snap controller
-        drivetrain.drive(xTranslation, yTranslation, rotation * Robot.rotationFlip, true);
+        drivetrain.drive(xTranslation, yTranslation, rotation, true);
     }
 
     @Override

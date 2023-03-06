@@ -15,7 +15,7 @@ public class Hold extends CommandBase {
         if (manipulator.isStalling()) {
             manipulator.setState(Manipulator.State.IDLE);
         } else {
-            manipulator.setState(Manipulator.State.COLLECT);
+            manipulator.setState(Manipulator.State.HOLD);
         }
     }
 

@@ -1,9 +1,9 @@
 package org.team498.C2023.subsystems;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMax.IdleMode;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.RelativeEncoder;
+import com.ctre.phoenix.motorcontrol.FollowerType;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -18,9 +18,8 @@ import static org.team498.C2023.Ports.Elevator.F_ELEVATOR_ID;
 import static org.team498.C2023.Ports.Elevator.B_ELEVATOR_ID;
 
 public class Elevator extends SubsystemBase {
-    private final CANSparkMax leftMotor;
-    private final CANSparkMax rightMotor;
-    private final RelativeEncoder encoder;
+    private final TalonFX leftMotor;
+    private final TalonFX rightMotor;
 
     private final ProfiledPIDController PID;
 
@@ -28,17 +27,19 @@ public class Elevator extends SubsystemBase {
 
     private final LinearInterpolator interpolator;
 
-    private ControlMode controlMode;
+    private ControlMode controlMode = ControlMode.PID;
     private double speed = 0;
 
     public enum State {
         CONEARISER(0, 0),
-        SINGLE_SS(0.506641, 0.1),
-        DOUBLE_SS(0.66, 0),
+        SINGLE_SS(0.406641, 0.16745),
+        DOUBLE_SS(0.62, 0),
 
         LOW(0, 0),
-        MID(0.95, 0.6),
-        TOP(0.95, 0.95),
+        MID(0.875, 0.5),
+        TOP(0.875, 0.885),
+
+        UNSTICK_CUBE(0, 0.4),
 
         AUTO_SHOT(0, 0),
         IDLE(0, 0),
@@ -60,22 +61,16 @@ public class Elevator extends SubsystemBase {
     }
 
     private Elevator() {
-        leftMotor = new CANSparkMax(F_ELEVATOR_ID, MotorType.kBrushless);
-        rightMotor = new CANSparkMax(B_ELEVATOR_ID, MotorType.kBrushless);
+        leftMotor = new TalonFX(F_ELEVATOR_ID);
+        rightMotor = new TalonFX(B_ELEVATOR_ID);
 
-        leftMotor.restoreFactoryDefaults();
-        rightMotor.restoreFactoryDefaults();
-
-        leftMotor.setIdleMode(IdleMode.kBrake);
-        rightMotor.setIdleMode(IdleMode.kBrake);
+        leftMotor.setNeutralMode(NeutralMode.Brake);
+        rightMotor.setNeutralMode(NeutralMode.Brake);
 
         leftMotor.setInverted(true);
         rightMotor.setInverted(true);
 
-        rightMotor.follow(leftMotor, false);
-
-        encoder = leftMotor.getEncoder();
-
+        rightMotor.follow(leftMotor, FollowerType.PercentOutput);
 
         PID = new ProfiledPIDController(P, I, D, new TrapezoidProfile.Constraints(5, 4));
         PID.reset(0);
@@ -88,8 +83,6 @@ public class Elevator extends SubsystemBase {
 
     @Override
     public void periodic() {
-        this.controlMode= ControlMode.PID;
-
         // PID.setGoal(SmartDashboard.getNumber("Elevator PID", 0));
         double speed;
         if (controlMode == ControlMode.PID) {
@@ -97,7 +90,7 @@ public class Elevator extends SubsystemBase {
         } else {
             speed = this.speed;
         }
-        leftMotor.set(speed + feedforward.calculate(speed));
+        leftMotor.set(TalonFXControlMode.PercentOutput, speed + feedforward.calculate(speed));
 
         SmartDashboard.putData(this);
         SmartDashboard.putNumber("Elevator Position", getPosition());
@@ -137,19 +130,19 @@ public class Elevator extends SubsystemBase {
     }
 
     public double getPosition() {
-        return encoder.getPosition() / MOTOR_ROTATION_TO_METERS;
+        return (leftMotor.getSelectedSensorPosition() / 2048) / MOTOR_ROTATION_TO_METERS;
     }
 
     public boolean atSetpoint() {
-        return Math.abs(PID.getGoal().position -getPosition()) < 0.025;
+        return Math.abs(PID.getGoal().position - getPosition()) < 0.025;
     }
 
     public double getPower() {
-        return leftMotor.get();
+        return leftMotor.getMotorOutputPercent();
     }
 
     public void setEncoderPosition(double position) {
-        encoder.setPosition(position);
+        leftMotor.setSelectedSensorPosition(position);
     }
 
     public void setToNextState() {

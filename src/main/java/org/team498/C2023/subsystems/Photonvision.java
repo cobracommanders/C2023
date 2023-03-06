@@ -42,7 +42,6 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 import org.team498.C2023.FieldPositions;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;

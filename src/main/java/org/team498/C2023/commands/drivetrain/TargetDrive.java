@@ -39,7 +39,7 @@ public class TargetDrive extends CommandBase {
         double rotationalSpeed = drivetrain.calculateRotationalSpeed();
 
         // Set the robot to drive in field relative mode, with the rotation controlled by the snap controller
-        drivetrain.drive(xTranslation, yTranslation, rotationalSpeed * Robot.rotationFlip, true);
+        drivetrain.drive(xTranslation, yTranslation, rotationalSpeed, true);
     }
 
     public Pose2d targetPose(Pose3d suppliedPose) {

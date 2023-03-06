@@ -1,6 +1,6 @@
 package org.team498.C2023.commands.robot;
 
-import org.team498.C2023.commands.intake.SetIntake;
+import org.team498.C2023.commands.intake.SetIntakeState;
 import org.team498.C2023.commands.manipulator.SetManipulatorState;
 import org.team498.C2023.commands.manipulator.StopManipulator;
 import org.team498.C2023.subsystems.Intake;
@@ -12,9 +12,10 @@ public class Reset extends SequentialCommandGroup {
     public Reset() {
         super(
                 new StopManipulator(),
+                new SetIntakeState(Intake.State.IDLE_OUT),
                 new LowerElevator(),
                 new SetManipulatorState(Manipulator.State.IDLE),
-                new SetIntake(Intake.State.IDLE)
+                new SetIntakeState(Intake.State.IDLE_IN)
         );
     }
 

@@ -17,7 +17,7 @@ public class PassGamePiece extends SequentialCommandGroup {
                 new SetWristToPassPosition(),
                 new SetElevatorToPassPosition()),
               new PassFromConeARiser(),
-              new SetManipulatorState(Manipulator.State.COLLECT),
+              new SetManipulatorState(Manipulator.State.CONEARISER),
               new WaitCommand(1),
               new StopManipulator(),
               new StopConeARiser()
