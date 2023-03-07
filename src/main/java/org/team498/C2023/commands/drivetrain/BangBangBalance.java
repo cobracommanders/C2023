@@ -33,8 +33,7 @@ public class BangBangBalance extends CommandBase {
             drivetrain.drive(Math.copySign(speed, Robot.alliance == Alliance.Blue ? -angle : angle), 0, 0, true);
         } else if (!isTipped) {
             //isTipped = true;
-            drivetrain.drive(Robot.alliance ==
-             Alliance.Blue ? -3 : 3, 0, 0, true);
+            drivetrain.drive(Robot.alliance == Alliance.Blue ? -3 : 3, 0, 0, true);
         } else {
             drivetrain.drive(0, 0, 0, true);
         }

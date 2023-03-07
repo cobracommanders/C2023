@@ -15,9 +15,9 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.team498.C2023.commands.auto.CubeEngage;
 import org.team498.C2023.commands.auto.JustScore;
 import org.team498.C2023.commands.auto.PreloadAndTaxi;
-import org.team498.C2023.commands.auto.ScoreAndTaxi;
 import org.team498.C2023.subsystems.Drivetrain;
 import org.team498.C2023.subsystems.Manipulator;
+import org.team498.C2023.subsystems.Photonvision;
 import org.team498.lib.drivers.Blinkin;
 import org.team498.lib.drivers.Gyro;
 import org.team498.lib.drivers.Blinkin.Color;
@@ -31,11 +31,9 @@ public class Robot extends TimedRobot {
     public static Alliance alliance = Alliance.Invalid;
     public static final Controls controls = new Controls();
 
-    public static boolean cameraEnabled = true;
-
     private final Drivetrain drivetrain = Drivetrain.getInstance();
     private final Gyro gyro = Gyro.getInstance();
-    // private final Photonvision photonvision = Photonvision.getInstance();
+    private final Photonvision photonvision = Photonvision.getInstance();
     private final Blinkin blinkin = Blinkin.getInstance();
     private final RobotState robotState = RobotState.getInstance();
 
@@ -72,8 +70,7 @@ public class Robot extends TimedRobot {
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
 
-        //if (cameraEnabled)
-        //photonvision.getEstimatedGlobalPose(drivetrain.getPose()).ifPresent(pose -> drivetrain.setOdometry(pose.estimatedPose));
+        photonvision.getEstimatedGlobalPose(drivetrain.getPose()).ifPresent(pose -> drivetrain.setOdometry(pose.estimatedPose));
 
 
         if (RobotPositions.inCommunity()) {
