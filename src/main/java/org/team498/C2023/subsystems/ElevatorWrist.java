@@ -10,14 +10,15 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.team498.C2023.Robot;
 import org.team498.C2023.RobotState;
+import org.team498.C2023.State;
 import org.team498.C2023.StateTables;
 import org.team498.lib.util.LinearInterpolator;
 
 import static org.team498.C2023.Constants.WristConstants.*;
-import static org.team498.C2023.Ports.Wrist.ENCODER_PORT;
-import static org.team498.C2023.Ports.Wrist.WRIST;
+import static org.team498.C2023.Ports.ElevatorWrist.ENCODER_PORT;
+import static org.team498.C2023.Ports.ElevatorWrist.WRIST;
 
-public class Wrist extends SubsystemBase {
+public class ElevatorWrist extends SubsystemBase {
     private final CANSparkMax wrist;
     private final DutyCycle encoder;
 
@@ -25,52 +26,20 @@ public class Wrist extends SubsystemBase {
 
     private final LinearInterpolator interpolator;
 
-    private ControlMode controlMode;
+    private ControlMode controlMode = ControlMode.PID;
     private double speed = 0;
 
     private double simAngle = 0;
-
-    public enum State {
-        CONEARISER(0, -0.038142),
-        SINGLE_SS(0, 0.06),
-        DOUBLE_SS(0.109352, 0),
-
-        LOW(0, 0),
-        MID(0.1, -0.04),
-        TOP(0.25, -0.02),
-
-        TRAVEL(0.041067, 0.041067),
-        INTAKE(0, -0.05),
-
-        AUTO_SHOT(0, 0),
-        IDLE(-0.065, -0.08333),
-        INTERPOLATE(0, 0),
-
-        SPIT(0, -0.038142),
-
-        UNSTICK_CUBE(0, -0.065);
-
-        private final double setpointCone;
-        private final double setpointCube;
-
-        State(double setpointCone, double setpointCube) {
-            this.setpointCone = setpointCone;
-            this.setpointCube = setpointCube;
-        }
-    }
 
     public enum ControlMode {
         PID,
         MANUAL
     }
 
-    private Wrist() {
+    private ElevatorWrist() {
         wrist = new CANSparkMax(WRIST, MotorType.kBrushless);
-
         wrist.restoreFactoryDefaults();
-
         wrist.setIdleMode(IdleMode.kBrake);
-
         wrist.setInverted(true);
 
         encoder = new DutyCycle(new DigitalInput(ENCODER_PORT));
@@ -85,7 +54,6 @@ public class Wrist extends SubsystemBase {
 
     @Override
     public void periodic() {
-        this.controlMode= ControlMode.PID;
         // PID.setSetpoint(SmartDashboard.getNumber("Wrist PID", 0));
         double speed;
         if (controlMode == ControlMode.PID) {
@@ -94,7 +62,6 @@ public class Wrist extends SubsystemBase {
             speed = this.speed;
         }
         wrist.set(speed);
-        
 
         SmartDashboard.putData(this);
         SmartDashboard.putNumber("Wrist Angle", getAngle());
@@ -102,27 +69,12 @@ public class Wrist extends SubsystemBase {
         SmartDashboard.putNumber("Wrist Error", PID.getPositionError());
     }
 
-    public State getNextState() {
-        return switch (RobotState.getInstance().getNextHeight()) {
-            case LOW -> State.LOW;
-            case MID -> State.MID;
-            case TOP -> State.TOP;
-            case DOUBLE_SS -> State.DOUBLE_SS;
-            case SINGLE_SS -> State.SINGLE_SS;
-            case INTAKE -> State.INTAKE;
-            case INTERPOLATE -> State.INTERPOLATE;
-        };
-    }
-
-    public void setState(State state) {
+    public void setState(State.ElevatorWrist state) {
         this.controlMode = ControlMode.PID;
-        if (state == State.INTERPOLATE) {
+        if (state == State.ElevatorWrist.INTERPOLATE) {
             PID.setSetpoint(interpolator.getInterpolatedValue(Drivetrain.getInstance().getNextDistanceToTag()));
-        }
-        else {
-            PID.setSetpoint(RobotState.getInstance().inConeMode()
-                            ? state.setpointCone
-                            : state.setpointCube);
+        } else {
+            PID.setSetpoint(state.setpoint);
         }
     }
 
@@ -133,10 +85,11 @@ public class Wrist extends SubsystemBase {
 
     public double getAngle() {
         double angle = Robot.isReal()
-               ? encoder.getOutput() + 0.5
-               : simAngle;
+                ? encoder.getOutput() + 0.5
+                : simAngle;
 
-        if (angle < 1) angle += 1;
+        if (angle < 1)
+            angle += 1;
 
         return angle - 1.370912;
     }
@@ -154,15 +107,14 @@ public class Wrist extends SubsystemBase {
     }
 
     public void setToNextState() {
-        setState(getNextState());
+        setState(RobotState.getInstance().getCurrentState().elevatorWrist);
     }
 
+    private static ElevatorWrist instance;
 
-    private static Wrist instance;
-
-    public static Wrist getInstance() {
+    public static ElevatorWrist getInstance() {
         if (instance == null) {
-            instance = new Wrist();
+            instance = new ElevatorWrist();
         }
 
         return instance;

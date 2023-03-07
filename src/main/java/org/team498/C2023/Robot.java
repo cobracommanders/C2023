@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.team498.C2023.commands.auto.CubeEngage;
 import org.team498.C2023.commands.auto.JustScore;
 import org.team498.C2023.commands.auto.PreloadAndTaxi;
-import org.team498.C2023.commands.auto.ScoreAndTaxi;
 import org.team498.C2023.subsystems.Drivetrain;
 import org.team498.C2023.subsystems.Manipulator;
 import org.team498.lib.drivers.Blinkin;

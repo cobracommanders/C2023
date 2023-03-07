@@ -66,7 +66,7 @@ public final class Constants {
         public static final double V = 0;
     }
 
-    public static final class IntakeConstants {
+    public static final class IntakeWristConstants {
         public static final double P = 2.5;
         public static final double I = 0;
         public static final double D = 0;

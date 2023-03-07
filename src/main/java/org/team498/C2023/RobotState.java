@@ -9,21 +9,12 @@ import org.team498.C2023.subsystems.Drivetrain;
 public class RobotState extends SubsystemBase {
     private final Drivetrain drivetrain;
     private GamePiece currentGameMode = GamePiece.CONE;
-    private Height nextHeight = Height.LOW;
+    private State state = State.IDLE_CUBE;
+    private State nextDriveteamState = State.IDLE_CUBE;
 
     public enum GamePiece {
         CUBE,
         CONE
-    }
-
-    public enum Height {
-        LOW,
-        MID,
-        TOP,
-        DOUBLE_SS,
-        SINGLE_SS,
-        INTAKE,
-        INTERPOLATE
     }
 
     private RobotState() {
@@ -35,13 +26,20 @@ public class RobotState extends SubsystemBase {
         SmartDashboard.putBoolean("Current Game Piece", gamePiece == GamePiece.CONE);
     }
 
-    public Height getNextHeight() {
-        return nextHeight;
+    public State getCurrentState() {
+        return state;
     }
 
-    public void setNextHeight(Height nextHeight) {
-        this.nextHeight = nextHeight;
-        SmartDashboard.putString("Scoring Target", nextHeight.name());
+    public void setState(State state) {
+        this.state = state;
+    }
+
+    public State getNextDriveteamState() {
+        return nextDriveteamState;
+    }
+
+    public void setNextDriveteamState(State nextTargetState) {
+        this.nextDriveteamState = nextTargetState;
     }
 
     public boolean inCubeMode() {return currentGameMode == GamePiece.CUBE;}

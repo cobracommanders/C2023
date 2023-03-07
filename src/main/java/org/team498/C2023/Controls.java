@@ -1,26 +1,18 @@
 package org.team498.C2023;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RepeatCommand;
 
 import org.team498.C2023.Constants.OIConstants;
 import org.team498.C2023.RobotState.GamePiece;
-import org.team498.C2023.RobotState.Height;
-import org.team498.C2023.commands.auto.CubeEngage;
 import org.team498.C2023.commands.drivetrain.*;
 import org.team498.C2023.commands.elevator.ManualElevator;
-import org.team498.C2023.commands.intake.SetIntakeState;
-import org.team498.C2023.commands.manipulator.SetManipulatorState;
-import org.team498.C2023.commands.manipulator.StopManipulator;
-import org.team498.C2023.commands.robot.LowerElevator;
 import org.team498.C2023.commands.robot.CollectFromSS;
 import org.team498.C2023.commands.robot.FixCube;
-import org.team498.C2023.commands.robot.IntakeCommand;
-import org.team498.C2023.commands.robot.Reset;
+import org.team498.C2023.commands.robot.GroundIntake;
+import org.team498.C2023.commands.robot.ReturnToIdle;
 import org.team498.C2023.commands.robot.Score;
 import org.team498.C2023.commands.robot.Spit;
-import org.team498.C2023.commands.wrist.ManualWrist;
-import org.team498.C2023.commands.wrist.SetWristState;
+import org.team498.C2023.commands.elevatorwrist.ManualElevatorWrist;
 import org.team498.C2023.subsystems.*;
 import org.team498.lib.drivers.Gyro;
 import org.team498.lib.drivers.Xbox;
@@ -32,8 +24,9 @@ public class Controls {
     private final Drivetrain drivetrain = Drivetrain.getInstance();
     private final Elevator elevator = Elevator.getInstance();
     private final Manipulator manipulator = Manipulator.getInstance();
-    private final Wrist wrist = Wrist.getInstance();
-    private final Intake intake = Intake.getInstance();
+    private final ElevatorWrist elevatorWrist = ElevatorWrist.getInstance();
+    private final IntakeWrist intakeWrist = IntakeWrist.getInstance();
+    private final IntakeRollers intake = IntakeRollers.getInstance();
     private final ConeARiser coneARiser = ConeARiser.getInstance();
     private final RobotState robotState = RobotState.getInstance();
 
@@ -50,39 +43,26 @@ public class Controls {
     }
 
     public void configureDriverCommands() {
-        // driver.leftTrigger().onTrue(new SetIntake(Intake.State.INTAKE).alongWith(new SetWristState(Wrist.State.CONEARISER)).alongWith(new SetManipulatorState(Manipulator.State.COLLECT))).onFalse(new SetIntake(Intake.State.IDLE).alongWith(new SetWristState(Wrist.State.SPIT)).alongWith(new SetManipulatorState(Manipulator.State.IDLE)));
-        driver.start().onTrue(new PathPlannerFollower(PathLib.singleCubeTaxi));
-
-        // driver.leftBumper().onTrue(new InstantCommand(() -> robotState.setCurrentGameMode(GamePiece.CUBE)));
-
         driver.rightTrigger().onTrue(new Score());
-        // driver.B().onTrue(new CubeEngage());
         driver.leftBumper().onTrue(new Spit());
-        driver.leftTrigger().onTrue(new IntakeCommand()).onFalse(new Reset());
+        driver.leftTrigger().onTrue(new InstantCommand(() -> robotState.setState(State.GROUND_CUBE)).alongWith(new GroundIntake())).onFalse(new ReturnToIdle());
         driver.A().onTrue(new InstantCommand(() -> Gyro.getInstance().setYaw(0)));
-        driver.X().onTrue(new SetIntakeState(Intake.State.OUTTAKE)).onFalse(new SetIntakeState(Intake.State.IDLE_IN));
+        driver.X().onTrue(new InstantCommand(() -> robotState.setState(State.OUTTAKE)).alongWith(new GroundIntake())).onFalse(new ReturnToIdle());
     }
 
     public void configureOperatorCommands() {
-        // operator.start().onTrue(new PathPlannerFollower(PathLib.singleCubeTaxi));
-        // operator.start().onTrue(new AlignAndExecute(RobotPositions::getLeftScoringPosition));
+        operator.Y().onTrue(new InstantCommand(() -> robotState.setNextDriveteamState(robotState.inConeMode() ? State.TOP_CONE : State.TOP_CUBE)));
+        operator.B().onTrue(new InstantCommand(() -> robotState.setNextDriveteamState(robotState.inConeMode() ? State.MID_CONE : State.MID_CUBE)));
 
-        operator.Y().onTrue(new InstantCommand(() -> robotState.setNextHeight(Height.TOP)));
-        operator.B().onTrue(new InstantCommand(() -> robotState.setNextHeight(Height.MID)));
-        operator.A().onTrue(new InstantCommand(() -> robotState.setNextHeight(Height.LOW)));
+        operator.X().whileTrue(new FixCube()).onFalse(new ReturnToIdle());
 
-        operator.X().whileTrue(new FixCube()).onFalse(new LowerElevator().alongWith(new SetIntakeState(Intake.State.IDLE_IN), new StopManipulator()));
-
-        // Left bumper sets the current game piece to a cone, right bumper sets it to a cube
         operator.rightBumper().onTrue(new InstantCommand(() -> robotState.setCurrentGameMode(GamePiece.CONE)));
         operator.leftBumper().onTrue(new InstantCommand(() -> robotState.setCurrentGameMode(GamePiece.CUBE)));
 
-        // operator.start().onTrue(new SetConeARiserState(ConeARiser.State.COLLECT)).onFalse(new SetConeARiserState(ConeARiser.State.IDLE));
-
-        operator.rightTrigger().onTrue(new InstantCommand(() -> robotState.setNextHeight(Height.DOUBLE_SS)).alongWith(new CollectFromSS())).onFalse(new Reset());
-        operator.leftTrigger().onTrue(new InstantCommand(() -> robotState.setNextHeight(Height.SINGLE_SS)).alongWith(new CollectFromSS())).onFalse(new Reset());
+        operator.rightTrigger().onTrue(new InstantCommand(() -> robotState.setNextDriveteamState(State.DOUBLE_SS)).alongWith(new CollectFromSS())).onFalse(new ReturnToIdle());
+        operator.leftTrigger().onTrue(new InstantCommand(() -> robotState.setNextDriveteamState(State.SINGLE_SS)).alongWith(new CollectFromSS())).onFalse(new ReturnToIdle());
 
         operator.start().toggleOnTrue(new ManualElevator(() -> -operator.leftY()));
-        operator.back().toggleOnTrue(new ManualWrist(() -> -operator.rightY()));
+        operator.back().toggleOnTrue(new ManualElevatorWrist(() -> -operator.rightY()));
     }
 }

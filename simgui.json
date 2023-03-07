@@ -3,7 +3,11 @@
     "types": {
       "/FMSInfo": "FMSInfo",
       "/SmartDashboard/Drivetrain": "Subsystem",
-      "/SmartDashboard/Field": "Field2d"
+      "/SmartDashboard/Elevator": "Subsystem",
+      "/SmartDashboard/Elevator Sim": "Mechanism2d",
+      "/SmartDashboard/ElevatorWrist": "Subsystem",
+      "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/SendableChooser[0]": "String Chooser"
     }
   },
   "NetworkTables": {

@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.team498.C2023.RobotState;
 import org.team498.C2023.StateTables;
+import org.team498.C2023.State;
 import org.team498.lib.util.LinearInterpolator;
 
 import static org.team498.C2023.Constants.ElevatorConstants.*;
@@ -29,31 +30,6 @@ public class Elevator extends SubsystemBase {
 
     private ControlMode controlMode = ControlMode.PID;
     private double speed = 0;
-
-    public enum State {
-        CONEARISER(0, 0),
-        SINGLE_SS(0.406641, 0.16745),
-        DOUBLE_SS(0.62, 0),
-
-        LOW(0, 0),
-        MID(0.875, 0.5),
-        TOP(0.875, 0.885),
-
-        UNSTICK_CUBE(0, 0.4),
-
-        AUTO_SHOT(0, 0),
-        IDLE(0, 0),
-        
-        INTERPOLATE(0, 0);
-
-        private final double setpointCone;
-        private final double setpointCube;
-
-        State(double setpointCone, double setpointCube) {
-            this.setpointCone = setpointCone;
-            this.setpointCube = setpointCube;
-        }
-    }
 
     public enum ControlMode {
         PID,
@@ -98,29 +74,16 @@ public class Elevator extends SubsystemBase {
         SmartDashboard.putNumber("Elevator Error", PID.getGoal().position - getPosition());
     }
 
-    public State getNextState() {
-        return switch (RobotState.getInstance().getNextHeight()) {
-            case LOW, INTAKE -> State.LOW;
-            case MID -> State.MID;
-            case TOP -> State.TOP;
-            case DOUBLE_SS -> State.DOUBLE_SS;
-            case SINGLE_SS -> State.SINGLE_SS;
-            case INTERPOLATE -> State.INTERPOLATE;
-        };
-    }
-
     public boolean aboveIntakeHeight() {
-        return getPosition() > 0.4;
+        return getPosition() > 0.4; //TODO find out the real number here
     }
 
-    public void setState(State state) {
+    public void setState(State.Elevator state) {
         this.controlMode = ControlMode.PID;
-        if (state == State.INTERPOLATE) {
+        if (state == State.Elevator.INTERPOLATE) {
             PID.setGoal(interpolator.getInterpolatedValue(Drivetrain.getInstance().getNextDistanceToTag()));
         } else {
-            PID.setGoal(RobotState.getInstance().inConeMode()
-            ? state.setpointCone
-            : state.setpointCube);
+            PID.setGoal(state.setpoint);
         }
     }
 
@@ -146,9 +109,8 @@ public class Elevator extends SubsystemBase {
     }
 
     public void setToNextState() {
-        setState(getNextState());
+        setState(RobotState.getInstance().getCurrentState().elevator);
     }
-
 
     private static Elevator instance;
 
