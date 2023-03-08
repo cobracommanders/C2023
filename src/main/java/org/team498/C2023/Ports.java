@@ -21,11 +21,14 @@ public final class Ports {
         public static final int GYRO = 20;
     }
 
-    public static class Intake {
+    public static class IntakeRollers {
         public static final int BOTTOM_ROLLER = 20;
+        public static final int TOP_ROLLER = 23;
+    }
+
+    public static class IntakeWrist {
         public static final int L_WRIST = 21;
         public static final int R_WRIST = 22;
-        public static final int TOP_ROLLER = 23;
         public static final int ENCODER_PORT = 1; // DIO
     }
 
@@ -38,7 +41,7 @@ public final class Ports {
         public static final int ROLLERS = 40;
     }
 
-    public static class Wrist {
+    public static class ElevatorWrist {
         public static final int WRIST = 50;
         public static final int ENCODER_PORT = 0; // DIO
     }

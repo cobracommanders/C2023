@@ -1,15 +1,15 @@
-package org.team498.C2023.commands.wrist;
+package org.team498.C2023.commands.elevatorwrist;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import org.team498.C2023.subsystems.Wrist;
+import org.team498.C2023.subsystems.ElevatorWrist;
 
 import java.util.function.DoubleSupplier;
 
-public class ManualWrist extends CommandBase {
-    private final Wrist wrist = Wrist.getInstance();
+public class ManualElevatorWrist extends CommandBase {
+    private final ElevatorWrist wrist = ElevatorWrist.getInstance();
     private final DoubleSupplier speedSupplier;
 
-    public ManualWrist(DoubleSupplier speedSupplier) {
+    public ManualElevatorWrist(DoubleSupplier speedSupplier) {
         this.speedSupplier = speedSupplier;
         addRequirements(wrist);
     }

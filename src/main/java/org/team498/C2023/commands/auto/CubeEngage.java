@@ -2,7 +2,7 @@ package org.team498.C2023.commands.auto;
 
 import org.team498.C2023.RobotState;
 import org.team498.C2023.RobotState.GamePiece;
-import org.team498.C2023.RobotState.Height;
+import org.team498.C2023.State;
 import org.team498.C2023.commands.drivetrain.BangBangBalance;
 import org.team498.C2023.commands.robot.Score;
 
@@ -13,7 +13,7 @@ public class CubeEngage extends SequentialCommandGroup {
     public CubeEngage() {
         super(
                 new InstantCommand(() -> RobotState.getInstance().setCurrentGameMode(GamePiece.CUBE)),
-                new InstantCommand(() -> RobotState.getInstance().setNextHeight(Height.TOP)),
+                new InstantCommand(() -> RobotState.getInstance().setNextDriveteamState(State.TOP_CUBE)),
                 new Score(),
                 new BangBangBalance());
     }

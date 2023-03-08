@@ -11,11 +11,11 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.team498.C2023.subsystems.Elevator;
-import org.team498.C2023.subsystems.Wrist;
+import org.team498.C2023.subsystems.ElevatorWrist;
 
 public class Simulation {
     private final Elevator elevator = Elevator.getInstance();
-    private final Wrist wrist = Wrist.getInstance();
+    private final ElevatorWrist wrist = ElevatorWrist.getInstance();
     private final Mechanism2d mechanism2d = new Mechanism2d(Units.inchesToMeters(35), Units.inchesToMeters(65));
     private final MechanismRoot2d root = mechanism2d.getRoot("Root", Units.inchesToMeters(1), Units.inchesToMeters(1));
 

@@ -9,24 +9,11 @@ import static org.team498.C2023.Ports.ConeARiser.FRONT_BACK;
 import static org.team498.C2023.Ports.ConeARiser.LEFT_RIGHT;
 
 import org.team498.C2023.RobotState;
+import org.team498.C2023.State;
 
 public class ConeARiser extends SubsystemBase {
     private final CANSparkMax frontBack;
     private final CANSparkMax leftRight;
-
-    public enum State {
-        COLLECT(0.5, 0.5),
-        REJECT(-1, -1),
-        IDLE(0, 0);
-
-        private final double frontBackSpeed;
-        private final double leftRightSpeed;
-
-        State(double frontBackSpeed, double leftRightSpeed) {
-            this.frontBackSpeed = frontBackSpeed;
-            this.leftRightSpeed = leftRightSpeed;
-        }
-    }
 
     private ConeARiser() {
         frontBack = new CANSparkMax(FRONT_BACK, MotorType.kBrushless);
@@ -42,18 +29,11 @@ public class ConeARiser extends SubsystemBase {
         leftRight.setIdleMode(IdleMode.kCoast);
     }
 
-    public State getNextState() {
-        return switch (RobotState.getInstance().getNextHeight()) {
-            case LOW, MID, TOP, INTAKE, INTERPOLATE -> State.REJECT;
-            case DOUBLE_SS, SINGLE_SS -> State.COLLECT;
-        };
-    }
-
     public void setToNextState() {
-        setState(getNextState());
+        setState(RobotState.getInstance().getCurrentState().coneARiser);
     }
 
-    public void setState(State state) {
+    public void setState(State.ConeARiser state) {
         frontBack.set(state.frontBackSpeed);
         leftRight.set(state.leftRightSpeed);
     }

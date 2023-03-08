@@ -1,0 +1,22 @@
+package org.team498.C2023.commands.intakewrist;
+
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import org.team498.C2023.subsystems.IntakeWrist;
+
+public class SetIntakeWristToNextState extends CommandBase {
+    private final IntakeWrist intake = IntakeWrist.getInstance();
+
+    public SetIntakeWristToNextState() {
+        addRequirements(intake);
+    }
+
+    @Override
+    public void initialize() {
+        intake.setToNextState();
+    }
+
+    @Override
+    public boolean isFinished() {
+        return intake.atSetpoint();
+    }
+}
