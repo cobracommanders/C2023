@@ -45,6 +45,7 @@ public class ElevatorWrist extends SubsystemBase {
         encoder = new DutyCycle(new DigitalInput(ENCODER_PORT));
 
         PID = new PIDController(P, I, D);
+        PID.setTolerance(0);
 
         interpolator = new LinearInterpolator(StateTables.wristAngleTable);
 
@@ -95,7 +96,7 @@ public class ElevatorWrist extends SubsystemBase {
     }
 
     public boolean atSetpoint() {
-        return PID.atSetpoint();
+        return Math.abs(PID.getSetpoint() - getAngle()) < 0.02;
     }
 
     public double getPower() {

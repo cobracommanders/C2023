@@ -46,7 +46,7 @@ public class IntakeWrist extends SubsystemBase {
 
     @Override
     public void periodic() {
-        leftWrist.set(-PID.calculate(getAngle()));
+        // leftWrist.set(-PID.calculate(getAngle()));
         SmartDashboard.putNumber("Intake Encoder", getAngle());
         SmartDashboard.putNumber("Intake Output", PID.calculate(getAngle()));
         SmartDashboard.putNumber("Intake Error", PID.getPositionError());
@@ -69,7 +69,8 @@ public class IntakeWrist extends SubsystemBase {
     }
 
     public boolean atSetpoint() {
-        return PID.atSetpoint();
+        // return PID.atSetpoint();
+        return true; //TODO Re-add intake
     }
 
     private static IntakeWrist instance;

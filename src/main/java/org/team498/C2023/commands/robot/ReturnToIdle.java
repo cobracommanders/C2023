@@ -34,14 +34,14 @@ public class ReturnToIdle extends ConditionalCommand {
                         new SetConeARiserToNextState()),
                 new SequentialCommandGroup(
                         new ConditionalCommand(new SetRobotState(State.IDLE_CONE), new SetRobotState(State.IDLE_CUBE), () -> RobotState.getInstance().inConeMode()),
-                        new SetElevatorToNextState(),
                         new ParallelCommandGroup(
+                                new SetElevatorToNextState(),
                                 new SetElevatorWristToNextState(),
                                 new SetIntakeWristToNextState()),
                         new SetIntakeRollersToNextState(),
                         new SetManipulatorToNextState(),
                         new SetConeARiserToNextState()),
                 () -> Elevator.getInstance().aboveIntakeHeight()
-        );
+        ); //TODO add command for travelling down while empty
     }
 }

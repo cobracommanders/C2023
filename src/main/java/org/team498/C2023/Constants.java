@@ -75,7 +75,7 @@ public final class Constants {
     }
 
     public static final class WristConstants {
-        public static final double P = 4;
+        public static final double P = 6;
         public static final double I = 0;
         public static final double D = 0;
 
@@ -83,6 +83,4 @@ public final class Constants {
 
         public static final double WRIST_RATIO = 5 * 4 * 3 * (80.0 / 36.0);
     }
-
-
 }

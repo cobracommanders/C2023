@@ -30,7 +30,7 @@ public class Controls {
     }
 
     public void configureDriverCommands() {
-        driver.rightTrigger().onTrue(new ConditionalCommand(new Score(), new Spit(), () -> robotState.getNextDriveteamState() == State.SPIT_CUBE));
+        driver.rightTrigger().onTrue(new ConditionalCommand(new Score(), new Spit(), () -> robotState.getNextDriveteamState() != State.SPIT_CUBE));
         driver.leftTrigger().onTrue(new InstantCommand(() -> robotState.setState(State.GROUND_CUBE)).alongWith(new GroundIntake())).onFalse(new ReturnToIdle());
         driver.A().onTrue(new InstantCommand(() -> Gyro.getInstance().setYaw(0)));
         driver.X().onTrue(new InstantCommand(() -> robotState.setState(State.OUTTAKE)).alongWith(new GroundIntake())).onFalse(new ReturnToIdle());

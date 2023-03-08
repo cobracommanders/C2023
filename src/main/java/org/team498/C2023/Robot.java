@@ -104,6 +104,10 @@ public class Robot extends TimedRobot {
                              ? 0
                              : 180;
         }
+
+
+        SmartDashboard.putString("Driveteam State", RobotState.getInstance().getNextDriveteamState().name());
+        SmartDashboard.putString("Robot State", RobotState.getInstance().getCurrentState().name());
     }
 
     @Override

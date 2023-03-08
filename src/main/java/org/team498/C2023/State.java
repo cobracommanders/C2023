@@ -94,8 +94,8 @@ public enum State {
 
         AUTO_SHOT(0),
 
-        IDLE_CUBE(-0.065),
-        IDLE_CONE(-0.08333),
+        IDLE_CUBE(-0.06),
+        IDLE_CONE(-0.02),
 
         CONEARISER_CUBE(-0.065),
         CONEARISER_CONE(0),

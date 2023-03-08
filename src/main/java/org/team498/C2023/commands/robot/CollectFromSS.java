@@ -1,8 +1,8 @@
 package org.team498.C2023.commands.robot;
 
-import org.team498.C2023.RobotState;
 import org.team498.C2023.State;
 import org.team498.C2023.commands.SetRobotState;
+import org.team498.C2023.commands.SetRobotToDriveteamState;
 import org.team498.C2023.commands.elevator.SetElevatorToNextState;
 import org.team498.C2023.commands.intakewrist.SetIntakeWristToNextState;
 import org.team498.C2023.commands.manipulator.SetManipulatorToNextState;
@@ -19,7 +19,7 @@ public class CollectFromSS extends SequentialCommandGroup {
                 new SetRobotState(State.TRAVEL_EMPTY),
                 new SetElevatorWristToNextState(),
                 new SetIntakeWristToNextState(),
-                new SetRobotState(RobotState.getInstance().getNextDriveteamState()),
+                new SetRobotToDriveteamState(),
                 new ParallelCommandGroup(
                         new SetElevatorToNextState(),
                         new SetManipulatorToNextState(),

@@ -48,7 +48,7 @@ public class Elevator extends SubsystemBase {
 
         rightMotor.follow(leftMotor, FollowerType.PercentOutput);
 
-        PID = new ProfiledPIDController(P, I, D, new TrapezoidProfile.Constraints(5, 4));
+        PID = new ProfiledPIDController(P, I, D, new TrapezoidProfile.Constraints(10, 6));
         PID.reset(0);
         PID.setTolerance(0);
 
