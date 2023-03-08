@@ -40,8 +40,10 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import org.team498.C2023.FieldPositions;
+import org.team498.lib.util.PoseUtil;
 
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -49,7 +51,6 @@ import java.util.function.Supplier;
 public class Photonvision {
     private PhotonPoseEstimator photonPoseEstimator;
     private PhotonCamera photonCamera;
-    private double distanceToTag;
 
     private Photonvision() {
         photonCamera = new PhotonCamera("Arducam_OV9281_USB_Camera");
@@ -84,15 +85,29 @@ public class Photonvision {
             return Optional.empty();
         }
         PhotonPipelineResult result = photonCamera.getLatestResult();
-        List<PhotonTrackedTarget> tags = result.targets;
-        // for (PhotonTrackedTarget tag : tags) {
-        //     if (Math.abs(tag.getBestCameraToTarget().getTranslation().getNorm()) >= 3) {
-        //         tags.remove(tag);
+
+
+        LinkedList<PhotonTrackedTarget> tags = new LinkedList<PhotonTrackedTarget>();
+
+        for (PhotonTrackedTarget tag : result.targets) {
+            if (!(Math.abs(tag.getBestCameraToTarget().getTranslation().getNorm()) <= 3.75)) {
+                // tags.add(tag);
+                return Optional.empty();
+            }
+        }
+
+        // photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
+
+        // Optional<EstimatedRobotPose> estimatedPose = photonPoseEstimator.update(result);
+        // if (estimatedPose.isPresent()) {
+        //     Pose2d pose = PoseUtil.toPose2d(estimatedPose.get().estimatedPose);
+        //     if (!Drivetrain.getInstance().isNear(pose, 2)) {
+        //         return Optional.empty();
         //     }
         // }
-        photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
 
-        return photonPoseEstimator.update(result);
+        Optional<EstimatedRobotPose> estimatedPose = photonPoseEstimator.update(result);
+        return estimatedPose;
     }
 
     public double distanceToClosestTag() {
