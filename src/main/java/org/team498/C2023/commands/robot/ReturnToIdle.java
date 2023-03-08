@@ -12,24 +12,36 @@ import org.team498.C2023.commands.elevatorwrist.SetElevatorWristToNextState;
 import org.team498.C2023.commands.intakerollers.SetIntakeRollersToNextState;
 import org.team498.C2023.commands.intakewrist.SetIntakeWristToNextState;
 import org.team498.C2023.commands.manipulator.SetManipulatorToNextState;
+import org.team498.C2023.subsystems.Elevator;
 
-public class ReturnToIdle extends SequentialCommandGroup {
+public class ReturnToIdle extends ConditionalCommand {
     public ReturnToIdle() {
         super(
-                new ConditionalCommand(new SetRobotState(State.TRAVEL_CONE), new SetRobotState(State.TRAVEL_CUBE), () -> RobotState.getInstance().inConeMode()),
-                new SetManipulatorToNextState(),
-                new ParallelCommandGroup(
-                        new SetElevatorWristToNextState(),
-                        new SetIntakeWristToNextState()),
-                new SetConeARiserToNextState(),
-                new ConditionalCommand(new SetRobotState(State.IDLE_CONE), new SetRobotState(State.IDLE_CUBE), () -> RobotState.getInstance().inConeMode()),
-                new SetElevatorToNextState(),
-                new ParallelCommandGroup(
-                        new SetElevatorWristToNextState(),
-                        new SetIntakeWristToNextState()),
-                new SetIntakeRollersToNextState(),
-                new SetManipulatorToNextState(),
-                new SetConeARiserToNextState());
+                new SequentialCommandGroup(
+                        new ConditionalCommand(new SetRobotState(State.TRAVEL_CONE), new SetRobotState(State.TRAVEL_CUBE), () -> RobotState.getInstance().inConeMode()),
+                        new SetManipulatorToNextState(),
+                        new ParallelCommandGroup(
+                                new SetElevatorWristToNextState(),
+                                new SetIntakeWristToNextState()),
+                        new SetConeARiserToNextState(),
+                        new ConditionalCommand(new SetRobotState(State.IDLE_CONE), new SetRobotState(State.IDLE_CUBE), () -> RobotState.getInstance().inConeMode()),
+                        new SetElevatorToNextState(),
+                        new ParallelCommandGroup(
+                                new SetElevatorWristToNextState(),
+                                new SetIntakeWristToNextState()),
+                        new SetIntakeRollersToNextState(),
+                        new SetManipulatorToNextState(),
+                        new SetConeARiserToNextState()),
+                new SequentialCommandGroup(
+                        new ConditionalCommand(new SetRobotState(State.IDLE_CONE), new SetRobotState(State.IDLE_CUBE), () -> RobotState.getInstance().inConeMode()),
+                        new SetElevatorToNextState(),
+                        new ParallelCommandGroup(
+                                new SetElevatorWristToNextState(),
+                                new SetIntakeWristToNextState()),
+                        new SetIntakeRollersToNextState(),
+                        new SetManipulatorToNextState(),
+                        new SetConeARiserToNextState()),
+                () -> Elevator.getInstance().aboveIntakeHeight()
+        );
     }
-
 }

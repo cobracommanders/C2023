@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 public class Spit extends SequentialCommandGroup {
     public Spit() {
         super(
-                new SetRobotState(State.SPIT),
+                new SetRobotState(State.SPIT_CUBE),
                 new ParallelCommandGroup(
                         new SetElevatorWristToNextState(),
                         new SetIntakeWristToNextState(),
