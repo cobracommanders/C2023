@@ -70,7 +70,7 @@ public class Robot extends TimedRobot {
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
 
-        photonvision.getEstimatedGlobalPose(drivetrain.getPose()).ifPresent(pose -> drivetrain.setOdometry(pose.estimatedPose));
+        photonvision.getEstimatedGlobalPose().ifPresent(pose -> drivetrain.setOdometry(pose.estimatedPose));
 
 
         if (RobotPositions.inCommunity()) {
