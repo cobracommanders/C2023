@@ -10,10 +10,10 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-import org.team498.C2023.FieldPositions;
+import org.team498.C2023.Constants;
 import org.team498.C2023.Robot;
 import org.team498.C2023.subsystems.Drivetrain;
-import org.team498.lib.field.Point;
+import org.team498.lib.util.PoseUtil;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -51,7 +51,7 @@ public class PathPlannerFollower extends CommandBase {
                         markerPoses.add(new Pose2d(marker.positionMeters, new Rotation2d()));
                     } else {
                         stopPoints.put(marker.timeSeconds, Double.parseDouble(event.substring(1)));
-                        markerPoses.add(FieldPositions.flip(Point.fromPose2d(new Pose2d(marker.positionMeters, new Rotation2d()))).toPose2d());
+                        markerPoses.add(PoseUtil.flip(PoseUtil.toPose2d(marker.positionMeters)));
                     }
                 }
             }
@@ -61,16 +61,16 @@ public class PathPlannerFollower extends CommandBase {
 
         Robot.field.getObject("Stop Points").setPoses(markerPoses);
 
-        drivetrain.setPose(trajectory.getInitialHolonomicPose());
+        drivetrain.setPose(Robot.alliance == Alliance.Blue ? trajectory.getInitialHolonomicPose() : PoseUtil.flip(trajectory.getInitialHolonomicPose()));
 
         // Display the trajectory on the driver station dashboard
         List<Pose2d> poses = new LinkedList<>();
         List<Trajectory.State> trajectoryStates = trajectory.getStates();
-        for (int i = 0; i < trajectoryStates.size(); i += trajectoryStates.size() / 84) {
+        for (int i = 0; i < trajectoryStates.size(); i += trajectoryStates.size() / 60) {
             if (Robot.alliance == Alliance.Blue) {
                 poses.add(trajectoryStates.get(i).poseMeters);
             } else {
-                poses.add(FieldPositions.flip(Point.fromPose2d(trajectoryStates.get(i).poseMeters)).toPose2d());
+                poses.add(PoseUtil.flip(trajectoryStates.get(i).poseMeters));
             }
         }
         Robot.field.getObject("Trajectory").setPoses(poses);
@@ -85,7 +85,11 @@ public class PathPlannerFollower extends CommandBase {
             if (!drivetrain.isNear(markerPoses.get(0), 0.25)) {
                 PathPlannerState state = (PathPlannerState) trajectory.sample(trajectoryTimer.get());
 
-                drivetrain.setPositionGoal(new Pose2d(state.poseMeters.getX(), state.poseMeters.getY(), state.holonomicRotation));
+                if (Robot.alliance == Alliance.Blue) {
+                    drivetrain.setPositionGoal(new Pose2d(state.poseMeters.getX(), state.poseMeters.getY(), state.holonomicRotation));
+                } else {
+                    drivetrain.setPositionGoal(PoseUtil.flip(new Pose2d(state.poseMeters.getX(), state.poseMeters.getY(), state.holonomicRotation)));
+                }
 
                 drivetrain.driveToPositionGoals();
             } else {
@@ -111,53 +115,21 @@ public class PathPlannerFollower extends CommandBase {
             if (Robot.alliance == Alliance.Blue) {
                 drivetrain.setPositionGoal(new Pose2d(state.poseMeters.getX(), state.poseMeters.getY(), state.holonomicRotation));
             } else {
-                drivetrain.setPositionGoal(FieldPositions.flip(Point.fromPose2d(new Pose2d(state.poseMeters.getX(), state.poseMeters.getY(), state.holonomicRotation))).toPose2d());
+                drivetrain.setPositionGoal(PoseUtil.flip(new Pose2d(state.poseMeters.getX(), state.poseMeters.getY(), state.holonomicRotation)));
             }
 
             drivetrain.driveToPositionGoals();
         }
-
-        // if (stopTimes.size() > 0) {
-        // if (trajectoryTimer.get() < stopTimes.get(0)) {
-        // PathPlannerState state = (PathPlannerState)
-        // trajectory.sample(trajectoryTimer.get());
-
-        // drivetrain.setPositionGoal(
-        // new Pose2d(state.poseMeters.getX(), state.poseMeters.getY(),
-        // state.holonomicRotation));
-
-        // drivetrain.driveToPositionGoals();
-        // } else {
-        // if (!hasReset) {
-        // trajectoryTimer.stop();
-        // drivetrain.drive(0, 0, 0, false);
-        // stopTimer.reset();
-        // stopTimer.start();
-        // hasReset = true;
-        // }
-
-        // if (stopTimer.hasElapsed(stopPoints.get(stopTimes.get(0)))) {
-        // stopTimes.remove(0);
-        // stopTimer.stop();
-        // trajectoryTimer.start();
-        // hasReset = false;
-        // }
-        // }
-        // } else {
-        // PathPlannerState state = (PathPlannerState)
-        // trajectory.sample(trajectoryTimer.get());
-
-        // drivetrain.setPositionGoal(
-        // new Pose2d(state.poseMeters.getX(), state.poseMeters.getY(),
-        // state.holonomicRotation));
-
-        // drivetrain.driveToPositionGoals();
-        // }
     }
 
     @Override
     public boolean isFinished() {
-        return trajectoryTimer.get() > trajectory.getTotalTimeSeconds();
+        // return trajectoryTimer.get() > trajectory.getTotalTimeSeconds();
+        if (Robot.alliance == Alliance.Blue) {
+            return drivetrain.isNear(trajectory.getEndState().poseMeters, Constants.DrivetrainConstants.PoseConstants.EPSILON);
+        } else {
+            return drivetrain.isNear(PoseUtil.flip(trajectory.getEndState().poseMeters), Constants.DrivetrainConstants.PoseConstants.EPSILON);
+        }
     }
 
     @Override

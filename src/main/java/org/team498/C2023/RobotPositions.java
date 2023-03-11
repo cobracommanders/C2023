@@ -13,11 +13,10 @@ import org.team498.lib.field.Point;
 import org.team498.lib.field.Rectangle;
 
 import java.util.LinkedList;
-import java.util.List;
 
 public class RobotPositions {
     private static final Drivetrain drivetrain = Drivetrain.getInstance();
-    private static final double scoringOffset = Units.inchesToMeters((DrivetrainConstants.ROBOT_WIDTH / 2) + 14);
+    public static final double scoringOffset = Units.inchesToMeters((DrivetrainConstants.ROBOT_WIDTH / 2) + 10);
 
     private static final Point rightDoubleSubstationBlue = new Point(0, 0);
     private static final Point leftDoubleSubstationBlue = new Point(0, 0);
@@ -46,6 +45,28 @@ public class RobotPositions {
         return drivetrain.isInRegion(Robot.alliance == Alliance.Blue
                                      ? blueSSPickupArea
                                      : redSSPickupArea);
+    }
+
+    public static Pose2d getNextScoringNodePosition() {
+        int height = switch (RobotState.getInstance().getNextScoringOption()) {
+            case TOP -> 0;
+            case MID -> 1;
+            case SPIT -> 2;
+        };
+
+        Grid closestGrid = getClosestGrid();
+        if (RobotState.getInstance().inCubeMode()) return closestGrid.getNodePoints()[height][1].toPose2d(); // Return the center position for cubes
+        if (drivetrain.distanceTo(closestGrid.getNodePoints()[2][0]) < drivetrain.distanceTo(closestGrid.getNodePoints()[2][2]))
+            return closestGrid.getNodePoints()[height][0].toPose2d();
+        return closestGrid.getNodePoints()[height][2].toPose2d();
+    }
+
+    public static Pose2d getClosestScoringPosition() {
+        Grid closestGrid = getClosestGrid();
+        if (RobotState.getInstance().inCubeMode()) return closestGrid.getNodePoints()[2][1].toPose2d(); // Return the center position for cubes
+        if (drivetrain.distanceTo(closestGrid.getNodePoints()[2][0]) < drivetrain.distanceTo(closestGrid.getNodePoints()[2][2]))
+            return closestGrid.getNodePoints()[2][0].toPose2d();
+        return closestGrid.getNodePoints()[2][2].toPose2d();
     }
 
     public static Pose2d getLeftScoringPosition() {
@@ -94,21 +115,10 @@ public class RobotPositions {
 
         Grid closestGrid = null;
 
-        Point currentPose = Point.fromPose2d(drivetrain.getPose());
-        double currentX = currentPose.getX();
-        double currentY = currentPose.getY();
-
         double closestDistance = Double.MAX_VALUE;
 
         for (Grid grid : grids) {
-            Point centerPoint = grid.getNodePoints()[1][1];
-            double x = centerPoint.getX();
-            double y = centerPoint.getY();
-
-            double xDiff = x - currentX;
-            double yDiff = y - currentY;
-
-            double distance = Math.hypot(xDiff, yDiff);
+            double distance = drivetrain.distanceTo(grid.getNodePoints()[1][1]);
 
             if (distance < closestDistance) {
                 closestDistance = distance;
@@ -117,39 +127,5 @@ public class RobotPositions {
         }
 
         return closestGrid;
-    }
-
-    private static Point getClosestScoringLocation() {
-        LinkedList<FieldPositions.Grid> grids = Robot.alliance == Alliance.Blue
-                                                ? FieldPositions.blueGrids
-                                                : FieldPositions.redGrids;
-
-        LinkedList<Point> scoringLocations = new LinkedList<>();
-        grids.forEach(grid -> scoringLocations.addAll(List.of(grid.getNodePoints()[2])));
-
-        Point closestPoint = null;
-
-        Point currentPose = Point.fromPose2d(drivetrain.getPose());
-        double currentX = currentPose.getX();
-        double currentY = currentPose.getY();
-
-        double closestDistance = Double.MAX_VALUE;
-
-        for (Point point : scoringLocations) {
-            double x = point.getX();
-            double y = point.getY();
-
-            double xDiff = x - currentX;
-            double yDiff = y - currentY;
-
-            double distance = Math.hypot(xDiff, yDiff);
-
-            if (distance < closestDistance) {
-                closestDistance = distance;
-                closestPoint = point;
-            }
-        }
-
-        return closestPoint;
     }
 }

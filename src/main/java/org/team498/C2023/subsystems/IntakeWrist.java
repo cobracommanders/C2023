@@ -10,17 +10,20 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycle;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import org.team498.C2023.RobotState;
 import org.team498.C2023.State;
 
 import static org.team498.C2023.Constants.IntakeWristConstants.*;
 import static org.team498.C2023.Ports.IntakeWrist.*;
+
+import org.team498.C2023.Robot;
 
 public class IntakeWrist extends SubsystemBase {
     private final CANSparkMax leftWrist;
     private final CANSparkMax rightWrist;
 
     private final ProfiledPIDController PID;
+
+    private double simAngle = 0;
 
     private final DutyCycle encoder;
 
@@ -57,20 +60,25 @@ public class IntakeWrist extends SubsystemBase {
         double angle = encoder.getOutput() + 0.5;
         if (angle > 1)
             angle -= 1;
-        return angle - 0.5;
+
+        return Robot.isReal() ? angle - 0.5 : simAngle;
     }
 
     public void setState(State.IntakeWrist state) {
         PID.setGoal(state.position);
     }
 
-    public void setToNextState() {
-        setState(RobotState.getInstance().getCurrentState().intakeWrist);
-    }
-
     public boolean atSetpoint() {
         // return PID.atSetpoint();
-        return true; //TODO Re-add intake
+        return true;
+    }
+
+    public void setSimAngle(double position) {
+        simAngle = (position / 360);
+    }
+
+    public double getPower() {
+        return leftWrist.get();
     }
 
     private static IntakeWrist instance;

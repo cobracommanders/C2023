@@ -83,8 +83,11 @@ public class Photonvision {
 
         PhotonPipelineResult result = photonCamera.getLatestResult();
 
+        PhotonTrackedTarget target = result.getBestTarget();
+        if (target == null) return Optional.empty();
+
         // Don't return a new position if the closest target is further than 3.75 meters away
-        if (Math.abs(result.getBestTarget().getBestCameraToTarget().getTranslation().getNorm()) >= acceptedTagRange) {
+        if (Math.abs(target.getBestCameraToTarget().getTranslation().getNorm()) >= acceptedTagRange) {
             return Optional.empty();
         }
 

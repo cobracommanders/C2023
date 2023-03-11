@@ -6,7 +6,6 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import org.team498.C2023.RobotState;
 import org.team498.C2023.State;
 
 import static org.team498.C2023.Ports.IntakeRollers.*;
@@ -45,11 +44,6 @@ public class IntakeRollers extends SubsystemBase {
         // bottomRollerPID.setSetpoint(state.bottomRollerSpeed);
         // topRollerPID.setSetpoint(state.topRollerSpeed);
     }
-
-    public void setToNextState() {
-        setState(RobotState.getInstance().getCurrentState().intakeRollers);
-    }
-
 
     private static IntakeRollers instance;
 

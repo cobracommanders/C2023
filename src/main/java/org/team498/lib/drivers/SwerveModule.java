@@ -105,7 +105,7 @@ public class SwerveModule extends SubsystemBase {
     }
 
     private double getPositionMeters() {
-        return Falcon500Conversions.falconToDegrees(driveMotor.getSelectedSensorPosition(), MK4I_DRIVE_REDUCTION_L2) / 360 * Units.inchesToMeters(
+        return (Falcon500Conversions.falconToDegrees(driveMotor.getSelectedSensorPosition(), MK4I_DRIVE_REDUCTION_L2) / 360) * Units.inchesToMeters(
                 DRIVE_WHEEL_CIRCUMFERENCE);
     }
 

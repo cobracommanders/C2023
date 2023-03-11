@@ -2,6 +2,7 @@ package org.team498.C2023;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -9,18 +10,26 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-
 import org.team498.C2023.commands.auto.CubeEngage;
+import org.team498.C2023.commands.auto.JustAutoShot;
 import org.team498.C2023.commands.auto.JustScore;
 import org.team498.C2023.commands.auto.PreloadAndTaxi;
+import org.team498.C2023.commands.auto.TwoCubeEngage;
+import org.team498.C2023.commands.auto.TwoCubePickupEngage;
 import org.team498.C2023.subsystems.Drivetrain;
+import org.team498.C2023.subsystems.Elevator;
+import org.team498.C2023.subsystems.ElevatorWrist;
 import org.team498.C2023.subsystems.Manipulator;
 import org.team498.C2023.subsystems.Photonvision;
+import org.team498.lib.auto.Auto;
 import org.team498.lib.drivers.Blinkin;
-import org.team498.lib.drivers.Gyro;
 import org.team498.lib.drivers.Blinkin.Color;
+import org.team498.lib.drivers.Gyro;
+import org.team498.lib.field.Point;
+import org.team498.lib.util.PoseUtil;
+
+import java.util.List;
 
 
 public class Robot extends TimedRobot {
@@ -37,7 +46,9 @@ public class Robot extends TimedRobot {
     private final Blinkin blinkin = Blinkin.getInstance();
     private final RobotState robotState = RobotState.getInstance();
 
-    private final SendableChooser<Command> autoChooser = new SendableChooser<Command>();
+    private final SendableChooser<Auto> autoChooser = new SendableChooser<Auto>();
+
+    private final List<Auto> autoOptions = List.of(new JustScore(), new CubeEngage(), new PreloadAndTaxi(), new TwoCubeEngage(), new TwoCubePickupEngage(), new JustAutoShot());
 
 
     @Override
@@ -51,8 +62,10 @@ public class Robot extends TimedRobot {
         FieldPositions.displayAll();
 
         autoChooser.setDefaultOption("Score", new JustScore());
-        autoChooser.addOption("Cube Engage", new CubeEngage());
-        autoChooser.addOption("Preload and Taxi", new PreloadAndTaxi());
+
+        autoOptions.forEach(auto -> {
+            autoChooser.addOption(auto.getName(), auto);
+        });
 
         controls.configureDefaultCommands();
         controls.configureDriverCommands();
@@ -74,20 +87,10 @@ public class Robot extends TimedRobot {
 
 
         if (RobotPositions.inCommunity()) {
-            if (RobotState.getInstance().inConeMode()) {
-                field.getObject("Scoring Targets").setPoses(RobotPositions.getRightScoringPosition(), RobotPositions.getLeftScoringPosition());
-            } else {
-                field.getObject("Scoring Targets").setPose(RobotPositions.getCenterScoringPosition());
-            }
-        } else if (RobotPositions.inLoadingZone()) {
-            field.getObject("Scoring Targets").setPoses(RobotPositions.getLeftSubstationPosition(),
-                                                        RobotPositions.getRightSubstationPosition(),
-                                                        RobotPositions.getSingleSubstationPosition()
-            );
+            field.getObject("Scoring Target").setPose(RobotPositions.getNextScoringNodePosition());
         } else {
-            field.getObject("Scoring Targets").setPose(new Pose2d(-1, -1, new Rotation2d()));
+            field.getObject("Scoring Target").setPose(new Pose2d(-1, -1, new Rotation2d()));
         }
-
 
 
         //TODO: Check if alliance is actually invalid when the FMS is not connected
@@ -104,8 +107,8 @@ public class Robot extends TimedRobot {
         }
 
 
-        SmartDashboard.putString("Driveteam State", RobotState.getInstance().getNextDriveteamState().name());
         SmartDashboard.putString("Robot State", RobotState.getInstance().getCurrentState().name());
+        SmartDashboard.putString("Blinkin Color", blinkin.getColor().name());
     }
 
     @Override
@@ -125,23 +128,41 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        if (RobotPositions.inSSPickupArea()) {
+        if (drivetrain.distanceTo(Point.fromPose2d(RobotPositions.getClosestScoringPosition())) < Units.inchesToMeters(25)) {
             blinkin.setColor(Blinkin.Color.LIME);
+        } else if (robotState.inShootDriveMode()) {
+            blinkin.setColor(Blinkin.Color.RED);
         } else {
             if (robotState.inConeMode() && Manipulator.getInstance().isStalling()) {
                 blinkin.setColor(Color.BLUE);
             } else {
-                blinkin.setColor(RobotState.getInstance().inConeMode() ? Blinkin.Color.YELLOW : Blinkin.Color.PURPLE);
+                blinkin.setColor(RobotState.getInstance().inConeMode()
+                                 ? Blinkin.Color.YELLOW
+                                 : Blinkin.Color.PURPLE);
             }
         }
     }
 
     @Override
     public void autonomousInit() {
-        // autoChooser.getSelected().schedule();
-        Drivetrain.getInstance().setPose(new Pose2d(0, 0, Rotation2d.fromDegrees(Robot.alliance == Alliance.Blue ? 0 : 180)));
-        new CubeEngage().schedule();
-        // new JustScore().schedule();
+        Auto auto = autoChooser.getSelected();
+
+        if (auto == null) auto = new JustScore();
+    
+        if (alliance == Alliance.Blue) {
+            Drivetrain.getInstance().setPose(auto.getInitialPose());
+        } else {
+            Drivetrain.getInstance().setPose(PoseUtil.flip(auto.getInitialPose()));
+        }
+
+        Elevator.getInstance().updateInitialPosition(auto.getInitialState() == State.AUTO_SHOT);
+
+        Elevator.getInstance().setState(auto.getInitialState().elevator);
+        ElevatorWrist.getInstance().setState(auto.getInitialState().elevatorWrist);
+
+
+
+        auto.getCommand().schedule();
     }
 
     @Override

@@ -1,7 +1,6 @@
 package org.team498.C2023.commands.robot;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import org.team498.C2023.commands.coneariser.SetConeARiserToNextState;
 import org.team498.C2023.commands.elevator.SetElevatorToNextState;
 import org.team498.C2023.commands.elevatorwrist.SetElevatorWristToNextState;
 import org.team498.C2023.commands.intakerollers.SetIntakeRollersToNextState;
@@ -16,8 +15,7 @@ public class GroundIntake extends ParallelCommandGroup {
                 new SetElevatorWristToNextState(),
                 new SetManipulatorToNextState(),
                 new SetIntakeWristToNextState(),
-                new SetIntakeRollersToNextState(),
-                new SetConeARiserToNextState()
+                new SetIntakeRollersToNextState()
         );
     }
 }

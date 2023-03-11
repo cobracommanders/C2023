@@ -3,7 +3,6 @@ package org.team498.C2023.commands.robot;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import org.team498.C2023.State;
 import org.team498.C2023.commands.SetRobotState;
-import org.team498.C2023.commands.coneariser.SetConeARiserToNextState;
 import org.team498.C2023.commands.elevator.SetElevatorToNextState;
 import org.team498.C2023.commands.elevatorwrist.SetElevatorWristToNextState;
 import org.team498.C2023.commands.intakewrist.SetIntakeWristToNextState;
@@ -18,7 +17,6 @@ public class FixCube extends RepeatCommand {
         super(
                 new SequentialCommandGroup(
                         new SetRobotState(State.UNSTICK_CUBE),
-                        new SetConeARiserToNextState(),
                         new SetManipulatorToNextState(),
                         new ParallelCommandGroup(
                                 new SetIntakeWristToNextState(),

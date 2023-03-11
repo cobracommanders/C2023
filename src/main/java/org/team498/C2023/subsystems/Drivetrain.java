@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -93,7 +94,7 @@ public class Drivetrain extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber("Pitch", gyro.getPitch());
         SmartDashboard.putNumber("Roll", gyro.getRoll());
-        if (Robot.isReal()) odometry.update(Rotation2d.fromDegrees(getYaw() + 180), getModulePositions());
+        if (Robot.isReal()) odometry.update(Rotation2d.fromDegrees(getYaw()), getModulePositions());
 
         if (RobotState.isDisabled()) {
             for (SwerveModule swerveModule : swerveModules) {
@@ -111,14 +112,12 @@ public class Drivetrain extends SubsystemBase {
     public void simulationPeriodic() {
         Pose2d currentPose = getPose();
 
-        double newX = currentPose.getX() + currentSpeeds.vxMetersPerSecond * Robot.kDefaultPeriod;
-        double newY = currentPose.getY() + currentSpeeds.vyMetersPerSecond * Robot.kDefaultPeriod;
-        double newAngle = currentPose.getRotation().getDegrees() + Math.toDegrees(currentSpeeds.omegaRadiansPerSecond * Robot.kDefaultPeriod);
+        double newX = currentPose.getX() + -currentSpeeds.vxMetersPerSecond * Robot.kDefaultPeriod;
+        double newY = currentPose.getY() + -currentSpeeds.vyMetersPerSecond * Robot.kDefaultPeriod;
+        double newAngle = -currentPose.getRotation().getDegrees() + Math.toDegrees(currentSpeeds.omegaRadiansPerSecond * Robot.kDefaultPeriod);
         gyro.setSimAngle(newAngle);
 
-        Robot.field.setRobotPose(newX, newY, Rotation2d.fromDegrees(-newAngle));
-
-        odometry.resetPosition(Rotation2d.fromDegrees(newAngle), getModulePositions(), new Pose2d(newX, newY, Rotation2d.fromDegrees(newAngle)));
+        odometry.resetPosition(Rotation2d.fromDegrees(-newAngle), getModulePositions(), new Pose2d(newX, newY, Rotation2d.fromDegrees(-newAngle)));
     }
 
     public Pose2d getPose() {
@@ -188,7 +187,7 @@ public class Drivetrain extends SubsystemBase {
     public void driveToPositionGoals() {
         double xAdjustment = xController.calculate(getPose().getX());
         double yAdjustment = yController.calculate(getPose().getY());
-        double angleAdjustment = -angleController.calculate(getYaw());
+        double angleAdjustment = angleController.calculate(getYaw());
         drive(xAdjustment, yAdjustment, angleAdjustment, true);
     }
 
@@ -201,9 +200,9 @@ public class Drivetrain extends SubsystemBase {
      * @param fieldOriented    true if the robot is driving in field oriented mode, false if robot oriented
      */
     public void drive(double vx, double vy, double degreesPerSecond, boolean fieldOriented) {
-        ChassisSpeeds speeds = fieldOriented
-                               ? ChassisSpeeds.fromFieldRelativeSpeeds(vx, vy, Math.toRadians(degreesPerSecond), getYaw())
-                               : new ChassisSpeeds(vx, vy, Math.toRadians(degreesPerSecond));
+                ChassisSpeeds speeds = fieldOriented
+                               ? ChassisSpeeds.fromFieldRelativeSpeeds(-vx, -vy, Math.toRadians(degreesPerSecond), getYaw())
+                               : new ChassisSpeeds(-vx, -vy, Math.toRadians(degreesPerSecond));
 
         drive(speeds, new Translation2d());
     }
@@ -278,6 +277,16 @@ public class Drivetrain extends SubsystemBase {
         double y = yLimiter.calculate(unlimited.vyMetersPerSecond);
         double r = unlimited.omegaRadiansPerSecond;
         return new ChassisSpeeds(x, y, r);
+    }
+
+    public double distanceTo(Point point) {
+        double x = point.getX();
+        double y = point.getY();
+
+        double xDiff = x - getPose().getX();
+        double yDiff = y - getPose().getY();
+
+        return Math.hypot(xDiff, yDiff);
     }
 
 
