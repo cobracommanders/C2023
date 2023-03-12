@@ -15,12 +15,12 @@ import org.team498.C2023.RobotState.GameMode;
 import org.team498.C2023.RobotState.ScoringOption;
 import org.team498.C2023.commands.drivetrain.AutoEngage;
 import org.team498.C2023.commands.drivetrain.DefenseDrive;
-import org.team498.C2023.commands.drivetrain.DriveToPosition;
 import org.team498.C2023.commands.drivetrain.TargetDrive;
 import org.team498.C2023.commands.elevator.ManualElevator;
 import org.team498.C2023.commands.elevatorwrist.ManualElevatorWrist;
 import org.team498.C2023.commands.robot.*;
 import org.team498.C2023.subsystems.Drivetrain;
+import org.team498.C2023.subsystems.Manipulator;
 import org.team498.lib.drivers.Gyro;
 import org.team498.lib.drivers.Xbox;
 import org.team498.lib.wpilib.ChoiceCommand;
@@ -53,13 +53,12 @@ public class Controls {
                 .onTrue(new PrepareToScore())
                 .onFalse(new ChoiceCommand(() -> {
                     Command command = switch (robotState.getNextScoringOption()) {
-                        case TOP, MID -> new SequentialCommandGroup(new ConditionalCommand(new WaitCommand(0.75), new WaitCommand(0.1), () -> RobotState.getInstance().inConeMode()), new Score());
+                        case TOP, MID -> new SequentialCommandGroup(new PrepareToScore(), new ConditionalCommand(new WaitCommand(0.75), new WaitCommand(0.1), () -> RobotState.getInstance().inConeMode()), new Score());
                         case SPIT -> new Spit();
                     };
                     return command;
                 }
             ));
-
 
         driver.start().onTrue(new AutoEngage());
 
@@ -76,9 +75,13 @@ public class Controls {
 
         operator.leftTrigger().onTrue(new CollectFromSS()).onFalse(new ReturnToIdle());
 
-        operator.rightTrigger().whileTrue(new FixCube()).onFalse(new ReturnToIdle());
+        operator.POV180().whileTrue(new FixCube()).onFalse(new ReturnToIdle());
+        operator.rightTrigger().toggleOnTrue(new InstantCommand(()-> robotState.setState(State.SPINUP_LOW)));
 
-        operator.start().toggleOnTrue(new ManualElevator(() -> -operator.leftY()));
-        operator.back().toggleOnTrue(new ManualElevatorWrist(() -> -operator.rightY()));
+        operator.start().toggleOnTrue(new ManualElevator(() -> -operator.rightY()));
+        operator.back().toggleOnTrue(new ManualElevatorWrist(() -> -operator.leftY()));
+
+        operator.POV90().whileTrue(new InstantCommand(()-> Manipulator.getInstance().setState(State.Manipulator.INTAKE_CONE)));
+        operator.POVMinus90().whileTrue(new InstantCommand(()-> Manipulator.getInstance().setState(State.Manipulator.MID_CONE)));
     }
 }

@@ -5,6 +5,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.team498.C2023.State;
 
@@ -35,6 +36,8 @@ public class IntakeRollers extends SubsystemBase {
     public void periodic() {
         // bottomRoller.set(ControlMode.PercentOutput, bottomRollerPID.calculate(bottomRoller.getSelectedSensorVelocity()));
         // topRoller.set(ControlMode.PercentOutput, topRollerPID.calculate(topRoller.getSelectedSensorVelocity()));
+        SmartDashboard.putNumber("top roller current", top.getStatorCurrent());
+        SmartDashboard.putNumber("bottom roller current", bottom.getStatorCurrent());
     }
 
     public void setState(State.IntakeRollers state) {
