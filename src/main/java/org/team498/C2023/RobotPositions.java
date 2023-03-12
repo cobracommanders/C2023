@@ -60,6 +60,9 @@ public class RobotPositions {
             return closestGrid.getNodePoints()[height][0].toPose2d();
         return closestGrid.getNodePoints()[height][2].toPose2d();
     }
+    public static double getFutureScoringNodeDistance() {
+        return Math.abs(drivetrain.distanceTo(Point.fromPose2d(getNextScoringNodePosition().transformBy(drivetrain.getVelocity().inverse()))));
+    }
 
     public static Pose2d getClosestScoringPosition() {
         Grid closestGrid = getClosestGrid();

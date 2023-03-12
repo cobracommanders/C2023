@@ -35,14 +35,14 @@ public class Manipulator extends SubsystemBase {
 
     @Override
     public void periodic() {        
-        rollers.set(getSetpoint(currentState, Drivetrain.getInstance().distanceTo(Point.fromPose2d(RobotPositions.getNextScoringNodePosition()))));
+        rollers.set(getSetpoint(currentState, RobotPositions.getFutureScoringNodeDistance()));
     }
 
     private double getSetpoint(State.Manipulator state, double interpolatedValue) {
         return switch (state) {
-            case SHOOT_DRIVE_CUBE_MID -> ShootTables.midCube.elevatorHeight.getInterpolatedValue(interpolatedValue);
-            case SHOOT_DRIVE_CUBE_TOP -> ShootTables.topCube.elevatorHeight.getInterpolatedValue(interpolatedValue);
-            case SHOOT_DRIVE_CONE_MID -> ShootTables.midCone.elevatorHeight.getInterpolatedValue(interpolatedValue);
+            case SHOOT_DRIVE_CUBE_MID -> ShootTables.midCube.shooterRPM.getInterpolatedValue(interpolatedValue);
+            case SHOOT_DRIVE_CUBE_TOP -> ShootTables.topCube.shooterRPM.getInterpolatedValue(interpolatedValue);
+            case SHOOT_DRIVE_CONE_MID -> ShootTables.midCone.shooterRPM.getInterpolatedValue(interpolatedValue);
             default -> state.setpoint;
         };
     }

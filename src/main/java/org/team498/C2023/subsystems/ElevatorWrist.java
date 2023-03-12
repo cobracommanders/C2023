@@ -52,7 +52,7 @@ public class ElevatorWrist extends SubsystemBase {
 
     @Override
     public void periodic() {
-        PID.setSetpoint(getSetpoint(currentState, Drivetrain.getInstance().distanceTo(Point.fromPose2d(RobotPositions.getNextScoringNodePosition()))));
+        PID.setSetpoint(getSetpoint(currentState, RobotPositions.getFutureScoringNodeDistance()));
 
         double speed;
         if (controlMode == ControlMode.PID) {
@@ -92,9 +92,9 @@ public class ElevatorWrist extends SubsystemBase {
 
     private double getSetpoint(State.ElevatorWrist state, double interpolatedValue) {
         return switch (state) {
-            case SHOOT_DRIVE_CUBE_MID -> ShootTables.midCube.elevatorHeight.getInterpolatedValue(interpolatedValue);
-            case SHOOT_DRIVE_CUBE_TOP -> ShootTables.topCube.elevatorHeight.getInterpolatedValue(interpolatedValue);
-            case SHOOT_DRIVE_CONE_MID -> ShootTables.midCone.elevatorHeight.getInterpolatedValue(interpolatedValue);
+            case SHOOT_DRIVE_CUBE_MID -> ShootTables.midCube.wristAngle.getInterpolatedValue(interpolatedValue);
+            case SHOOT_DRIVE_CUBE_TOP -> ShootTables.topCube.wristAngle.getInterpolatedValue(interpolatedValue);
+            case SHOOT_DRIVE_CONE_MID -> ShootTables.midCone.wristAngle.getInterpolatedValue(interpolatedValue);
             default -> state.setpoint;
         };
     }

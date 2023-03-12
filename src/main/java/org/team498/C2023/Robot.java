@@ -109,6 +109,8 @@ public class Robot extends TimedRobot {
 
         SmartDashboard.putString("Robot State", RobotState.getInstance().getCurrentState().name());
         SmartDashboard.putString("Blinkin Color", blinkin.getColor().name());
+
+        SmartDashboard.putNumber("Interpolation Value", Drivetrain.getInstance().distanceTo(Point.fromPose2d(RobotPositions.getNextScoringNodePosition())));
     }
 
     @Override

@@ -64,7 +64,7 @@ public class Elevator extends SubsystemBase {
 
     @Override
     public void periodic() {
-        PID.setGoal(getSetpoint(currentState, Drivetrain.getInstance().distanceTo(Point.fromPose2d(RobotPositions.getNextScoringNodePosition()))));
+        PID.setGoal(getSetpoint(currentState, RobotPositions.getFutureScoringNodeDistance()));
 
         double speed;
         if (controlMode == ControlMode.PID) {

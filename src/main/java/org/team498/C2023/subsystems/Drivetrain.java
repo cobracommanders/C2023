@@ -8,6 +8,7 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -140,6 +141,10 @@ public class Drivetrain extends SubsystemBase {
         return () -> new Pose2d(x, y, Rotation2d.fromDegrees(rotation));
     }
 
+    public Transform2d getVelocity() {
+        return new Transform2d(new Translation2d(currentSpeeds.vxMetersPerSecond * (Robot.kDefaultPeriod * 10), currentSpeeds.vyMetersPerSecond * (Robot.kDefaultPeriod * 10)), Rotation2d.fromRadians(currentSpeeds.omegaRadiansPerSecond * (Robot.kDefaultPeriod * 10)));
+    }
+
     public double getNextDistanceToTag() {
         return Math.abs(getNextPoseToTag().get().getTranslation().getNorm());
     }
@@ -177,7 +182,7 @@ public class Drivetrain extends SubsystemBase {
 
     /** Calculate the rotational speed from the pid controller */
     public double calculateRotationalSpeed() {
-        return -angleController.calculate(getYaw());
+        return angleController.calculate(getYaw());
     }
 
     /** @return true if the angle controller is at its goal */
