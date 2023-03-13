@@ -102,7 +102,7 @@ public enum State {
         AUTO_SHOT(0),
 
         IDLE_CUBE(-0.06),
-        IDLE_CONE(-0.02),
+        IDLE_CONE(-0.03),
 
         CONEARISER_CUBE(-0.065),
         CONEARISER_CONE(0),
@@ -119,10 +119,10 @@ public enum State {
     }
 
     public enum IntakeRollers {
-        INTAKE(0.5, 0.5),
+        INTAKE(0.75, 0.75),
         SPIT(0.45, -0.45),
         IDLE(0, 0),
-        OUTTAKE(-0.5, -0.5);
+        OUTTAKE(-0.75, -0.75);
 
         public final double bottomRollerSpeed;
         public final double topRollerSpeed;
@@ -134,13 +134,13 @@ public enum State {
     }
 
     public enum IntakeWrist {
-        INTAKE(0.1),
+        INTAKE(0.08),
         SPIT(0.35),
-        IDLE_OUT(0.1),
+        IDLE_OUT(0.08),
         TRAVEL_CUBE(0.2),
         TRAVEL_CONE(0.2),
         IDLE_IN(0.4),
-        OUTTAKE(0.1);
+        OUTTAKE(0.08);
 
         public final double position;
 

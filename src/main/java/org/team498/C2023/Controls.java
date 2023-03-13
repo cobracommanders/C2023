@@ -18,6 +18,7 @@ import org.team498.C2023.commands.drivetrain.DefenseDrive;
 import org.team498.C2023.commands.drivetrain.TargetDrive;
 import org.team498.C2023.commands.elevator.ManualElevator;
 import org.team498.C2023.commands.elevatorwrist.ManualElevatorWrist;
+import org.team498.C2023.commands.intakerollers.SetIntakeRollersToNextState;
 import org.team498.C2023.commands.robot.*;
 import org.team498.C2023.subsystems.Drivetrain;
 import org.team498.C2023.subsystems.Manipulator;
@@ -49,11 +50,11 @@ public class Controls {
 
 
         driver.rightTrigger()
-                .whileTrue(new ConditionalCommand(new TargetDrive(driver::leftYSquared, driver::leftXSquared, driver.rightBumper(), () -> RobotPositions.getNextScoringNodePosition().transformBy(Drivetrain.getInstance().getVelocity().times(5).inverse())), Commands.none(), () -> RobotState.getInstance().inCubeMode() && RobotState.getInstance().getNextScoringOption() != ScoringOption.SPIT))
+                //.whileTrue(new ConditionalCommand(new TargetDrive(driver::leftYSquared, driver::leftXSquared, driver.rightBumper(), () -> RobotPositions.getNextScoringNodePosition().transformBy(Drivetrain.getInstance().getVelocity().times(5).inverse())), Commands.none(), () -> RobotState.getInstance().inCubeMode() && RobotState.getInstance().getNextScoringOption() != ScoringOption.SPIT && robotState.inShootDriveMode()))
                 .onTrue(new PrepareToScore())
                 .onFalse(new ChoiceCommand(() -> {
                     Command command = switch (robotState.getNextScoringOption()) {
-                        case TOP, MID -> new SequentialCommandGroup(new PrepareToScore(), new ConditionalCommand(new WaitCommand(0.75), new WaitCommand(0.1), () -> RobotState.getInstance().inConeMode()), new Score());
+                        case TOP, MID -> new SequentialCommandGroup(new VerifyScoreLocation(), new ConditionalCommand(new WaitCommand(0.75), new WaitCommand(0.1), () -> RobotState.getInstance().inConeMode()), new Score());
                         case SPIT -> new Spit();
                     };
                     return command;
@@ -76,7 +77,7 @@ public class Controls {
         operator.leftTrigger().onTrue(new CollectFromSS()).onFalse(new ReturnToIdle());
 
         operator.POV180().whileTrue(new FixCube()).onFalse(new ReturnToIdle());
-        operator.rightTrigger().toggleOnTrue(new InstantCommand(()-> robotState.setState(State.SPINUP_LOW)));
+        operator.rightTrigger().toggleOnTrue(new ConditionalCommand(new InstantCommand(()-> robotState.setState(State.SPINUP_LOW)), new InstantCommand(()-> robotState.setState(State.IDLE_CUBE)), ()-> robotState.getCurrentState() == State.IDLE_CUBE).andThen(new SetIntakeRollersToNextState()));
 
         operator.start().toggleOnTrue(new ManualElevator(() -> -operator.rightY()));
         operator.back().toggleOnTrue(new ManualElevatorWrist(() -> -operator.leftY()));

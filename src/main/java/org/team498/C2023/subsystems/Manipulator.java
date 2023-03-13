@@ -4,6 +4,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.team498.C2023.State;
 import org.team498.C2023.ShootTables;
@@ -36,6 +37,7 @@ public class Manipulator extends SubsystemBase {
     @Override
     public void periodic() {        
         rollers.set(getSetpoint(currentState, RobotPositions.getFutureScoringNodeDistance()));
+        SmartDashboard.putNumber("Manipulator current", rollers.getOutputCurrent());
     }
 
     private double getSetpoint(State.Manipulator state, double interpolatedValue) {

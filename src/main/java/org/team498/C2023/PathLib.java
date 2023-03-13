@@ -4,6 +4,7 @@ import com.pathplanner.lib.PathPlannerTrajectory;
 import org.team498.lib.util.Trajectories;
 
 public class PathLib {
+    public static final PathPlannerTrajectory noRotationTwoCubeEngage = Trajectories.getPathPlannerTrajectory("No rotation two cube engage");
     public static final PathPlannerTrajectory singleCubeTaxi = Trajectories.getPathPlannerTrajectory("Single Cube Taxi");
 
     public static final PathPlannerTrajectory secondNodeToTopCube = Trajectories.getPathPlannerTrajectory("Second Node To Top Cube");

@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.team498.C2023.commands.auto.CubeEngage;
 import org.team498.C2023.commands.auto.JustAutoShot;
 import org.team498.C2023.commands.auto.JustScore;
+import org.team498.C2023.commands.auto.NoRotationTwoCube;
 import org.team498.C2023.commands.auto.PreloadAndTaxi;
 import org.team498.C2023.commands.auto.TwoCubeEngage;
 import org.team498.C2023.commands.auto.TwoCubePickupEngage;
@@ -48,7 +49,7 @@ public class Robot extends TimedRobot {
 
     private final SendableChooser<Auto> autoChooser = new SendableChooser<Auto>();
 
-    private final List<Auto> autoOptions = List.of(new JustScore(), new CubeEngage(), new PreloadAndTaxi(), new TwoCubeEngage(), new TwoCubePickupEngage(), new JustAutoShot());
+    private final List<Auto> autoOptions = List.of(new JustScore(), new CubeEngage(), new PreloadAndTaxi(), new TwoCubeEngage(), new TwoCubePickupEngage(), new JustAutoShot(), new NoRotationTwoCube());
 
 
     @Override
