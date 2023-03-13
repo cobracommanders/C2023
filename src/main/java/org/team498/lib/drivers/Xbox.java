@@ -1,5 +1,7 @@
 package org.team498.lib.drivers;
 
+import edu.wpi.first.hal.DriverStationJNI;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import org.team498.lib.util.RotationUtil;
@@ -295,5 +297,14 @@ public class Xbox {
     public Trigger POVMinus135() {return new Trigger(() -> rawPOVAngle() == -135);}
     public Trigger POVMinus90() {return new Trigger(() -> rawPOVAngle() == -90);}
     public Trigger POVMinus45() {return new Trigger(() -> rawPOVAngle() == -45);}
-}
 
+
+    public void rumble(double value) {
+        value = MathUtil.clamp(value, 0, 1);
+        short rumbleValue = (short) (value * 65535);
+
+        DriverStationJNI.setJoystickOutputs(
+                (byte) port, 0, rumbleValue, rumbleValue);
+
+    }
+}

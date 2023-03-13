@@ -10,7 +10,6 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -25,6 +24,7 @@ import org.team498.lib.drivers.Gyro;
 import org.team498.lib.drivers.SwerveModule;
 import org.team498.lib.field.BaseRegion;
 import org.team498.lib.field.Point;
+import org.team498.lib.util.RotationUtil;
 import org.team498.lib.wpilib.ChassisSpeeds;
 
 import static org.team498.C2023.Constants.DrivetrainConstants.*;
@@ -113,12 +113,12 @@ public class Drivetrain extends SubsystemBase {
     public void simulationPeriodic() {
         Pose2d currentPose = getPose();
 
-        double newX = currentPose.getX() + -currentSpeeds.vxMetersPerSecond * Robot.kDefaultPeriod;
-        double newY = currentPose.getY() + -currentSpeeds.vyMetersPerSecond * Robot.kDefaultPeriod;
-        double newAngle = -currentPose.getRotation().getDegrees() + Math.toDegrees(currentSpeeds.omegaRadiansPerSecond * Robot.kDefaultPeriod);
-        gyro.setSimAngle(newAngle);
+        double newX = currentPose.getX() + currentSpeeds.vxMetersPerSecond * Robot.kDefaultPeriod;
+        double newY = currentPose.getY() + currentSpeeds.vyMetersPerSecond * Robot.kDefaultPeriod;
+        double newAngle = currentPose.getRotation().getDegrees() + Math.toDegrees(currentSpeeds.omegaRadiansPerSecond * Robot.kDefaultPeriod);
+        gyro.setSimAngle(-newAngle);
 
-        odometry.resetPosition(Rotation2d.fromDegrees(-newAngle), getModulePositions(), new Pose2d(newX, newY, Rotation2d.fromDegrees(-newAngle)));
+        odometry.resetPosition(Rotation2d.fromDegrees(newAngle), getModulePositions(), new Pose2d(newX, newY, Rotation2d.fromDegrees(newAngle)));
     }
 
     public Pose2d getPose() {
@@ -292,6 +292,25 @@ public class Drivetrain extends SubsystemBase {
         double yDiff = y - getPose().getY();
 
         return Math.hypot(xDiff, yDiff);
+    }
+
+    public double calculateDegreesToTarget(Pose2d target) {
+        Pose2d currentPose = getPose();
+
+        // Estimate the future pose of the robot to compensate for lag
+        double newX = currentPose.getX() + (currentSpeeds.vxMetersPerSecond * (Robot.kDefaultPeriod * (Robot.isReal() ? 10 : 0)));
+        double newY = currentPose.getY() + (currentSpeeds.vyMetersPerSecond * (Robot.kDefaultPeriod * (Robot.isReal() ? 10 : 0)));
+
+        Pose2d futurePose = new Pose2d(newX, newY, new Rotation2d());
+
+        // Calculate the angle between the target and the current robot position.
+        double angle = Math.toDegrees(Math.atan2(-futurePose.getY() + target.getY(), -futurePose.getX() + target.getX()));
+
+        // Normalize the angle to a number between 0 and 360.
+        angle = RotationUtil.toSignedDegrees(angle);
+
+        // Return the angle to which the turret needs to be adjusted.
+        return angle;
     }
 
 

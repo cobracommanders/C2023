@@ -28,6 +28,7 @@ import org.team498.lib.drivers.Blinkin.Color;
 import org.team498.lib.drivers.Gyro;
 import org.team498.lib.field.Point;
 import org.team498.lib.util.PoseUtil;
+import org.team498.lib.util.RotationUtil;
 
 import java.util.List;
 
@@ -130,9 +131,11 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        if (drivetrain.distanceTo(Point.fromPose2d(RobotPositions.getClosestScoringPosition())) < Units.inchesToMeters(25)) {
+        SmartDashboard.putNumber("anlge error", RotationUtil.toSignedDegrees(Math.abs(drivetrain.getYaw() - drivetrain.calculateDegreesToTarget(RobotPositions.getNextScoringNodePosition()))));
+        if ((Math.abs(RotationUtil.toSignedDegrees(Math.abs(drivetrain.getYaw() - drivetrain.calculateDegreesToTarget(RobotPositions.getNextScoringNodePosition())))) < 5) && (drivetrain.distanceTo(Point.fromPose2d(RobotPositions.getClosestScoringPosition())) < Units.inchesToMeters(25))) {
             blinkin.setColor(Blinkin.Color.LIME);
-        } else if (robotState.inShootDriveMode()) {
+            controls.driver.rumble(0.5);
+        } else if (robotState.inShootDriveMode() && RobotPositions.inCommunity()) {
             blinkin.setColor(Blinkin.Color.RED);
         } else {
             if (robotState.inConeMode() && Manipulator.getInstance().isStalling()) {

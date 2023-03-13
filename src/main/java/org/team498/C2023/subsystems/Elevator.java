@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.team498.C2023.ShootTables;
 import org.team498.C2023.State;
-import org.team498.lib.field.Point;
 
 import static org.team498.C2023.Constants.ElevatorConstants.*;
 import static org.team498.C2023.Ports.Elevator.*;

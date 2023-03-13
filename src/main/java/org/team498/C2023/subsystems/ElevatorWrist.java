@@ -12,7 +12,6 @@ import org.team498.C2023.Robot;
 import org.team498.C2023.RobotPositions;
 import org.team498.C2023.State;
 import org.team498.C2023.ShootTables;
-import org.team498.lib.field.Point;
 
 import static org.team498.C2023.Constants.WristConstants.*;
 import static org.team498.C2023.Ports.ElevatorWrist.ENCODER_PORT;

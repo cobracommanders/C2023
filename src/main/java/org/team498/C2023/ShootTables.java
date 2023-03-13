@@ -3,10 +3,6 @@ package org.team498.C2023;
 import org.team498.lib.util.LinearInterpolator;
 
 public class ShootTables {
-    // Number of robot loop cycles to offset the robot position by when calculating
-    // the angle to aim at
-    public static final double aimLagCompensation = 10;
-
     public static class midCube {
         public static final LinearInterpolator shooterRPM = new LinearInterpolator(new double[][] {
                 { 1, 0.5 },
