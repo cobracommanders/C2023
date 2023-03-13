@@ -1,7 +1,10 @@
 package org.team498.C2023.subsystems;
 
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
+import com.ctre.phoenix.sensors.WPI_CANCoder;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -47,24 +50,27 @@ public class Drivetrain extends SubsystemBase {
     private static SlewRateLimiter yLimiter = new SlewRateLimiter(DrivetrainConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
 
     private final SwerveModule[] swerveModules;
+    private final Translation2d[] modulePositions;
     private final SwerveDriveKinematics kinematics;
     private final SwerveDriveOdometry odometry;
     private final Gyro gyro = Gyro.getInstance();
     public ChassisSpeeds currentSpeeds = new ChassisSpeeds();
 
+    private final SwerveDriveOdometry fakeOdometry;
+
     private Drivetrain() {
-        TalonFX FL_Drive = new TalonFX(FL_DRIVE);
-        TalonFX FR_Drive = new TalonFX(FR_DRIVE);
-        TalonFX BL_Drive = new TalonFX(BL_DRIVE);
-        TalonFX BR_Drive = new TalonFX(BR_DRIVE);
-        TalonFX FL_Steer = new TalonFX(FL_STEER);
-        TalonFX FR_Steer = new TalonFX(FR_STEER);
-        TalonFX BL_Steer = new TalonFX(BL_STEER);
-        TalonFX BR_Steer = new TalonFX(BR_STEER);
-        CANCoder FL_CANCoder = new CANCoder(FL_CANCODER);
-        CANCoder FR_CANCoder = new CANCoder(FR_CANCODER);
-        CANCoder BL_CANCoder = new CANCoder(BL_CANCODER);
-        CANCoder BR_CANCoder = new CANCoder(BR_CANCODER);
+        WPI_TalonFX FL_Drive = new WPI_TalonFX(FL_DRIVE);
+        WPI_TalonFX FR_Drive = new WPI_TalonFX(FR_DRIVE);
+        WPI_TalonFX BL_Drive = new WPI_TalonFX(BL_DRIVE);
+        WPI_TalonFX BR_Drive = new WPI_TalonFX(BR_DRIVE);
+        WPI_TalonFX FL_Steer = new WPI_TalonFX(FL_STEER);
+        WPI_TalonFX FR_Steer = new WPI_TalonFX(FR_STEER);
+        WPI_TalonFX BL_Steer = new WPI_TalonFX(BL_STEER);
+        WPI_TalonFX BR_Steer = new WPI_TalonFX(BR_STEER);
+        WPI_CANCoder FL_CANCoder = new WPI_CANCoder(FL_CANCODER);
+        WPI_CANCoder FR_CANCoder = new WPI_CANCoder(FR_CANCODER);
+        WPI_CANCoder BL_CANCoder = new WPI_CANCoder(BL_CANCODER);
+        WPI_CANCoder BR_CANCoder = new WPI_CANCoder(BR_CANCODER);
 
         SwerveModule FL_Module = new SwerveModule("FL", FL_Drive, FL_Steer, FL_CANCoder, FL_MODULE_OFFSET);
         SwerveModule FR_Module = new SwerveModule("FR", FR_Drive, FR_Steer, FR_CANCoder, FR_MODULE_OFFSET);
@@ -87,14 +93,20 @@ public class Drivetrain extends SubsystemBase {
         Translation2d FR_ModulePosition = new Translation2d(moduleDistance, -moduleDistance);
         Translation2d BL_ModulePosition = new Translation2d(-moduleDistance, moduleDistance);
         Translation2d BR_ModulePosition = new Translation2d(-moduleDistance, -moduleDistance);
+        modulePositions = new Translation2d[] {FL_ModulePosition, FR_ModulePosition, BL_ModulePosition, BR_ModulePosition};
         kinematics = new SwerveDriveKinematics(FL_ModulePosition, FR_ModulePosition, BL_ModulePosition, BR_ModulePosition);
-        odometry = new SwerveDriveOdometry(kinematics, Rotation2d.fromDegrees(0), getModulePositions());
+        // odometry = new SwerveDriveOdometry(kinematics, Rotation2d.fromDegrees(0));
+        // fakeOdometry = new SwerveDriveOdometry(kinematics, Rotation2d.fromDegrees(0));
+
+        odometry = new SwerveDriveOdometry(kinematics, Rotation2d.fromDegrees(getYaw()), getModulePositions());
+        fakeOdometry = new SwerveDriveOdometry(kinematics, Rotation2d.fromDegrees(getYaw()), getModulePositions());
     }
 
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Pitch", gyro.getPitch());
         SmartDashboard.putNumber("Roll", gyro.getRoll());
+        // if (Robot.isReal()) odometry.update(Rotation2d.fromDegrees(getYaw()), getModuleStates());
         if (Robot.isReal()) odometry.update(Rotation2d.fromDegrees(getYaw()), getModulePositions());
 
         if (RobotState.isDisabled()) {
@@ -107,19 +119,53 @@ public class Drivetrain extends SubsystemBase {
         SmartDashboard.putNumber("Gyro", getYaw());
 
         Robot.field.setRobotPose(getPose());
+		Robot.field.getObject("Swerve Modules").setPoses(getModulePoses());
+
+        SwerveModuleState[] targetStates = getTargetModuleStates();
+        SmartDashboard.putNumberArray("Target Swerve States", new double[] {
+            targetStates[0].angle.getDegrees(), targetStates[0].speedMetersPerSecond,
+            targetStates[1].angle.getDegrees(), targetStates[1].speedMetersPerSecond,
+            targetStates[2].angle.getDegrees(), targetStates[2].speedMetersPerSecond,
+            targetStates[3].angle.getDegrees(), targetStates[3].speedMetersPerSecond,
+        });
+
+        SwerveModuleState[] realStates = getModuleStates();
+        SmartDashboard.putNumberArray("Swerve States", new double[] {
+            realStates[0].angle.getDegrees(), realStates[0].speedMetersPerSecond,
+            realStates[1].angle.getDegrees(), realStates[1].speedMetersPerSecond,
+            realStates[2].angle.getDegrees(), realStates[2].speedMetersPerSecond,
+            realStates[3].angle.getDegrees(), realStates[3].speedMetersPerSecond,
+        });
     }
 
     @Override
     public void simulationPeriodic() {
-        Pose2d currentPose = getPose();
+        Pose2d currentPose = fakeOdometry.getPoseMeters();
 
         double newX = currentPose.getX() + currentSpeeds.vxMetersPerSecond * Robot.kDefaultPeriod;
         double newY = currentPose.getY() + currentSpeeds.vyMetersPerSecond * Robot.kDefaultPeriod;
         double newAngle = currentPose.getRotation().getDegrees() + Math.toDegrees(currentSpeeds.omegaRadiansPerSecond * Robot.kDefaultPeriod);
+
+        Robot.field.getObject("Ideal Pose").setPose(new Pose2d(newX, newY, Rotation2d.fromDegrees(getYaw())));
+
+        // odometry.update(Rotation2d.fromDegrees(getYaw()), getModuleStates());
+        odometry.update(Rotation2d.fromDegrees(getYaw()), getModulePositions());
         gyro.setSimAngle(-newAngle);
 
-        odometry.resetPosition(Rotation2d.fromDegrees(newAngle), getModulePositions(), new Pose2d(newX, newY, Rotation2d.fromDegrees(newAngle)));
+
+        // fakeOdometry.resetPosition(new Pose2d(newX, newY, Rotation2d.fromDegrees(newAngle)), Rotation2d.fromDegrees(newAngle));
+        fakeOdometry.resetPosition(Rotation2d.fromDegrees(newAngle), getModulePositions(), new Pose2d(newX, newY, Rotation2d.fromDegrees(newAngle)));
     }
+
+    public Pose2d[] getModulePoses() {
+        Pose2d[] poses = new Pose2d[swerveModules.length];
+        for (int i = 0; i < swerveModules.length; i++) {
+            SwerveModule m = swerveModules[i];
+            poses[i] = m.getPose(getPose(), modulePositions[i]);
+        }
+
+        return poses;
+	}
 
     public Pose2d getPose() {
         return odometry.getPoseMeters();
@@ -150,16 +196,19 @@ public class Drivetrain extends SubsystemBase {
     }
 
     public void setPose(Pose2d pose) {
-        odometry.resetPosition(Rotation2d.fromDegrees(gyro.getYaw()), getModulePositions(), pose);
+        // odometry.resetPosition(pose, Rotation2d.fromDegrees(gyro.getYaw()));
+        // fakeOdometry.resetPosition(pose, Rotation2d.fromDegrees(gyro.getYaw()));
+        odometry.resetPosition(Rotation2d.fromDegrees(getYaw()), getModulePositions(), pose);
+        fakeOdometry.resetPosition(Rotation2d.fromDegrees(getYaw()), getModulePositions(), pose);
         // gyro.setAngleOffset(pose.getRotation().getDegrees());
         gyro.setYaw(pose.getRotation().getDegrees());
     }
 
     public void setOdometry(Pose3d pose) {
-        odometry.resetPosition(Rotation2d.fromDegrees(gyro.getYaw()),
-                               getModulePositions(),
-                               new Pose2d(pose.getX(), pose.getY(), Rotation2d.fromDegrees(gyro.getYaw()))
-        );
+        // odometry.resetPosition(new Pose2d(pose.getX(), pose.getY(), Rotation2d.fromDegrees(gyro.getYaw())), Rotation2d.fromDegrees(gyro.getYaw()));
+        // fakeOdometry.resetPosition(new Pose2d(pose.getX(), pose.getY(), Rotation2d.fromDegrees(gyro.getYaw())), Rotation2d.fromDegrees(gyro.getYaw()));
+        odometry.resetPosition(Rotation2d.fromDegrees(gyro.getYaw()), getModulePositions(), new Pose2d(pose.getX(), pose.getY(), Rotation2d.fromDegrees(gyro.getYaw())));
+        fakeOdometry.resetPosition(Rotation2d.fromDegrees(gyro.getYaw()), getModulePositions(), new Pose2d(pose.getX(), pose.getY(), Rotation2d.fromDegrees(gyro.getYaw())));
     }
 
     /** @return true if all three swerve controllers have reached their position goals (x pos, y pos, angle) */
@@ -238,7 +287,7 @@ public class Drivetrain extends SubsystemBase {
         for (int i = 0; i < swerveModules.length; i++) {
             swerveModules[i].setState(moduleStates[i], force);
         }
-        
+
         currentSpeeds = ChassisSpeeds.toFieldRelativeSpeeds(kinematics.toChassisSpeeds(moduleStates), Rotation2d.fromDegrees(getYaw()));
     }
 
@@ -247,6 +296,22 @@ public class Drivetrain extends SubsystemBase {
         SwerveModulePosition[] positions = new SwerveModulePosition[swerveModules.length];
         for (int i = 0; i < swerveModules.length; i++) {
             positions[i] = swerveModules[i].getPosition();
+        }
+        return positions;
+    }
+
+    public SwerveModuleState[] getModuleStates() {
+        SwerveModuleState[] positions = new SwerveModuleState[swerveModules.length];
+        for (int i = 0; i < swerveModules.length; i++) {
+            positions[i] = swerveModules[i].getState();
+        }
+        return positions;
+    }
+
+    public SwerveModuleState[] getTargetModuleStates() {
+        SwerveModuleState[] positions = new SwerveModuleState[swerveModules.length];
+        for (int i = 0; i < swerveModules.length; i++) {
+            positions[i] = swerveModules[i].getTargetState();
         }
         return positions;
     }
