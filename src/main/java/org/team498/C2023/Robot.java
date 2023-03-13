@@ -86,13 +86,7 @@ public class Robot extends TimedRobot {
 
         photonvision.getEstimatedGlobalPose().ifPresent(pose -> drivetrain.setOdometry(pose.estimatedPose));
 
-
-        if (RobotPositions.inCommunity()) {
-            field.getObject("Scoring Target").setPose(RobotPositions.getNextScoringNodePosition());
-        } else {
-            field.getObject("Scoring Target").setPose(new Pose2d(-1, -1, new Rotation2d()));
-        }
-
+        field.getObject("Scoring Target").setPose(RobotPositions.getNextScoringNodePosition());
 
         //TODO: Check if alliance is actually invalid when the FMS is not connected
         if (alliance == Alliance.Invalid) {
