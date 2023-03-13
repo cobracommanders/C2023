@@ -1,8 +1,6 @@
 package org.team498.C2023.subsystems;
 
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.WPI_CANCoder;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -142,9 +140,9 @@ public class Drivetrain extends SubsystemBase {
     public void simulationPeriodic() {
         Pose2d currentPose = fakeOdometry.getPoseMeters();
 
-        double newX = currentPose.getX() + currentSpeeds.vxMetersPerSecond * Robot.kDefaultPeriod;
-        double newY = currentPose.getY() + currentSpeeds.vyMetersPerSecond * Robot.kDefaultPeriod;
-        double newAngle = currentPose.getRotation().getDegrees() + Math.toDegrees(currentSpeeds.omegaRadiansPerSecond * Robot.kDefaultPeriod);
+        double newX = currentPose.getX() + currentSpeeds.vxMetersPerSecond * Robot.DEFAULT_PERIOD;
+        double newY = currentPose.getY() + currentSpeeds.vyMetersPerSecond * Robot.DEFAULT_PERIOD;
+        double newAngle = currentPose.getRotation().getDegrees() + Math.toDegrees(currentSpeeds.omegaRadiansPerSecond * Robot.DEFAULT_PERIOD);
 
         Robot.field.getObject("Real Pose").setPose(new Pose2d(newX, newY, Rotation2d.fromDegrees(getYaw())));
 
@@ -172,23 +170,23 @@ public class Drivetrain extends SubsystemBase {
     }
 
     public Pose2d getNextPose() {
-        double x = getPose().getX() + (currentSpeeds.vxMetersPerSecond * (Robot.kDefaultPeriod * 10));
-        double y = getPose().getY() + (currentSpeeds.vyMetersPerSecond * (Robot.kDefaultPeriod * 10));
-        double rotation = getPose().getRotation().getDegrees() + (currentSpeeds.omegaRadiansPerSecond * (Robot.kDefaultPeriod * 10));
+        double x = getPose().getX() + (currentSpeeds.vxMetersPerSecond * (Robot.DEFAULT_PERIOD * 10));
+        double y = getPose().getY() + (currentSpeeds.vyMetersPerSecond * (Robot.DEFAULT_PERIOD * 10));
+        double rotation = getPose().getRotation().getDegrees() + (currentSpeeds.omegaRadiansPerSecond * (Robot.DEFAULT_PERIOD * 10));
         return new Pose2d(x, y, Rotation2d.fromDegrees(rotation));
     }
 
     public Supplier<Pose2d> getNextPoseToTag() {
         Pose3d ogPose = Photonvision.getInstance().nearestTagPose().get();
         //TODO: since this is the tag pose, it might need to subtract the current velocity
-        double x = ogPose.getX() + (currentSpeeds.vxMetersPerSecond * (Robot.kDefaultPeriod * 10));
-        double y = ogPose.getY() + (currentSpeeds.vyMetersPerSecond * (Robot.kDefaultPeriod * 10));
-        double rotation = ogPose.getRotation().toRotation2d().getDegrees() + (currentSpeeds.omegaRadiansPerSecond * (Robot.kDefaultPeriod * 10));
+        double x = ogPose.getX() + (currentSpeeds.vxMetersPerSecond * (Robot.DEFAULT_PERIOD * 10));
+        double y = ogPose.getY() + (currentSpeeds.vyMetersPerSecond * (Robot.DEFAULT_PERIOD * 10));
+        double rotation = ogPose.getRotation().toRotation2d().getDegrees() + (currentSpeeds.omegaRadiansPerSecond * (Robot.DEFAULT_PERIOD * 10));
         return () -> new Pose2d(x, y, Rotation2d.fromDegrees(rotation));
     }
 
     public Transform2d getVelocity() {
-        return new Transform2d(new Translation2d(currentSpeeds.vxMetersPerSecond * (Robot.kDefaultPeriod * 10), currentSpeeds.vyMetersPerSecond * (Robot.kDefaultPeriod * 10)), Rotation2d.fromRadians(currentSpeeds.omegaRadiansPerSecond * (Robot.kDefaultPeriod * 10)));
+        return new Transform2d(new Translation2d(currentSpeeds.vxMetersPerSecond * (Robot.DEFAULT_PERIOD * 10), currentSpeeds.vyMetersPerSecond * (Robot.DEFAULT_PERIOD * 10)), Rotation2d.fromRadians(currentSpeeds.omegaRadiansPerSecond * (Robot.DEFAULT_PERIOD * 10)));
     }
 
     public double getNextDistanceToTag() {
@@ -363,8 +361,8 @@ public class Drivetrain extends SubsystemBase {
         Pose2d currentPose = getPose();
 
         // Estimate the future pose of the robot to compensate for lag
-        double newX = currentPose.getX() + (currentSpeeds.vxMetersPerSecond * (Robot.kDefaultPeriod * (Robot.isReal() ? 10 : 0)));
-        double newY = currentPose.getY() + (currentSpeeds.vyMetersPerSecond * (Robot.kDefaultPeriod * (Robot.isReal() ? 10 : 0)));
+        double newX = currentPose.getX() + (currentSpeeds.vxMetersPerSecond * (Robot.DEFAULT_PERIOD * (Robot.isReal() ? 10 : 0)));
+        double newY = currentPose.getY() + (currentSpeeds.vyMetersPerSecond * (Robot.DEFAULT_PERIOD * (Robot.isReal() ? 10 : 0)));
 
         Pose2d futurePose = new Pose2d(newX, newY, new Rotation2d());
 

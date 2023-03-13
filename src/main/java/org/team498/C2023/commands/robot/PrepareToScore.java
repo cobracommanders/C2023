@@ -9,8 +9,8 @@ import org.team498.C2023.commands.SetRobotToNextScoringState;
 import org.team498.C2023.commands.elevator.SetElevatorToNextState;
 import org.team498.C2023.commands.intakewrist.SetIntakeWristToNextState;
 import org.team498.C2023.commands.manipulator.SetManipulatorToNextState;
+import org.team498.C2023.subsystems.elevator.Elevator;
 import org.team498.C2023.commands.elevatorwrist.SetElevatorWristToNextState;
-import org.team498.C2023.subsystems.Elevator;
 
 public class PrepareToScore extends SequentialCommandGroup {
     public PrepareToScore() {

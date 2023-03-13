@@ -3,6 +3,12 @@ package org.team498.C2023;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
 public final class Constants {
+    public enum Mode {
+        REAL, SIM, REPLAY, PRACTICE
+    }
+
+    public static final Mode mode = Mode.SIM;
+
     public static final class OIConstants {
         public static final int DRIVER_CONTROLLER_ID = 0;
         public static final int OPERATOR_CONTROLLER_ID = 1;

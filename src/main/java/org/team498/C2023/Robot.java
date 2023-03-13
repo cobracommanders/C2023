@@ -5,23 +5,24 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import org.team498.C2023.commands.auto.CubeEngage;
-import org.team498.C2023.commands.auto.JustAutoShot;
-import org.team498.C2023.commands.auto.JustScore;
-import org.team498.C2023.commands.auto.PreloadAndTaxi;
-import org.team498.C2023.commands.auto.TwoCubeEngage;
-import org.team498.C2023.commands.auto.TwoCubePickupEngage;
+import org.littletonrobotics.junction.LogFileUtil;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+import org.team498.C2023.commands.auto.*;
 import org.team498.C2023.subsystems.Drivetrain;
-import org.team498.C2023.subsystems.Elevator;
 import org.team498.C2023.subsystems.ElevatorWrist;
 import org.team498.C2023.subsystems.Manipulator;
 import org.team498.C2023.subsystems.Photonvision;
+import org.team498.C2023.subsystems.elevator.Elevator;
 import org.team498.lib.auto.Auto;
 import org.team498.lib.drivers.Blinkin;
 import org.team498.lib.drivers.Blinkin.Color;
@@ -33,7 +34,8 @@ import org.team498.lib.util.RotationUtil;
 import java.util.List;
 
 
-public class Robot extends TimedRobot {
+public class Robot extends LoggedRobot {
+    public static final double DEFAULT_PERIOD = 0.02;
     public static int coordinateFlip = 1;
     public static int rotationOffset = 0;
 
@@ -49,11 +51,42 @@ public class Robot extends TimedRobot {
 
     private final SendableChooser<Auto> autoChooser = new SendableChooser<Auto>();
 
-    private final List<Auto> autoOptions = List.of(new JustScore(), new CubeEngage(), new PreloadAndTaxi(), new TwoCubeEngage(), new TwoCubePickupEngage(), new JustAutoShot());
+    private final List<Auto> autoOptions = List.of(new JustScore(),
+                                                   new CubeEngage(),
+                                                   new PreloadAndTaxi(),
+                                                   new TwoCubeEngage(),
+                                                   new TwoCubePickupEngage(),
+                                                   new JustAutoShot()
+    );
 
 
     @Override
     public void robotInit() {
+        Logger.getInstance().recordMetadata("ProjectName", "C2023"); // Set a metadata value
+
+        if (isReal()) {
+            Logger.getInstance().addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB stick
+            Logger.getInstance().addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+            new PowerDistribution(1, PowerDistribution.ModuleType.kRev); // Enables power distribution logging //TODO Check CAN ID
+        } else {
+            switch (Constants.mode) {
+                case SIM -> {
+                    Logger.getInstance().addDataReceiver(new WPILOGWriter("/"));
+                    Logger.getInstance().addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+                }
+                case REPLAY -> {
+                    setUseTiming(true); // Set to false to run as fast as possible when replaying logs
+                    String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
+                    Logger.getInstance().setReplaySource(new WPILOGReader(logPath)); // Read replay log
+                    Logger.getInstance().addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
+                }
+                default -> {}
+            }
+
+        }
+
+        Logger.getInstance().start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
+
         drivetrain.setPose(new Pose2d(8.29, 4, Rotation2d.fromDegrees(0)));
         controls.driver.setRightStickLastAngle(-gyro.getAngleOffset());
 
@@ -105,7 +138,9 @@ public class Robot extends TimedRobot {
         SmartDashboard.putString("Robot State", RobotState.getInstance().getCurrentState().name());
         SmartDashboard.putString("Blinkin Color", blinkin.getColor().name());
 
-        SmartDashboard.putNumber("Interpolation Value", Drivetrain.getInstance().distanceTo(Point.fromPose2d(RobotPositions.getNextScoringNodePosition())));
+        SmartDashboard.putNumber("Interpolation Value",
+                                 Drivetrain.getInstance().distanceTo(Point.fromPose2d(RobotPositions.getNextScoringNodePosition()))
+        );
     }
 
     @Override
@@ -125,8 +160,11 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        SmartDashboard.putNumber("anlge error", RotationUtil.toSignedDegrees(Math.abs(drivetrain.getYaw() - drivetrain.calculateDegreesToTarget(RobotPositions.getNextScoringNodePosition()))));
-        if ((Math.abs(RotationUtil.toSignedDegrees(Math.abs(drivetrain.getYaw() - drivetrain.calculateDegreesToTarget(RobotPositions.getNextScoringNodePosition())))) < 5) && (drivetrain.distanceTo(Point.fromPose2d(RobotPositions.getClosestScoringPosition())) < Units.inchesToMeters(25))) {
+        SmartDashboard.putNumber("anlge error",
+                                 RotationUtil.toSignedDegrees(Math.abs(drivetrain.getYaw() - drivetrain.calculateDegreesToTarget(RobotPositions.getNextScoringNodePosition())))
+        );
+        if ((Math.abs(RotationUtil.toSignedDegrees(Math.abs(drivetrain.getYaw() - drivetrain.calculateDegreesToTarget(RobotPositions.getNextScoringNodePosition())))) < 5) && (drivetrain.distanceTo(
+                Point.fromPose2d(RobotPositions.getClosestScoringPosition())) < Units.inchesToMeters(25))) {
             blinkin.setColor(Blinkin.Color.LIME);
             controls.driver.rumble(0.5);
         } else if (robotState.inShootDriveMode() && RobotPositions.inCommunity()) {
@@ -147,7 +185,7 @@ public class Robot extends TimedRobot {
         Auto auto = autoChooser.getSelected();
 
         if (auto == null) auto = new JustScore();
-    
+
         if (alliance == Alliance.Blue) {
             Drivetrain.getInstance().setPose(auto.getInitialPose());
         } else {
@@ -158,7 +196,6 @@ public class Robot extends TimedRobot {
 
         Elevator.getInstance().setState(auto.getInitialState().elevator);
         ElevatorWrist.getInstance().setState(auto.getInitialState().elevatorWrist);
-
 
 
         auto.getCommand().schedule();

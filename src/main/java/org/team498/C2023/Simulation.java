@@ -10,9 +10,9 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import org.team498.C2023.subsystems.Elevator;
 import org.team498.C2023.subsystems.ElevatorWrist;
 import org.team498.C2023.subsystems.IntakeWrist;
+import org.team498.C2023.subsystems.elevator.Elevator;
 
 public class Simulation {
     private final Elevator elevator = Elevator.getInstance();
@@ -77,18 +77,18 @@ public class Simulation {
     }
 
     public void update() {
-        elevatorSim.setInput(elevator.getPower() * RobotController.getBatteryVoltage());
-        elevatorSim.update(Robot.kDefaultPeriod);
-        elevator.setEncoderPosition(elevatorSim.getPositionMeters() * Constants.ElevatorConstants.MOTOR_ROTATION_TO_METERS);
-        elevatorMechanism.setLength(elevator.getPosition());
+        // elevatorSim.setInput(elevator.getPower() * RobotController.getBatteryVoltage());
+        // elevatorSim.update(Robot.DEFAULT_PERIOD);
+        // elevator.setEncoderPosition(elevatorSim.getPositionMeters() * Constants.ElevatorConstants.MOTOR_ROTATION_TO_METERS);
+        // elevatorMechanism.setLength(elevator.getPosition());
 
         elevatorWristSim.setInput(elevatorWrist.getPower() * RobotController.getBatteryVoltage());
-        elevatorWristSim.update(Robot.kDefaultPeriod);
+        elevatorWristSim.update(Robot.DEFAULT_PERIOD);
         elevatorWrist.setSimAngle(Math.toDegrees(elevatorWristSim.getAngleRads()));
         elevatorWristMechanism.setAngle(elevatorWrist.getAngle() * 360 - 60);
 
         intakeWristSim.setInput(-intakeWrist.getPower() * RobotController.getBatteryVoltage());
-        intakeWristSim.update(Robot.kDefaultPeriod);
+        intakeWristSim.update(Robot.DEFAULT_PERIOD);
         intakeWrist.setSimAngle(Math.toDegrees(intakeWristSim.getAngleRads()));
         intakeWristMechanism.setAngle(intakeWrist.getAngle() * 360 - 20);
     }

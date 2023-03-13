@@ -20,7 +20,6 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -123,12 +122,12 @@ public class SwerveModule extends SubsystemBase {
         encoder.setPosition(Falcon500Conversions.falconToDegrees(steerMotor.getSelectedSensorPosition(), MK4I_STEER_REDUCTION_L2));
 
         steerSim.setInputVoltage(steerMotor.getMotorOutputVoltage());
-        steerSim.update(Robot.kDefaultPeriod);
-        steerMotor.setSelectedSensorPosition(steerMotor.getSelectedSensorPosition() + ((steerSim.getAngularVelocityRPM() / MK4I_STEER_REDUCTION_L2) * 2048 * Robot.kDefaultPeriod));
+        steerSim.update(Robot.DEFAULT_PERIOD);
+        steerMotor.setSelectedSensorPosition(steerMotor.getSelectedSensorPosition() + ((steerSim.getAngularVelocityRPM() / MK4I_STEER_REDUCTION_L2) * 2048 * Robot.DEFAULT_PERIOD));
 
         driveSim.setInputVoltage(driveMotor.getMotorOutputVoltage());
-        driveSim.update(Robot.kDefaultPeriod);
-        driveMotor.setSelectedSensorPosition(driveMotor.getSelectedSensorPosition() + ((driveSim.getAngularVelocityRPM() / MK4I_DRIVE_REDUCTION_L2) * 2048 * Robot.kDefaultPeriod));
+        driveSim.update(Robot.DEFAULT_PERIOD);
+        driveMotor.setSelectedSensorPosition(driveMotor.getSelectedSensorPosition() + ((driveSim.getAngularVelocityRPM() / MK4I_DRIVE_REDUCTION_L2) * 2048 * Robot.DEFAULT_PERIOD));
 	}
 
     /** Get the velocity of the wheel in meters per second */
