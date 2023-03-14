@@ -117,17 +117,19 @@ public enum State {
     }
 
     public enum IntakeRollers {
-        INTAKE(0.5, 0.5),
-        SPIT(0.45, -0.45),
-        IDLE(0, 0),
-        OUTTAKE(-0.5, -0.5);
+        INTAKE(0.5, 0.5, 0.5),
+        SPIT(0.45, -0.45, 0.45),
+        IDLE(0, 0, 0),
+        OUTTAKE(-0.5, -0.5, -0.5);
 
         public final double bottomRollerSpeed;
         public final double topRollerSpeed;
+        public final double thirdRollerSpeed;
 
-        IntakeRollers(double bottomRollerSpeed, double topRollerSpeed) {
+        IntakeRollers(double bottomRollerSpeed, double topRollerSpeed, double thirdRollerSpeed) {
             this.bottomRollerSpeed = bottomRollerSpeed;
             this.topRollerSpeed = topRollerSpeed;
+            this.thirdRollerSpeed = thirdRollerSpeed;
         }
     }
 

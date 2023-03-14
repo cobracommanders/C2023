@@ -75,13 +75,13 @@ public class Elevator extends SubsystemBase {
         leftMotor.set(TalonFXControlMode.PercentOutput, speed + feedforward.calculate(speed));
 
         SmartDashboard.putData(this);
-        SmartDashboard.putNumber("Elevator Position", getPosition());
         SmartDashboard.putBoolean("Elevator at Setpoint", atSetpoint());
         SmartDashboard.putNumber("Elevator Error", PID.getGoal().position - getPosition());
 
         if (Robot.isSimulation()) simPower = speed + feedforward.calculate(speed);
 
         SmartDashboard.putNumber("Elevator Absolute Encoder", getAbsoluteEncoderPosition());
+        SmartDashboard.putNumber("Elevator Position", getPosition());
     }
 
     public boolean aboveIntakeHeight() {
@@ -109,11 +109,11 @@ public class Elevator extends SubsystemBase {
     }
 
     public double getAbsoluteEncoderPosition() {
-        double angle = encoder.getOutput() + 0.25;
+        double angle = encoder.getOutput() + 0.75;
             if (angle < 1)
                 angle += 1;
             
-        return (angle - 0.744160 - 0.25);
+        return (angle - 0.744160 - 0.75);
     }
 
     public void updateInitialPosition(boolean inAutoPose) {
@@ -125,11 +125,10 @@ public class Elevator extends SubsystemBase {
             
             setEncoderPosition(angle - 0.0);
         } else {
-            angle = encoder.getOutput() + 0.25;
+            angle = encoder.getOutput() + 0.75;
             if (angle < 1)
                 angle += 1;
-            
-            setEncoderPosition(angle - 0.744160 - 0.25);
+            setEncoderPosition((angle - 0.744160 - 0.75) * -5);
         }
     }
 
@@ -138,7 +137,8 @@ public class Elevator extends SubsystemBase {
     }
 
     public boolean atSetpoint() {
-        return Math.abs(PID.getGoal().position - getPosition()) < 0.025;
+        // return Math.abs(PID.getGoal().position - getPosition()) < 0.025;
+        return true;
     }
 
     public double getPower() {

@@ -49,7 +49,7 @@ public class IntakeWrist extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // leftWrist.set(-PID.calculate(getAngle()));
+        leftWrist.set(-PID.calculate(getAngle()));
         SmartDashboard.putNumber("Intake Encoder", getAngle());
         SmartDashboard.putNumber("Intake Output", PID.calculate(getAngle()));
         SmartDashboard.putNumber("Intake Error", PID.getPositionError());
@@ -57,11 +57,11 @@ public class IntakeWrist extends SubsystemBase {
     }
 
     public double getAngle() {
-        double angle = encoder.getOutput() + 0.5;
+        double angle = encoder.getOutput() + 0.15;
         if (angle > 1)
             angle -= 1;
 
-        return Robot.isReal() ? angle - 0.5 : simAngle;
+        return Robot.isReal() ? angle - 0.15 - 0.330891: simAngle;
     }
 
     public void setState(State.IntakeWrist state) {
@@ -69,8 +69,7 @@ public class IntakeWrist extends SubsystemBase {
     }
 
     public boolean atSetpoint() {
-        // return PID.atSetpoint();
-        return true;
+        return PID.atSetpoint();
     }
 
     public void setSimAngle(double position) {

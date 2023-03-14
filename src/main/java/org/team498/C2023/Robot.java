@@ -125,8 +125,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        SmartDashboard.putNumber("anlge error", RotationUtil.toSignedDegrees(Math.abs(drivetrain.getYaw() - drivetrain.calculateDegreesToTarget(RobotPositions.getNextScoringNodePosition()))));
-        if ((Math.abs(RotationUtil.toSignedDegrees(Math.abs(drivetrain.getYaw() - drivetrain.calculateDegreesToTarget(RobotPositions.getNextScoringNodePosition())))) < 5) && (drivetrain.distanceTo(Point.fromPose2d(RobotPositions.getClosestScoringPosition())) < Units.inchesToMeters(25))) {
+        if ((Math.abs(RotationUtil.toSignedDegrees(Math.abs(drivetrain.getYaw() - drivetrain.calculateDegreesToTarget(RobotPositions.getNextScoringNodePosition())))) < 7.5) && (drivetrain.distanceTo(Point.fromPose2d(RobotPositions.getClosestScoringPosition())) < Units.inchesToMeters(25))) {
             blinkin.setColor(Blinkin.Color.LIME);
             controls.driver.rumble(0.5);
         } else if (robotState.inShootDriveMode() && RobotPositions.inCommunity()) {

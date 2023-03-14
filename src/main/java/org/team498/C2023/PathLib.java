@@ -10,4 +10,6 @@ public class PathLib {
     public static final PathPlannerTrajectory topCubeToSecondNode = Trajectories.getPathPlannerTrajectory("Top Cube To Second Node");
     public static final PathPlannerTrajectory secondNodeToChargeStation = Trajectories.getPathPlannerTrajectory("Second Node To Charge Station");
     public static final PathPlannerTrajectory secondNodeToSecondCube = Trajectories.getPathPlannerTrajectory("Second Node To Second Cube");
+
+    public static final PathPlannerTrajectory testPath = Trajectories.getPathPlannerTrajectory("Test Path");
 }

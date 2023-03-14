@@ -1,8 +1,6 @@
 package org.team498.C2023.subsystems;
 
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.WPI_CANCoder;
 
 import edu.wpi.first.math.controller.PIDController;
@@ -56,8 +54,6 @@ public class Drivetrain extends SubsystemBase {
     private final Gyro gyro = Gyro.getInstance();
     public ChassisSpeeds currentSpeeds = new ChassisSpeeds();
 
-    private final SwerveDriveOdometry fakeOdometry;
-
     private Drivetrain() {
         WPI_TalonFX FL_Drive = new WPI_TalonFX(FL_DRIVE);
         WPI_TalonFX FR_Drive = new WPI_TalonFX(FR_DRIVE);
@@ -95,18 +91,14 @@ public class Drivetrain extends SubsystemBase {
         Translation2d BR_ModulePosition = new Translation2d(-moduleDistance, -moduleDistance);
         modulePositions = new Translation2d[] {FL_ModulePosition, FR_ModulePosition, BL_ModulePosition, BR_ModulePosition};
         kinematics = new SwerveDriveKinematics(FL_ModulePosition, FR_ModulePosition, BL_ModulePosition, BR_ModulePosition);
-        // odometry = new SwerveDriveOdometry(kinematics, Rotation2d.fromDegrees(0));
-        // fakeOdometry = new SwerveDriveOdometry(kinematics, Rotation2d.fromDegrees(0));
 
         odometry = new SwerveDriveOdometry(kinematics, Rotation2d.fromDegrees(getYaw()), getModulePositions());
-        fakeOdometry = new SwerveDriveOdometry(kinematics, Rotation2d.fromDegrees(getYaw()), getModulePositions());
     }
 
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Pitch", gyro.getPitch());
         SmartDashboard.putNumber("Roll", gyro.getRoll());
-        // if (Robot.isReal()) odometry.update(Rotation2d.fromDegrees(getYaw()), getModuleStates());
         if (Robot.isReal()) odometry.update(Rotation2d.fromDegrees(getYaw()), getModulePositions());
 
         if (RobotState.isDisabled()) {
@@ -140,7 +132,7 @@ public class Drivetrain extends SubsystemBase {
 
     @Override
     public void simulationPeriodic() {
-        Pose2d currentPose = fakeOdometry.getPoseMeters();
+        Pose2d currentPose = getPose();
 
         double newX = currentPose.getX() + currentSpeeds.vxMetersPerSecond * Robot.kDefaultPeriod;
         double newY = currentPose.getY() + currentSpeeds.vyMetersPerSecond * Robot.kDefaultPeriod;
@@ -148,13 +140,8 @@ public class Drivetrain extends SubsystemBase {
 
         Robot.field.getObject("Ideal Pose").setPose(new Pose2d(newX, newY, Rotation2d.fromDegrees(getYaw())));
 
-        // odometry.update(Rotation2d.fromDegrees(getYaw()), getModuleStates());
         odometry.update(Rotation2d.fromDegrees(getYaw()), getModulePositions());
         gyro.setSimAngle(-newAngle);
-
-
-        // fakeOdometry.resetPosition(new Pose2d(newX, newY, Rotation2d.fromDegrees(newAngle)), Rotation2d.fromDegrees(newAngle));
-        fakeOdometry.resetPosition(Rotation2d.fromDegrees(newAngle), getModulePositions(), new Pose2d(newX, newY, Rotation2d.fromDegrees(newAngle)));
     }
 
     public Pose2d[] getModulePoses() {
@@ -196,19 +183,12 @@ public class Drivetrain extends SubsystemBase {
     }
 
     public void setPose(Pose2d pose) {
-        // odometry.resetPosition(pose, Rotation2d.fromDegrees(gyro.getYaw()));
-        // fakeOdometry.resetPosition(pose, Rotation2d.fromDegrees(gyro.getYaw()));
         odometry.resetPosition(Rotation2d.fromDegrees(getYaw()), getModulePositions(), pose);
-        fakeOdometry.resetPosition(Rotation2d.fromDegrees(getYaw()), getModulePositions(), pose);
-        // gyro.setAngleOffset(pose.getRotation().getDegrees());
         gyro.setYaw(pose.getRotation().getDegrees());
     }
 
     public void setOdometry(Pose3d pose) {
-        // odometry.resetPosition(new Pose2d(pose.getX(), pose.getY(), Rotation2d.fromDegrees(gyro.getYaw())), Rotation2d.fromDegrees(gyro.getYaw()));
-        // fakeOdometry.resetPosition(new Pose2d(pose.getX(), pose.getY(), Rotation2d.fromDegrees(gyro.getYaw())), Rotation2d.fromDegrees(gyro.getYaw()));
         odometry.resetPosition(Rotation2d.fromDegrees(gyro.getYaw()), getModulePositions(), new Pose2d(pose.getX(), pose.getY(), Rotation2d.fromDegrees(gyro.getYaw())));
-        fakeOdometry.resetPosition(Rotation2d.fromDegrees(gyro.getYaw()), getModulePositions(), new Pose2d(pose.getX(), pose.getY(), Rotation2d.fromDegrees(gyro.getYaw())));
     }
 
     /** @return true if all three swerve controllers have reached their position goals (x pos, y pos, angle) */
