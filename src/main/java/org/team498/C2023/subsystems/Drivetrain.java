@@ -144,6 +144,17 @@ public class Drivetrain extends SubsystemBase {
         gyro.setSimAngle(-newAngle);
     }
 
+    public double getFieldRelativePitch() {
+        return sampleRotation(getYaw());
+    }
+    
+    private double sampleRotation(double yawSample) {
+        double sampleRadians = yawSample * Math.PI / 180.0;
+        double pitch = gyro.getPitch() * Math.cos(sampleRadians);
+        double roll = gyro.getRoll() * Math.sin(sampleRadians);
+        return roll / pitch; //tan(pitch * sample, roll * sample)
+    }
+
     public Pose2d[] getModulePoses() {
         Pose2d[] poses = new Pose2d[swerveModules.length];
         for (int i = 0; i < swerveModules.length; i++) {
