@@ -7,7 +7,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 public interface Auto {
     default boolean compare(Position start, Position end, Action action) {
-        return this.getStartPosition() == start && this.getEndPosition() == end && this.getAction() == action;
+        // return this.getStartPosition() == start && this.getEndPosition() == end && this.getAction() == action;
+        return false;
     }
     public static enum Position {
         //TODO: Assign actual positions to these numbers
@@ -51,9 +52,9 @@ public interface Auto {
     default String getName() {
         return getClass().getSimpleName();
     }
-    Position getStartPosition();
-    Position getEndPosition();
-    Action getAction();
+    // Position getStartPosition();
+    // Position getEndPosition();
+    // Action getAction();
 
     Command getCommand();
     Pose2d getInitialPose();
