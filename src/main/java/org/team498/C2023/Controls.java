@@ -1,7 +1,6 @@
 package org.team498.C2023;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -10,10 +9,8 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 import org.team498.C2023.Constants.OIConstants;
 import org.team498.C2023.RobotState.GameMode;
-import org.team498.C2023.RobotState.ScoringOption;
 import org.team498.C2023.commands.drivetrain.AutoEngage;
 import org.team498.C2023.commands.drivetrain.DefenseDrive;
-import org.team498.C2023.commands.drivetrain.TargetDrive;
 import org.team498.C2023.commands.elevator.ManualElevator;
 import org.team498.C2023.commands.elevatorwrist.ManualElevatorWrist;
 import org.team498.C2023.commands.intakerollers.SetIntakeRollersToNextState;
@@ -43,12 +40,16 @@ public class Controls {
 
     public void configureDriverCommands() {
         driver.leftTrigger().onTrue(new InstantCommand(() -> robotState.setState(State.GROUND_CUBE)).andThen(new GroundIntake())).onFalse(new ReturnToIdle());
+        driver.leftBumper().onTrue(new InstantCommand(() -> robotState.setState(State.OUTTAKE)).andThen(new GroundIntake())).onFalse(new ReturnToIdle());
         driver.A().onTrue(new InstantCommand(() -> Gyro.getInstance().setYaw(0)));
         driver.X().onTrue(new InstantCommand(() -> robotState.setState(State.OUTTAKE)).alongWith(new GroundIntake())).onFalse(new ReturnToIdle());
 
+        // driver.B().onTrue(new PathPlannerFollower(PathLib.testPath));
+        driver.B().onTrue(new RealignCone());
+
 
         driver.rightTrigger()
-                //.whileTrue(new ConditionalCommand(new TargetDrive(driver::leftYSquared, driver::leftXSquared, driver.rightBumper(), () -> RobotPositions.getNextScoringNodePosition().transformBy(Drivetrain.getInstance().getVelocity().times(5).inverse())), Commands.none(), () -> RobotState.getInstance().inCubeMode() && RobotState.getInstance().getNextScoringOption() != ScoringOption.SPIT && robotState.inShootDriveMode()))
+                // .whileTrue(new ConditionalCommand(new TargetDrive(driver::leftYSquared, driver::leftXSquared, driver.rightBumper(), () -> RobotPositions.getNextScoringNodePosition().transformBy(Drivetrain.getInstance().getVelocity().times(5).inverse())), Commands.none(), () -> RobotState.getInstance().inCubeMode() && RobotState.getInstance().getNextScoringOption() != ScoringOption.SPIT))
                 .onTrue(new PrepareToScore())
                 .onFalse(new ChoiceCommand(() -> {
                     Command command = switch (robotState.getNextScoringOption()) {
@@ -60,6 +61,8 @@ public class Controls {
             ));
 
         driver.start().onTrue(new AutoEngage());
+
+        // driver.B().onTrue(new InstantCommand(() -> Elevator.getInstance().updateInitialPosition(false)));
     }
 
     public void configureOperatorCommands() {

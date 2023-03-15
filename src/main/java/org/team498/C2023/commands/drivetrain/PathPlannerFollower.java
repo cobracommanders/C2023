@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-import org.team498.C2023.Constants;
 import org.team498.C2023.Robot;
 import org.team498.C2023.subsystems.Drivetrain;
 import org.team498.lib.util.PoseUtil;
@@ -124,12 +123,12 @@ public class PathPlannerFollower extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        // return trajectoryTimer.get() > trajectory.getTotalTimeSeconds();
-        if (Robot.alliance == Alliance.Blue) {
-            return drivetrain.isNear(trajectory.getEndState().poseMeters, Constants.DrivetrainConstants.PoseConstants.EPSILON);
-        } else {
-            return drivetrain.isNear(PoseUtil.flip(trajectory.getEndState().poseMeters), Constants.DrivetrainConstants.PoseConstants.EPSILON);
-        }
+        return trajectoryTimer.get() > trajectory.getTotalTimeSeconds();
+        // if (Robot.alliance == Alliance.Blue) {
+            // return drivetrain.isNear(trajectory.getEndState().poseMeters, Constants.DrivetrainConstants.PoseConstants.EPSILON);
+        // } else {
+            // return drivetrain.isNear(PoseUtil.flip(trajectory.getEndState().poseMeters), Constants.DrivetrainConstants.PoseConstants.EPSILON);
+        // }
     }
 
     @Override
