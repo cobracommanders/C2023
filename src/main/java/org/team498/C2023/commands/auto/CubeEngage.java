@@ -40,18 +40,18 @@ public class CubeEngage implements Auto {
         return State.IDLE_CUBE;
     }
 
-    @Override
-    public Position getStartPosition() {
-        return Position.CUBE_2;
-    }
+    // @Override
+    // public Position getStartPosition() {
+    //     return Position.CUBE_2;
+    // }
 
-    @Override
-    public Position getEndPosition() {
-        return Position.ENGAGED_1;
-    }
+    // @Override
+    // public Position getEndPosition() {
+    //     return Position.ENGAGED_1;
+    // }
 
-    @Override
-    public Action getAction() {
-        return Action.ENGAGE;
-    }
+    // @Override
+    // public Action getAction() {
+    //     return Action.ENGAGE;
+    // }
 }
