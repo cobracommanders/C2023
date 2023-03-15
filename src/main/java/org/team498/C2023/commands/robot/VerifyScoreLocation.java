@@ -13,10 +13,10 @@ import org.team498.C2023.commands.elevatorwrist.SetElevatorWristToNextState;
 import org.team498.C2023.commands.intakerollers.SetIntakeRollersToNextState;
 import org.team498.C2023.subsystems.Elevator;
 
-public class PrepareToScore extends SequentialCommandGroup {
-    public PrepareToScore() {
+public class VerifyScoreLocation extends SequentialCommandGroup {
+    public VerifyScoreLocation() {
         super(
-                new ConditionalCommand(new SetRobotState(State.TRAVEL_CONE), new SetRobotState(State.TRAVEL_CUBE), () -> RobotState.getInstance().inConeMode()),
+                //new ConditionalCommand(new SetRobotState(State.TRAVEL_CONE), new SetRobotState(State.TRAVEL_CUBE), () -> RobotState.getInstance().inConeMode()),
                 new SetManipulatorToNextState(),
                 new ParallelCommandGroup(
                         new SetIntakeWristToNextState(),

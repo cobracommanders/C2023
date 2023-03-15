@@ -17,10 +17,10 @@ public class Spit extends SequentialCommandGroup {
                 new SetRobotState(State.SPIT_CUBE),
                 new ParallelCommandGroup(
                         new SetElevatorWristToNextState(),
-                        // new SetIntakeWristToNextState(),
+                        new SetIntakeWristToNextState(),
                         new SetIntakeRollersToNextState(),
                         new SetElevatorToNextState()),
-                // new WaitCommand(1), //TODO make this faster
+                new WaitCommand(0.2), //TODO make this faster
                 new SetManipulatorToNextState(),
                 new WaitCommand(0.25),
                 new ReturnToIdle());

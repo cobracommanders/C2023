@@ -6,15 +6,20 @@
           "open": true
         },
         "open": true
+      },
+      "photonvision": {
+        "open": true
       }
     },
     "types": {
       "/FMSInfo": "FMSInfo",
       "/SmartDashboard/Drivetrain": "Subsystem",
       "/SmartDashboard/Elevator": "Subsystem",
+      "/SmartDashboard/ElevatorWrist": "Subsystem",
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/ManualElevator": "Command",
       "/SmartDashboard/ManualWrist": "Command",
+      "/SmartDashboard/SendableChooser[0]": "String Chooser",
       "/SmartDashboard/Wrist": "Subsystem"
     },
     "windows": {
