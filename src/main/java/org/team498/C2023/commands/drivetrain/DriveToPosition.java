@@ -23,7 +23,7 @@ public class DriveToPosition extends CommandBase {
 
     @Override
     public void execute() {
-        drivetrain.driveToPositionGoals();
+        drivetrain.drive(drivetrain.calculatePositionalSpeed());
     }
 
     @Override

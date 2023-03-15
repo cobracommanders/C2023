@@ -31,7 +31,7 @@ public class FollowTrajectory extends CommandBase {
     public void execute() {
         Trajectory.State state = trajectory.sample(timer.get());
 
-        drivetrain.setPositionGoal(new Pose2d(state.poseMeters.getX(), state.poseMeters.getY(), new Rotation2d()));
+        drivetrain.setPositionGoals(new Pose2d(state.poseMeters.getX(), state.poseMeters.getY(), new Rotation2d()));
 
         drivetrain.driveToPositionGoals();
     }

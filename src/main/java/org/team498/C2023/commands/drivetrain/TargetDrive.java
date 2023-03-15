@@ -39,7 +39,7 @@ public class TargetDrive extends CommandBase {
         drivetrain.setAngleGoal(drivetrain.calculateDegreesToTarget(target.get()));
 
         // Calculate the rotational speed from the pid controller, unless it's already at the goal
-        double rotationalSpeed = drivetrain.calculateRotationalSpeed();
+        double rotationalSpeed = drivetrain.calculateAngularSpeed();
 
         // Set the robot to drive in field relative mode, with the rotation controlled by the snap controller
         drivetrain.drive(xTranslation, yTranslation, rotationalSpeed, true);

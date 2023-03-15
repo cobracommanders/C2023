@@ -86,9 +86,9 @@ public class PathPlannerFollower extends CommandBase {
                 PathPlannerState state = (PathPlannerState) trajectory.sample(trajectoryTimer.get());
 
                 if (Robot.alliance == Alliance.Blue) {
-                    drivetrain.setPositionGoal(new Pose2d(state.poseMeters.getX(), state.poseMeters.getY(), state.holonomicRotation));
+                    drivetrain.setPositionGoals(new Pose2d(state.poseMeters.getX(), state.poseMeters.getY(), state.holonomicRotation));
                 } else {
-                    drivetrain.setPositionGoal(PoseUtil.flip(new Pose2d(state.poseMeters.getX(), state.poseMeters.getY(), state.holonomicRotation)));
+                    drivetrain.setPositionGoals(PoseUtil.flip(new Pose2d(state.poseMeters.getX(), state.poseMeters.getY(), state.holonomicRotation)));
                 }
 
                 drivetrain.driveToPositionGoals();
@@ -113,9 +113,9 @@ public class PathPlannerFollower extends CommandBase {
             PathPlannerState state = (PathPlannerState) trajectory.sample(trajectoryTimer.get());
 
             if (Robot.alliance == Alliance.Blue) {
-                drivetrain.setPositionGoal(new Pose2d(state.poseMeters.getX(), state.poseMeters.getY(), state.holonomicRotation));
+                drivetrain.setPositionGoals(new Pose2d(state.poseMeters.getX(), state.poseMeters.getY(), state.holonomicRotation));
             } else {
-                drivetrain.setPositionGoal(PoseUtil.flip(new Pose2d(state.poseMeters.getX(), state.poseMeters.getY(), state.holonomicRotation)));
+                drivetrain.setPositionGoals(PoseUtil.flip(new Pose2d(state.poseMeters.getX(), state.poseMeters.getY(), state.holonomicRotation)));
             }
 
             drivetrain.driveToPositionGoals();

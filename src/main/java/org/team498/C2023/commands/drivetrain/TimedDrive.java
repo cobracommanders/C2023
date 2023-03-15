@@ -32,7 +32,7 @@ public class TimedDrive extends CommandBase {
 
     @Override
     public void execute() {
-        drivetrain.drive(speeds, new Translation2d());
+        drivetrain.drive(speeds);
     }
 
     @Override

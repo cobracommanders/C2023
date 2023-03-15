@@ -20,9 +20,11 @@ public class Elevator extends SubsystemBase {
     private double speed = 0;
     private double setpoint = 0;
 
-    private Elevator(ElevatorIO io) {
-        this.io = io;
-
+    private Elevator() {
+        this.io = switch (Constants.mode) {
+            case REAL, REPLAY -> new ElevatorIOCompRobot();
+            default -> new ElevatorIO() {};
+        };
 
         switch (Constants.mode) {
             case REAL, REPLAY -> {
@@ -37,7 +39,10 @@ public class Elevator extends SubsystemBase {
                 io.configPID(5, 0, 0);
                 constraints = new TrapezoidProfile.Constraints(5, 3);
             }
-            default -> {io.configPID(0, 0, 0); constraints = new TrapezoidProfile.Constraints(0, 0);}
+            default -> {
+                io.configPID(0, 0, 0);
+                constraints = new TrapezoidProfile.Constraints(0, 0);
+            }
         }
 
         FF = new ElevatorFeedforward(0, 0.075, 0);
@@ -51,7 +56,9 @@ public class Elevator extends SubsystemBase {
         setpoint = getSetpoint(currentState, RobotPositions.getFutureScoringNodeDistance());
 
         if (controlMode == ControlMode.PID) {
-            var profile = new TrapezoidProfile(constraints, new TrapezoidProfile.State(setpoint, 0), new TrapezoidProfile.State(inputs.positionMeters, 0));
+            var profile = new TrapezoidProfile(constraints, new TrapezoidProfile.State(setpoint, 0),
+                                               new TrapezoidProfile.State(inputs.positionMeters, 0)
+            );
             io.setPosition(profile.calculate(Robot.DEFAULT_PERIOD).position, FF.calculate(inputs.velocityMetersPerSecond) / 12);
         } else {
             io.setSpeed(speed);
@@ -106,10 +113,7 @@ public class Elevator extends SubsystemBase {
 
     public static Elevator getInstance() {
         if (instance == null) {
-            instance = new Elevator(switch (Constants.mode) {
-                case REAL, REPLAY -> new ElevatorIOCompRobot();
-                default -> new ElevatorIO() {};
-            });
+            instance = new Elevator();
         }
         return instance;
     }
