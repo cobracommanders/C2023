@@ -10,7 +10,7 @@ public final class Ports {
 
         public static final int FL_STEER = 2;
         public static final int FR_STEER = 6;
-        public static final int BL_STEER = 4    ;
+        public static final int BL_STEER = 4;
         public static final int BR_STEER = 8;
 
         public static final int FL_CANCODER = 11;
@@ -24,6 +24,7 @@ public final class Ports {
     public static class IntakeRollers {
         public static final int BOTTOM_ROLLER = 20;
         public static final int TOP_ROLLER = 23;
+        public static final int THIRD_ROLLER = 24;
     }
 
     public static class IntakeWrist {
@@ -35,6 +36,8 @@ public final class Ports {
     public static class Elevator {
         public static final int F_ELEVATOR_ID = 30;
         public static final int B_ELEVATOR_ID = 31;
+
+        public static final int ENCODER_PORT = 4; // DIO
     }
 
     public static class Manipulator {
@@ -44,11 +47,6 @@ public final class Ports {
     public static class ElevatorWrist {
         public static final int WRIST = 50;
         public static final int ENCODER_PORT = 0; // DIO
-    }
-
-    public static class ConeARiser {
-        public static final int FRONT_BACK = 60;
-        public static final int LEFT_RIGHT = 61;
     }
 
     public static class Accessories {

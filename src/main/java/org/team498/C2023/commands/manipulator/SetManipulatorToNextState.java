@@ -1,6 +1,8 @@
 package org.team498.C2023.commands.manipulator;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+
+import org.team498.C2023.RobotState;
 import org.team498.C2023.subsystems.Manipulator;
 
 public class SetManipulatorToNextState extends InstantCommand {
@@ -11,6 +13,6 @@ public class SetManipulatorToNextState extends InstantCommand {
 
     @Override
     public void initialize() {
-        manipulator.setToNextState();
+        manipulator.setState(RobotState.getInstance().getCurrentState().manipulator);
     }
 }

@@ -26,11 +26,7 @@ package org.team498.C2023.subsystems;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import org.photonvision.EstimatedRobotPose;
@@ -40,17 +36,17 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import org.team498.C2023.FieldPositions;
-import org.team498.lib.util.PoseUtil;
 
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 public class Photonvision {
     private PhotonPoseEstimator photonPoseEstimator;
-    private PhotonCamera photonCamera;
+    private final PhotonCamera photonCamera;
+
+    private final double acceptedTagRange = 3.75;
 
     private Photonvision() {
         photonCamera = new PhotonCamera("Arducam_OV9281_USB_Camera");
@@ -60,7 +56,8 @@ public class Photonvision {
             AprilTagFieldLayout fieldLayout = AprilTagFields.k2023ChargedUp.loadAprilTagLayoutField();
             // Create pose estimator
             photonPoseEstimator = new PhotonPoseEstimator(fieldLayout,
-                                                          PoseStrategy.MULTI_TAG_PNP, photonCamera,
+                                                          PoseStrategy.MULTI_TAG_PNP,
+                                                          photonCamera,
                                                           new Transform3d(new Translation3d(Units.inchesToMeters(2.5),
                                                                                             -Units.inchesToMeters(5.6875),
                                                                                             Units.inchesToMeters(22)
@@ -76,38 +73,25 @@ public class Photonvision {
     }
 
     /**
-     * @param prevEstimatedRobotPose The current best guess at robot pose
      * @return an EstimatedRobotPose with an estimated pose, the timestamp, and targets used to create the estimate
      */
-    public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose) {
+    public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
         if (photonPoseEstimator == null) {
             // The field layout failed to load, so we cannot estimate poses.
             return Optional.empty();
         }
+
         PhotonPipelineResult result = photonCamera.getLatestResult();
 
+        PhotonTrackedTarget target = result.getBestTarget();
+        if (target == null) return Optional.empty();
 
-        LinkedList<PhotonTrackedTarget> tags = new LinkedList<PhotonTrackedTarget>();
-
-        for (PhotonTrackedTarget tag : result.targets) {
-            if (!(Math.abs(tag.getBestCameraToTarget().getTranslation().getNorm()) <= 3.75)) {
-                // tags.add(tag);
-                return Optional.empty();
-            }
+        // Don't return a new position if the closest target is further than 3.75 meters away
+        if (Math.abs(target.getBestCameraToTarget().getTranslation().getNorm()) >= acceptedTagRange) {
+            return Optional.empty();
         }
 
-        // photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
-
-        // Optional<EstimatedRobotPose> estimatedPose = photonPoseEstimator.update(result);
-        // if (estimatedPose.isPresent()) {
-        //     Pose2d pose = PoseUtil.toPose2d(estimatedPose.get().estimatedPose);
-        //     if (!Drivetrain.getInstance().isNear(pose, 2)) {
-        //         return Optional.empty();
-        //     }
-        // }
-
-        Optional<EstimatedRobotPose> estimatedPose = photonPoseEstimator.update(result);
-        return estimatedPose;
+        return photonPoseEstimator.update(result);
     }
 
     public double distanceToClosestTag() {
@@ -134,7 +118,7 @@ public class Photonvision {
             }
         }
         final int tag = closestTag;
-        return ()-> FieldPositions.aprilTags.get(tag);
+        return () -> FieldPositions.aprilTags.get(tag);
     }
 
 

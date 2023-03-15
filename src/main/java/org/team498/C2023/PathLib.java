@@ -1,17 +1,16 @@
 package org.team498.C2023;
 
 import com.pathplanner.lib.PathPlannerTrajectory;
-import edu.wpi.first.math.trajectory.Trajectory;
 import org.team498.lib.util.Trajectories;
 
 public class PathLib {
-    public static final Trajectory unnamed = Trajectories.getTrajectory("Unnamed");
-    public static final PathPlannerTrajectory pathPlannerTrajectory = Trajectories.getPathPlannerTrajectory("New Path");
-
-    public static final class SingleCube {
-        public static final PathPlannerTrajectory Path1 = Trajectories.getPathPlannerTrajectory("3 Cone");
-    }
-
+    public static final PathPlannerTrajectory noRotationTwoCubeEngage = Trajectories.getPathPlannerTrajectory("No rotation two cube engage");
     public static final PathPlannerTrajectory singleCubeTaxi = Trajectories.getPathPlannerTrajectory("Single Cube Taxi");
 
+    public static final PathPlannerTrajectory secondNodeToTopCube = Trajectories.getPathPlannerTrajectory("Second Node To Top Cube");
+    public static final PathPlannerTrajectory topCubeToSecondNode = Trajectories.getPathPlannerTrajectory("Top Cube To Second Node");
+    public static final PathPlannerTrajectory secondNodeToChargeStation = Trajectories.getPathPlannerTrajectory("Second Node To Charge Station");
+    public static final PathPlannerTrajectory secondNodeToSecondCube = Trajectories.getPathPlannerTrajectory("Second Node To Second Cube");
+
+    public static final PathPlannerTrajectory testPath = Trajectories.getPathPlannerTrajectory("Test Path");
 }

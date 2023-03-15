@@ -8,22 +8,29 @@ import org.team498.C2023.subsystems.Drivetrain;
 
 public class RobotState extends SubsystemBase {
     private final Drivetrain drivetrain;
-    private GamePiece currentGameMode = GamePiece.CONE;
-    private State state = State.IDLE_CUBE;
-    private State nextDriveteamState = State.IDLE_CUBE;
+    private GameMode currentGameMode = GameMode.CONE;
+    private ScoringOption nextScoringOption = ScoringOption.MID;
 
-    public enum GamePiece {
+    private State state = State.IDLE_CUBE;
+
+    public enum GameMode {
         CUBE,
         CONE
     }
+
+    public enum ScoringOption {
+        TOP, MID, SPIT
+    }
+
+    private boolean shootDrive = false;
 
     private RobotState() {
         this.drivetrain = Drivetrain.getInstance();
     }
 
-    public void setCurrentGameMode(GamePiece gamePiece) {
-        currentGameMode = gamePiece;
-        SmartDashboard.putBoolean("Current Game Piece", gamePiece == GamePiece.CONE);
+    public void setCurrentGameMode(GameMode gameMode) {
+        currentGameMode = gameMode;
+        SmartDashboard.putBoolean("Current Game Piece", gameMode == GameMode.CONE);
     }
 
     public State getCurrentState() {
@@ -34,23 +41,57 @@ public class RobotState extends SubsystemBase {
         this.state = state;
     }
 
-    public State getNextDriveteamState() {
-        return nextDriveteamState;
+    public ScoringOption getNextScoringOption() {
+        return nextScoringOption;
     }
 
-    public void setNextDriveteamState(State nextTargetState) {
-        this.nextDriveteamState = nextTargetState;
+    public void setNextScoringOption(ScoringOption nextScoringOption) {
+        this.nextScoringOption = nextScoringOption;
     }
 
-    public boolean inCubeMode() {return currentGameMode == GamePiece.CUBE;}
-    public boolean inConeMode() {return currentGameMode == GamePiece.CONE;}
+    public void setShootDrive(boolean shootDrive) {
+        this.shootDrive = shootDrive;
+    }
+
+    public boolean inShootDriveMode() {
+        return shootDrive;
+    }
+
+    public State getNextScoringState() {
+        State state;
+
+        if (shootDrive) {
+            state = switch (nextScoringOption) {
+                case TOP -> State.SHOOT_DRIVE_CUBE_TOP;
+                case MID -> currentGameMode == GameMode.CONE ? State.SHOOT_DRIVE_CONE_MID : State.SHOOT_DRIVE_CUBE_MID;
+                case SPIT -> State.SPIT_CUBE;
+            };
+        } else {
+            state = switch (nextScoringOption) {
+                case TOP -> currentGameMode == GameMode.CONE ? State.TOP_CONE : State.TOP_CUBE;
+                case MID -> currentGameMode == GameMode.CONE ? State.MID_CONE : State.MID_CUBE;
+                case SPIT -> State.SPIT_CUBE;
+            };
+        }
+
+        SmartDashboard.putString("Driveteam State", state.name());
+        return state;
+    }
+
+    public boolean inCubeMode() {
+        return currentGameMode == GameMode.CUBE;
+    }
+
+    public boolean inConeMode() {
+        return currentGameMode == GameMode.CONE;
+    }
 
     public Transform2d getRobotToField() {
         return toTransform2d(drivetrain.getPose());
     }
 
     // public Transform2d getRobotToTarget() {
-    //     return getVisionToTarget().plus(getVisionToRobot().inverse());
+    // return getVisionToTarget().plus(getVisionToRobot().inverse());
     // }
 
     public Transform2d getRobotToPoint(Pose2d target) {
@@ -58,7 +99,8 @@ public class RobotState extends SubsystemBase {
     }
 
     // public Transform2d getVisionToTarget() {
-    //     return toTransform2d(vision.getEstimatedGlobalPose(drivetrain.getPose()).get().estimatedPose);
+    // return
+    // toTransform2d(vision.getEstimatedGlobalPose(drivetrain.getPose()).get().estimatedPose);
     // }
 
     public Transform2d getVisionToRobot() {
@@ -76,7 +118,6 @@ public class RobotState extends SubsystemBase {
     public Pose2d toPose2d(Transform2d pose) {
         return new Pose2d(pose.getX(), pose.getY(), pose.getRotation());
     }
-
 
     private static RobotState instance;
 

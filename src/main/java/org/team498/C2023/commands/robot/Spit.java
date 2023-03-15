@@ -5,7 +5,6 @@ import org.team498.C2023.commands.SetRobotState;
 import org.team498.C2023.commands.elevator.SetElevatorToNextState;
 import org.team498.C2023.commands.elevatorwrist.SetElevatorWristToNextState;
 import org.team498.C2023.commands.intakerollers.SetIntakeRollersToNextState;
-import org.team498.C2023.commands.intakewrist.SetIntakeWristToNextState;
 import org.team498.C2023.commands.manipulator.SetManipulatorToNextState;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -21,9 +20,9 @@ public class Spit extends SequentialCommandGroup {
                         new SetIntakeWristToNextState(),
                         new SetIntakeRollersToNextState(),
                         new SetElevatorToNextState()),
-                new WaitCommand(1), //TODO make this faster
+                new WaitCommand(0.2), //TODO make this faster
                 new SetManipulatorToNextState(),
-                new WaitCommand(1),
+                new WaitCommand(0.25),
                 new ReturnToIdle());
     }
 }

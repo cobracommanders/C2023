@@ -16,7 +16,7 @@ public class ManualElevator extends CommandBase {
 
     @Override
     public void execute() {
-        elevator.setSpeed(speedSupplier.getAsDouble());        
+        elevator.setSpeed(speedSupplier.getAsDouble() * 0.25);        
     }
 
     @Override

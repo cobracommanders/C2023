@@ -1,12 +1,11 @@
 package org.team498.lib.drivers;
 
-import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import static org.team498.C2023.Ports.Accessories.BLINKIN;
 
 public class Blinkin {
     private final Spark blinkin;
-    // private final PWM pwm = new PWM(BLINKIN, false);
+    private Color color = Color.BLUE;
 
     /** Additional colors can be found <a href=https://www.revrobotics.com/content/docs/REV-11-1105-UM.pdf>here</a> */
     public enum Color {
@@ -27,15 +26,15 @@ public class Blinkin {
 
     private Blinkin() {
         blinkin = new Spark(BLINKIN);
-
-        // pwm.setBounds(2.003, 1.55, 1.50, 1.46, 0.999);
-        // pwm.setPeriodMultiplier(PWM.PeriodMultiplier.k1X);
-        // pwm.setSpeed(0.0);
-        // pwm.setZeroLatch();
     }
 
     public void setColor(Color color) {
+        this.color = color;
         set(color.val);
+    }
+
+    public Color getColor() {
+        return color;
     }
 
     public void set(double val) {
