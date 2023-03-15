@@ -42,7 +42,8 @@ public class Controls {
         driver.A().onTrue(new InstantCommand(() -> Gyro.getInstance().setYaw(0)));
         driver.X().onTrue(new InstantCommand(() -> robotState.setState(State.OUTTAKE)).alongWith(new GroundIntake())).onFalse(new ReturnToIdle());
 
-        driver.B().onTrue(new PathPlannerFollower(PathLib.testPath));
+        // driver.B().onTrue(new PathPlannerFollower(PathLib.testPath));
+        driver.B().onTrue(new RealignCone());
 
 
         driver.rightTrigger()

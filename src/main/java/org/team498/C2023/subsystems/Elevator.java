@@ -137,8 +137,8 @@ public class Elevator extends SubsystemBase {
     }
 
     public boolean atSetpoint() {
-        // return Math.abs(PID.getGoal().position - getPosition()) < 0.025;
-        return true;
+        return Math.abs(PID.getGoal().position - getPosition()) < 0.025;
+        // return true;
     }
 
     public double getPower() {

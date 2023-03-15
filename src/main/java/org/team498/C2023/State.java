@@ -12,7 +12,7 @@ public enum State {
     IDLE_CONE(Elevator.IDLE, ElevatorWrist.IDLE_CONE, IntakeWrist.IDLE_IN, IntakeRollers.IDLE, Manipulator.IDLE),
     IDLE_CUBE(Elevator.IDLE, ElevatorWrist.IDLE_CUBE, IntakeWrist.IDLE_IN, IntakeRollers.IDLE, Manipulator.IDLE),
 
-    OUTTAKE(Elevator.IDLE, ElevatorWrist.IDLE_CUBE, IntakeWrist.OUTTAKE, IntakeRollers.OUTTAKE, Manipulator.SPIT),
+    OUTTAKE(Elevator.IDLE, ElevatorWrist.OUTTAKE, IntakeWrist.OUTTAKE, IntakeRollers.OUTTAKE, Manipulator.SPIT),
 
     GROUND_CUBE(Elevator.INTAKE, ElevatorWrist.INTAKE, IntakeWrist.INTAKE, IntakeRollers.INTAKE, Manipulator.INTAKE_CUBE),
 
@@ -56,7 +56,7 @@ public enum State {
 
         SPIT(0),
 
-        MID_CONE(0.875),
+        MID_CONE(0.825),
         MID_CUBE(0.5),
 
         TOP_CONE(0.875),
@@ -96,6 +96,7 @@ public enum State {
         TRAVEL(0.041067),
 
         INTAKE(-0.05),
+        OUTTAKE(-0.05),
 
         AUTO_SHOT(0),
 
@@ -134,10 +135,10 @@ public enum State {
     }
 
     public enum IntakeWrist {
-        INTAKE(0.1),
+        INTAKE(0),
         SPIT(0.35),
         IDLE_OUT(0.1),
-        TRAVEL_CUBE(0.2),
+        TRAVEL_CUBE(0.3),
         TRAVEL_CONE(0.2),
         IDLE_IN(0.4),
         OUTTAKE(0.1);
@@ -164,7 +165,7 @@ public enum State {
         SHOOT_DRIVE_CUBE_TOP(0),
         SHOOT_DRIVE_CONE_MID(0),
 
-        TRAVEL_CUBE(-0.2),
+        TRAVEL_CUBE(0),
         IDLE(0);
 
         public final double setpoint;
