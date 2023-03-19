@@ -4,7 +4,6 @@ import org.team498.C2023.State;
 import org.team498.C2023.commands.SetRobotState;
 import org.team498.C2023.commands.manipulator.SetManipulatorToNextState;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 

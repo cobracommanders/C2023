@@ -11,6 +11,20 @@ public class PathLib {
     public static final PathPlannerTrajectory topCubeToSecondNode = Trajectories.getPathPlannerTrajectory("Top Cube To Second Node");
     public static final PathPlannerTrajectory secondNodeToChargeStation = Trajectories.getPathPlannerTrajectory("Second Node To Charge Station");
     public static final PathPlannerTrajectory secondNodeToSecondCube = Trajectories.getPathPlannerTrajectory("Second Node To Second Cube");
+    public static final PathPlannerTrajectory secondCubeToSecondNode = Trajectories.getPathPlannerTrajectory("Second Cube To Second Node");
 
     public static final PathPlannerTrajectory testPath = Trajectories.getPathPlannerTrajectory("Test Path");
+
+    public static final PathPlannerTrajectory leftConeTaxi = Trajectories.getPathPlannerTrajectory("Left Cone Taxi");
+    public static final PathPlannerTrajectory leftCubeTaxi = Trajectories.getPathPlannerTrajectory("Left Cube Taxi");
+    public static final PathPlannerTrajectory rightConeTaxi = Trajectories.getPathPlannerTrajectory("Right Cone Taxi");
+    public static final PathPlannerTrajectory rightCubeTaxi = Trajectories.getPathPlannerTrajectory("Right Cube Taxi");
+
+    public static final PathPlannerTrajectory eighthNodeToFourthCube = Trajectories.getPathPlannerTrajectory("Eighth Node To Fourth Cube");
+    public static final PathPlannerTrajectory eighthNodeToFourthCube2 = Trajectories.getPathPlannerTrajectory("Eighth Node To Fourth Cube 2");
+    public static final PathPlannerTrajectory fourthCubeToEighthNode  = Trajectories.getPathPlannerTrajectory("Fourth Cube To Eighth Node");
+    public static final PathPlannerTrajectory eighthNodeToChargeStation  = Trajectories.getPathPlannerTrajectory("Eighth Node To Charge Station");
+
+    public static final PathPlannerTrajectory reverse  = Trajectories.getPathPlannerTrajectory("Reverse");
+
 }

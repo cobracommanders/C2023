@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj2.command.RepeatCommand;
 public class AutoEngage extends RepeatCommand {
     public AutoEngage() {
         super(
-            new DriveToPosition(() -> new Pose2d(3.83, 2.9, Rotation2d.fromDegrees(180)))
+            new DriveToPosition(() -> new Pose2d(3.93, 2.9, Rotation2d.fromDegrees(180)))
         );
     }
 }

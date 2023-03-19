@@ -11,8 +11,14 @@
     }
   },
   "NetworkTables": {
+    "Retained Values": {
+      "open": false
+    },
     "transitory": {
       "SmartDashboard": {
+        "SendableChooser[0]": {
+          "open": true
+        },
         "open": true
       }
     }

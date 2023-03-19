@@ -27,13 +27,11 @@ public enum State {
     SHOOT_DRIVE_CUBE_TOP(Elevator.SHOOT_DRIVE_CUBE_TOP, ElevatorWrist.SHOOT_DRIVE_CUBE_TOP, IntakeWrist.IDLE_IN, IntakeRollers.IDLE, Manipulator.SHOOT_DRIVE_CUBE_TOP),
     SHOOT_DRIVE_CONE_MID(Elevator.SHOOT_DRIVE_CONE_MID, ElevatorWrist.SHOOT_DRIVE_CONE_MID, IntakeWrist.IDLE_IN, IntakeRollers.IDLE, Manipulator.SHOOT_DRIVE_CONE_MID),
 
-    TRAVEL_EMPTY(Elevator.IDLE, ElevatorWrist.TRAVEL, IntakeWrist.IDLE_IN, IntakeRollers.IDLE, Manipulator.IDLE),
+    TRAVEL_EMPTY(Elevator.IDLE, ElevatorWrist.TRAVEL, /*IntakeWrist.IDLE_IN,*/ IntakeWrist.TEMPORARY_IDLE, IntakeRollers.IDLE, Manipulator.IDLE),
     TRAVEL_CONE(Elevator.IDLE, ElevatorWrist.TRAVEL, IntakeWrist.TRAVEL_CONE, IntakeRollers.IDLE, Manipulator.INTAKE_CONE),
-    TRAVEL_CUBE(Elevator.IDLE, ElevatorWrist.TRAVEL, IntakeWrist.TRAVEL_CUBE, IntakeRollers.IDLE, Manipulator.TRAVEL_CUBE),
+    TRAVEL_CUBE(Elevator.IDLE, ElevatorWrist.TRAVEL, IntakeWrist.TEMPORARY_IDLE, IntakeRollers.IDLE, Manipulator.TRAVEL_CUBE),
 
     AUTO_SHOT(Elevator.AUTO_SHOT, ElevatorWrist.AUTO_SHOT, IntakeWrist.IDLE_IN, IntakeRollers.IDLE, Manipulator.AUTO_SHOT),
-
-    SPINUP_LOW(Elevator.IDLE, ElevatorWrist.IDLE_CUBE, IntakeWrist.IDLE_IN, IntakeRollers.SPIT, Manipulator.IDLE)
     ;
 
     public final Elevator elevator;
@@ -54,7 +52,7 @@ public enum State {
         CONEARISER_CONE(0),
         CONEARISER_CUBE(0),
         SINGLE_SS(0.16745),
-        DOUBLE_SS(0.62),
+        DOUBLE_SS(0.6),
 
         SPIT(0),
 
@@ -87,17 +85,18 @@ public enum State {
         SINGLE_SS(0.06),
         DOUBLE_SS(0.109352),
 
-        SPIT(-0.038142),
+        SPIT(-0.025),
 
         MID_CONE(0.1),
         MID_CUBE(-0.04),
 
-        TOP_CONE(0.25),
+        // TOP_CONE(0.25),
+        TOP_CONE(0),
         TOP_CUBE(-0.02),
 
         TRAVEL(0.041067),
 
-        INTAKE(-0.05),
+        INTAKE(-0.04),
         OUTTAKE(-0.05),
 
         AUTO_SHOT(0),
@@ -121,7 +120,7 @@ public enum State {
 
     public enum IntakeRollers {
         INTAKE(0.5, 0.5, 0.5),
-        SPIT(0.45, -0.45, 0.45),
+        SPIT(-1, 1, 0),
         IDLE(0, 0, 0),
         OUTTAKE(-0.5, -0.5, -0.5);
 
@@ -138,9 +137,10 @@ public enum State {
 
     public enum IntakeWrist {
         INTAKE(0),
-        SPIT(0.35),
+        SPIT(0.4),
         IDLE_OUT(0.1),
         TRAVEL_CUBE(0.3),
+        TEMPORARY_IDLE(0.1),
         TRAVEL_CONE(0.2),
         IDLE_IN(0.4),
         OUTTAKE(0.08);

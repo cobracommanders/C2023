@@ -29,7 +29,7 @@ public class Elevator extends SubsystemBase {
 
     private final ElevatorFeedforward feedforward = new ElevatorFeedforward(S, G, V);
 
-    private ControlMode controlMode = ControlMode.MANUAL;
+    private ControlMode controlMode = ControlMode.PID;
     private State.Elevator currentState = State.Elevator.IDLE;
 
     private double speed = 0;
@@ -54,7 +54,7 @@ public class Elevator extends SubsystemBase {
 
         encoder = new DutyCycle(new DigitalInput(ENCODER_PORT));
 
-        PID = new ProfiledPIDController(P, I, D, new TrapezoidProfile.Constraints(10, 6));
+        PID = new ProfiledPIDController(P, I, D, new TrapezoidProfile.Constraints(3, 5));
         PID.reset(0);
         PID.setTolerance(0);
 
@@ -137,8 +137,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public boolean atSetpoint() {
-        return Math.abs(PID.getGoal().position - getPosition()) < 0.025;
-        // return true;
+        return Math.abs(PID.getGoal().position - getPosition()) < 0.05;
     }
 
     public double getPower() {

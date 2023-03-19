@@ -37,7 +37,6 @@ public class PathPlannerFollower extends CommandBase {
 
     @Override
     public void initialize() {
-        // Robot.cameraEnabled = false;
         trajectoryTimer.reset();
         trajectoryTimer.start();
 

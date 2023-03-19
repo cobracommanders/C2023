@@ -9,32 +9,25 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 public class BangBangBalance extends CommandBase {
     private Gyro gyro = Gyro.getInstance();
     private Drivetrain drivetrain = Drivetrain.getInstance();
-    private boolean isTipped;
     private double deadzone;
     private double speed;
-    private boolean invert;
 
-    public BangBangBalance(boolean invert) {
-        deadzone = 8;
+    public BangBangBalance() {
+        deadzone = 7;
         speed = 0.33;
-        this.invert = invert;
         addRequirements(drivetrain);
     }
 
     @Override
     public void initialize() {
-        isTipped = false;
+        drivetrain.setAngleGoal(180 - Robot.rotationOffset);
     }
 
     @Override
     public void execute() {
         double angle = gyro.getPitch();
         if (Math.abs(angle) > deadzone) {
-            isTipped = true;
-            drivetrain.drive(Math.copySign(speed, -angle * Robot.coordinateFlip), 0, 0, true);
-        } else if (!isTipped) {
-            //isTipped = true;
-            drivetrain.drive((-3 * Robot.coordinateFlip) * (invert ? -1 : 1), 0, 0, true);
+            drivetrain.drive(Math.copySign(speed, -angle * Robot.coordinateFlip), 0, drivetrain.calculateRotationalSpeed(), true);
         } else {
             drivetrain.drive(0, 0, 0, true);
         }

@@ -14,13 +14,22 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.team498.C2023.commands.auto.CubeEngage;
 import org.team498.C2023.commands.auto.JustAutoShot;
 import org.team498.C2023.commands.auto.JustScore;
+import org.team498.C2023.commands.auto.LeftConeTaxi;
+import org.team498.C2023.commands.auto.LeftCubeTaxi;
 import org.team498.C2023.commands.auto.NoRotationTwoCube;
 import org.team498.C2023.commands.auto.PreloadAndTaxi;
-import org.team498.C2023.commands.auto.TwoCubeEngage;
+import org.team498.C2023.commands.auto.RightConeTaxi;
+import org.team498.C2023.commands.auto.RightCubeTaxi;
+import org.team498.C2023.commands.auto.TwoCubeBump;
+import org.team498.C2023.commands.auto.TwoCubeEngageLeft;
+import org.team498.C2023.commands.auto.TwoCubeEngageBump;
+import org.team498.C2023.commands.auto.TwoCubeLeft;
 import org.team498.C2023.commands.auto.TwoCubePickupEngage;
+import org.team498.C2023.commands.auto.TwoPlusOneBump;
 import org.team498.C2023.subsystems.Drivetrain;
 import org.team498.C2023.subsystems.Elevator;
 import org.team498.C2023.subsystems.ElevatorWrist;
+import org.team498.C2023.subsystems.IntakeWrist;
 import org.team498.C2023.subsystems.Manipulator;
 import org.team498.C2023.subsystems.Photonvision;
 import org.team498.lib.auto.Auto;
@@ -32,7 +41,6 @@ import org.team498.lib.util.PoseUtil;
 import org.team498.lib.util.RotationUtil;
 
 import java.util.List;
-
 
 public class Robot extends TimedRobot {
     public static int coordinateFlip = 1;
@@ -50,8 +58,13 @@ public class Robot extends TimedRobot {
 
     private final SendableChooser<Auto> autoChooser = new SendableChooser<Auto>();
 
-    private final List<Auto> autoOptions = List.of(new JustScore(), new CubeEngage(), new PreloadAndTaxi(), new TwoCubeEngage(), new TwoCubePickupEngage(), new JustAutoShot(), new NoRotationTwoCube());
+    private final List<Auto> autoOptions = List.of(new JustScore(), new CubeEngage(), new PreloadAndTaxi(),
+            new TwoCubeEngageLeft(), new TwoCubeEngageBump(), new TwoCubePickupEngage(), new JustAutoShot(),
+            new NoRotationTwoCube(), new TwoCubeBump(), new LeftConeTaxi(), new LeftCubeTaxi(), new RightConeTaxi(),
+            new RightCubeTaxi(), new TwoPlusOneBump(),
+            new TwoCubeLeft());
 
+    private Auto autoToRun;
 
     @Override
     public void robotInit() {
@@ -73,6 +86,8 @@ public class Robot extends TimedRobot {
         controls.configureDriverCommands();
         controls.configureOperatorCommands();
 
+        PathLib.eighthNodeToChargeStation.getClass();
+
         SmartDashboard.putData(autoChooser);
     }
 
@@ -87,26 +102,28 @@ public class Robot extends TimedRobot {
 
         photonvision.getEstimatedGlobalPose().ifPresent(pose -> drivetrain.setOdometry(pose.estimatedPose));
 
-        field.getObject("Scoring Target").setPose(RobotPositions.getNextScoringNodePosition());
+        // field.getObject("Scoring
+        // Target").setPose(RobotPositions.getNextScoringNodePosition());
 
-        //TODO: Check if alliance is actually invalid when the FMS is not connected
+        // TODO: Check if alliance is actually invalid when the FMS is not connected
         if (alliance == Alliance.Invalid) {
             alliance = DriverStation.getAlliance();
-            // This reverses the coordinates/direction of the drive commands on the red alliance
+            // This reverses the coordinates/direction of the drive commands on the red
+            // alliance
             coordinateFlip = alliance == Alliance.Blue
-                             ? 1
-                             : -1;
+                    ? 1
+                    : -1;
             // Add 180 degrees to all teleop rotation setpoints while on the red alliance
             rotationOffset = alliance == Alliance.Blue
-                             ? 0
-                             : 180;
+                    ? 0
+                    : 180;
         }
-
 
         SmartDashboard.putString("Robot State", RobotState.getInstance().getCurrentState().name());
         SmartDashboard.putString("Blinkin Color", blinkin.getColor().name());
 
-        SmartDashboard.putNumber("Interpolation Value", Drivetrain.getInstance().distanceTo(Point.fromPose2d(RobotPositions.getNextScoringNodePosition())));
+        SmartDashboard.putNumber("Interpolation Value",
+                Drivetrain.getInstance().distanceTo(Point.fromPose2d(RobotPositions.getNextScoringNodePosition())));
     }
 
     @Override
@@ -114,19 +131,26 @@ public class Robot extends TimedRobot {
         // blinkin.setColor(Blinkin.Color.BLUE);
 
         alliance = DriverStation.getAlliance();
-        // This reverses the coordinates/direction of the drive commands on the red alliance
+        // This reverses the coordinates/direction of the drive commands on the red
+        // alliance
         coordinateFlip = alliance == Alliance.Blue
-                         ? 1
-                         : -1;
+                ? 1
+                : -1;
         // Add 180 degrees to all teleop rotation setpoints while on the red alliance
         rotationOffset = alliance == Alliance.Blue
-                         ? 0
-                         : 180;
+                ? 0
+                : 180;
+
+        autoToRun = autoChooser.getSelected();
+
     }
 
     @Override
     public void teleopPeriodic() {
-        if ((Math.abs(RotationUtil.toSignedDegrees(Math.abs(drivetrain.getYaw() - drivetrain.calculateDegreesToTarget(RobotPositions.getNextScoringNodePosition())))) < 7.5) && (drivetrain.distanceTo(Point.fromPose2d(RobotPositions.getClosestScoringPosition())) < Units.inchesToMeters(25))) {
+        if ((Math.abs(RotationUtil.toSignedDegrees(Math.abs(drivetrain.getYaw()
+                - drivetrain.calculateDegreesToTarget(RobotPositions.getNextScoringNodePosition())))) < 3.5)
+                && (drivetrain.distanceTo(Point.fromPose2d(RobotPositions.getClosestScoringPosition())) < Units
+                        .inchesToMeters(25))) {
             blinkin.setColor(Blinkin.Color.LIME);
             controls.driver.rumble(0.5);
         } else if (robotState.inShootDriveMode() && RobotPositions.inCommunity()) {
@@ -136,32 +160,32 @@ public class Robot extends TimedRobot {
                 blinkin.setColor(Color.BLUE);
             } else {
                 blinkin.setColor(RobotState.getInstance().inConeMode()
-                                 ? Blinkin.Color.YELLOW
-                                 : Blinkin.Color.PURPLE);
+                        ? Blinkin.Color.YELLOW
+                        : Blinkin.Color.PURPLE);
             }
+            controls.driver.rumble(0);
         }
     }
 
     @Override
     public void autonomousInit() {
-        Auto auto = autoChooser.getSelected();
+        if (autoToRun == null)
+            autoToRun = new JustScore();
 
-        if (auto == null) auto = new JustScore();
-    
         if (alliance == Alliance.Blue) {
-            Drivetrain.getInstance().setPose(auto.getInitialPose());
+            Drivetrain.getInstance().setPose(autoToRun.getInitialPose());
         } else {
-            Drivetrain.getInstance().setPose(PoseUtil.flip(auto.getInitialPose()));
+            Drivetrain.getInstance().setPose(PoseUtil.flip(autoToRun.getInitialPose()));
         }
 
-        Elevator.getInstance().updateInitialPosition(auto.getInitialState() == State.AUTO_SHOT);
+        // Elevator.getInstance().updateInitialPosition(auto.getInitialState() ==
+        // State.AUTO_SHOT);
 
-        Elevator.getInstance().setState(auto.getInitialState().elevator);
-        ElevatorWrist.getInstance().setState(auto.getInitialState().elevatorWrist);
+        // Elevator.getInstance().setState(autoToRun.getInitialState().elevator);
+        // ElevatorWrist.getInstance().setState(autoToRun.getInitialState().elevatorWrist);
+        // IntakeWrist.getInstance().setState(autoToRun.getInitialState().intakeWrist);
 
-
-
-        auto.getCommand().schedule();
+        autoToRun.getCommand().schedule();
     }
 
     @Override

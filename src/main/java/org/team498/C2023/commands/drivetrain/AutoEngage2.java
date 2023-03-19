@@ -1,37 +1,34 @@
 package org.team498.C2023.commands.drivetrain;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import org.team498.C2023.Robot;
 import org.team498.C2023.subsystems.Drivetrain;
+import org.team498.lib.util.PoseUtil;
 
-import java.util.function.Supplier;
-
-public class DriveToPosition extends CommandBase {
+public class AutoEngage2 extends CommandBase {
     private final Drivetrain drivetrain = Drivetrain.getInstance();
-    private final Supplier<Pose2d> target;
 
-    public DriveToPosition(Supplier<Pose2d> target) {
-        this.target = target;
-
+    public AutoEngage2() {
         addRequirements(drivetrain);
     }
 
     @Override
     public void initialize() {
-        drivetrain.setPositionGoal(target.get());
-        Robot.field.getObject("Drive Target").setPose(target.get());
+        drivetrain.setPositionGoal(Robot.alliance == Alliance.Blue ? new Pose2d(3.93, 2.9, Rotation2d.fromDegrees(180)) : PoseUtil.flip(new Pose2d(3.93, 2.9, Rotation2d.fromDegrees(180))));
     }
 
     @Override
     public void execute() {
-        drivetrain.driveToPositionGoals();
+        drivetrain.drive(drivetrain.calculateTranslationalSpeeds().vxMetersPerSecond, 0, drivetrain.calculateRotationalSpeed(), true);
     }
 
     @Override
     public boolean isFinished() {
-        return drivetrain.atPositionGoals();
+        return drivetrain.atXControllerGoal();
     }
 
     @Override

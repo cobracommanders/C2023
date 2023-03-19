@@ -6,7 +6,8 @@ import org.team498.C2023.State;
 import org.team498.C2023.RobotState.GameMode;
 import org.team498.C2023.RobotState.ScoringOption;
 import org.team498.C2023.commands.SetRobotState;
-import org.team498.C2023.commands.drivetrain.BangBangBalance;
+import org.team498.C2023.commands.drivetrain.AutoEngageBangBang;
+import org.team498.C2023.commands.drivetrain.BangBangEngage;
 import org.team498.C2023.commands.drivetrain.LockWheels;
 import org.team498.C2023.commands.drivetrain.PathPlannerFollower;
 import org.team498.C2023.commands.elevator.SetElevatorToNextState;
@@ -58,7 +59,7 @@ public class TwoCubePickupEngage implements Auto {
             new LockWheels(),
             new FullScore(),
             new PathPlannerFollower(PathLib.secondNodeToSecondCube),
-            new BangBangBalance(true)
+            new AutoEngageBangBang()
         );
     }
 

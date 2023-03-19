@@ -21,6 +21,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.team498.lib.util.Falcon500Conversions;
 
@@ -112,6 +113,8 @@ public class SwerveModule extends SubsystemBase {
         steerMotor.set(ControlMode.Position, Falcon500Conversions.degreesToFalcon(angle, MK4I_STEER_REDUCTION_L2));
 
         lastAngle = getState().angle.getDegrees();
+
+        SmartDashboard.putNumber(name, getSteerEncoder());
     }
 
     @Override

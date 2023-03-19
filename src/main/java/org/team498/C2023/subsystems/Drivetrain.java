@@ -225,6 +225,17 @@ public class Drivetrain extends SubsystemBase {
         drive(xAdjustment, yAdjustment, angleAdjustment, true);
     }
 
+    public ChassisSpeeds calculateTranslationalSpeeds() {
+        double xAdjustment = xController.calculate(getPose().getX());
+        double yAdjustment = yController.calculate(getPose().getY());
+        double angleAdjustment = angleController.calculate(getYaw());
+        return new ChassisSpeeds(xAdjustment, yAdjustment, angleAdjustment);
+    }
+
+    public boolean atXControllerGoal() {
+        return Math.abs(xController.getPositionError()) < PoseConstants.EPSILON;
+    }
+
     /**
      * Sets the swerve drive to desired speed of direction and rotation.
      *
