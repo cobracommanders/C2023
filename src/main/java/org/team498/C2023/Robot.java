@@ -1,7 +1,5 @@
 package org.team498.C2023;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -87,9 +85,6 @@ public class Robot extends LoggedRobot {
 
         Logger.getInstance().start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
 
-        drivetrain.setPose(new Pose2d(8.29, 4, Rotation2d.fromDegrees(0)));
-        controls.driver.setRightStickLastAngle(-gyro.getAngleOffset());
-
         gyro.setYaw(0);
 
         SmartDashboard.putData(field);
@@ -117,9 +112,9 @@ public class Robot extends LoggedRobot {
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
 
-        photonvision.getEstimatedGlobalPose().ifPresent(pose -> drivetrain.setOdometry(pose.estimatedPose));
+        photonvision.getEstimatedGlobalPose().ifPresent(pose -> drivetrain.setPos2e(PoseUtil.toPose2d(pose.estimatedPose)));
 
-        field.getObject("Scoring Target").setPose(RobotPositions.getNextScoringNodePosition());
+        field.getObject("Scoring Target").setPose(RobotPosition.getNextScoringNodePosition());
 
         //TODO: Check if alliance is actually invalid when the FMS is not connected
         if (alliance == Alliance.Invalid) {
@@ -133,14 +128,6 @@ public class Robot extends LoggedRobot {
                              ? 0
                              : 180;
         }
-
-
-        SmartDashboard.putString("Robot State", RobotState.getInstance().getCurrentState().name());
-        SmartDashboard.putString("Blinkin Color", blinkin.getColor().name());
-
-        SmartDashboard.putNumber("Interpolation Value",
-                                 Drivetrain.getInstance().distanceTo(Point.fromPose2d(RobotPositions.getNextScoringNodePosition()))
-        );
     }
 
     @Override
@@ -161,13 +148,15 @@ public class Robot extends LoggedRobot {
     @Override
     public void teleopPeriodic() {
         SmartDashboard.putNumber("anlge error",
-                                 RotationUtil.toSignedDegrees(Math.abs(drivetrain.getYaw() - drivetrain.calculateDegreesToTarget(RobotPositions.getNextScoringNodePosition())))
+                                 RotationUtil.toSignedDegrees(Math.abs(drivetrain.getYaw() - RobotPosition.calculateDegreesToTarget(
+                                         RobotPosition.getNextScoringNodePosition())))
         );
-        if ((Math.abs(RotationUtil.toSignedDegrees(Math.abs(drivetrain.getYaw() - drivetrain.calculateDegreesToTarget(RobotPositions.getNextScoringNodePosition())))) < 5) && (drivetrain.distanceTo(
-                Point.fromPose2d(RobotPositions.getClosestScoringPosition())) < Units.inchesToMeters(25))) {
+        if ((Math.abs(RotationUtil.toSignedDegrees(Math.abs(drivetrain.getYaw() - RobotPosition.calculateDegreesToTarget(
+                RobotPosition.getNextScoringNodePosition())))) < 5) && (RobotPosition.distanceTo(
+                Point.fromPose2d(RobotPosition.getClosestScoringPosition())) < Units.inchesToMeters(25))) {
             blinkin.setColor(Blinkin.Color.LIME);
             controls.driver.rumble(0.5);
-        } else if (robotState.inShootDriveMode() && RobotPositions.inCommunity()) {
+        } else if (robotState.inShootDriveMode() && RobotPosition.inCommunity()) {
             blinkin.setColor(Blinkin.Color.RED);
         } else {
             if (robotState.inConeMode() && Manipulator.getInstance().isStalling()) {
@@ -187,9 +176,12 @@ public class Robot extends LoggedRobot {
         if (auto == null) auto = new JustScore();
 
         if (alliance == Alliance.Blue) {
-            Drivetrain.getInstance().setPose(auto.getInitialPose());
+            Drivetrain.getInstance().setPos2e(auto.getInitialPose());
+            Drivetrain.getInstance().setYaw(auto.getInitialPose().getRotation().getDegrees());
         } else {
-            Drivetrain.getInstance().setPose(PoseUtil.flip(auto.getInitialPose()));
+            Drivetrain.getInstance().setPos2e(PoseUtil.flip(auto.getInitialPose()));
+            Drivetrain.getInstance().setYaw(PoseUtil.flip(auto.getInitialPose()).getRotation().getDegrees());
+            
         }
 
         Elevator.getInstance().updateInitialPosition(auto.getInitialState() == State.AUTO_SHOT);

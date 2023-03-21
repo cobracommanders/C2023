@@ -14,7 +14,7 @@ public class SetIntakeRollersToNextState extends InstantCommand {
 
     @Override
     public void initialize() {
-        intake.setState(RobotState.getInstance().getCurrentState().intakeRollers);
+        intake.setState(RobotState.getInstance().getState().intakeRollers);
 
     }
 }

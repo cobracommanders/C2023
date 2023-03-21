@@ -4,22 +4,22 @@ import com.ctre.phoenix.motorcontrol.*;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycle;
-import org.team498.lib.drivers.TalonFX;
+import org.team498.lib.drivers.LazyTalonFX;
 import org.team498.lib.util.Falcon500Conversions;
 
 import static org.team498.C2023.Constants.ElevatorConstants.*;
 import static org.team498.C2023.Ports.Elevator.*;
 
 public class ElevatorIOCompRobot implements ElevatorIO {
-    private final TalonFX leader;
-    private final TalonFX follower;
+    private final LazyTalonFX leader;
+    private final LazyTalonFX follower;
     private final DutyCycle encoder;
 
     private final ElevatorFeedforward FF = new ElevatorFeedforward(0, 0, 0);
 
     public ElevatorIOCompRobot() {
-        leader = new TalonFX(F_ELEVATOR_ID);
-        follower = new TalonFX(B_ELEVATOR_ID);
+        leader = new LazyTalonFX(F_ELEVATOR_ID);
+        follower = new LazyTalonFX(B_ELEVATOR_ID);
 
         leader.configFactoryDefault();
         follower.configFactoryDefault();

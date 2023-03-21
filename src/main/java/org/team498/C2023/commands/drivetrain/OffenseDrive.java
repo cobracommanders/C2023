@@ -46,7 +46,7 @@ public class OffenseDrive extends CommandBase {
         drivetrain.setAngleGoal(rotation);
 
         // Calculate the rotational speed from the pid controller, unless it's already at the goal
-        double rotationalSpeed = drivetrain.calculateAngularSpeed();
+        double rotationalSpeed = drivetrain.calculateAngleSpeed();
 
         // Set the robot to drive in field relative mode, with the rotation controlled by the snap controller
         drivetrain.drive(xTranslation, yTranslation, rotationalSpeed, true);

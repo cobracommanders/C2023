@@ -15,7 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class FieldPositions {
+public final class FieldPositions {
     public static final double height = 8.0137;
     public static final double width = 16.54175;
 

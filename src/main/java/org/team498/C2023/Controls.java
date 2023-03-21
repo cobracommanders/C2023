@@ -1,5 +1,8 @@
 package org.team498.C2023;
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -45,14 +48,14 @@ public class Controls {
 
 
         driver.rightTrigger()
-                .whileTrue(new ConditionalCommand(new TargetDrive(driver::leftYSquared, driver::leftXSquared, driver.rightBumper(), () -> RobotPositions.getNextScoringNodePosition().transformBy(Drivetrain.getInstance().getVelocity().times(5).inverse())), Commands.none(), () -> RobotState.getInstance().inCubeMode() && RobotState.getInstance().getNextScoringOption() != ScoringOption.SPIT))
+                .whileTrue(new ConditionalCommand(new TargetDrive(driver::leftYSquared, driver::leftXSquared, driver.rightBumper(), 
+                () -> RobotPosition.getNextScoringNodePosition().transformBy(new Transform2d(new Translation2d(Drivetrain.getInstance().getCurrentSpeeds().vxMetersPerSecond, Drivetrain.getInstance().getCurrentSpeeds().vyMetersPerSecond), Rotation2d.fromRadians(Drivetrain.getInstance().getCurrentSpeeds().omegaRadiansPerSecond)).times(5).inverse())), Commands.none(), () -> RobotState.getInstance().inCubeMode() && RobotState.getInstance().getNextScoringOption() != ScoringOption.SPIT))
                 .onTrue(new PrepareToScore())
                 .onFalse(new ChoiceCommand(() -> switch (robotState.getNextScoringOption()) {
                     case TOP, MID -> new SequentialCommandGroup(new ConditionalCommand(new WaitCommand(0.75), new WaitCommand(0.1), () -> RobotState.getInstance().inConeMode()), new Score());
                     case SPIT -> new Spit();
                 }
             ));
-
         driver.start().onTrue(new AutoEngage());
     }
 

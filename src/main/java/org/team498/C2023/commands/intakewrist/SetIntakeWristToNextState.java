@@ -14,7 +14,7 @@ public class SetIntakeWristToNextState extends CommandBase {
 
     @Override
     public void initialize() {
-        intake.setState(RobotState.getInstance().getCurrentState().intakeWrist);
+        intake.setState(RobotState.getInstance().getState().intakeWrist);
     }
 
     @Override

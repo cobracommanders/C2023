@@ -15,16 +15,23 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 import org.team498.C2023.Constants;
+import org.team498.C2023.Ports;
+import org.team498.C2023.Robot;
+import org.team498.lib.drivers.gyro.GyroIO;
+import org.team498.lib.drivers.gyro.GyroIOInputsAutoLogged;
+import org.team498.lib.drivers.gyro.GyroIOPigeon2;
 import org.team498.lib.drivers.swervemodule.ModuleIO;
 import org.team498.lib.drivers.swervemodule.ModuleIOFalcon500;
 import org.team498.lib.drivers.swervemodule.ModuleIOInputsAutoLogged;
+import org.team498.lib.drivers.swervemodule.ModuleIOSim;
+import org.team498.lib.logger.LoggerUtil;
 import org.team498.lib.wpilib.ChassisSpeeds;
 
 import static org.team498.C2023.Constants.DrivetrainConstants.*;
 
 public class Drivetrain extends SubsystemBase {
     private final ModuleIO[] modules;
-    private final ModuleIOInputsAutoLogged[] inputs = new ModuleIOInputsAutoLogged[] {new ModuleIOInputsAutoLogged(), new ModuleIOInputsAutoLogged(), new ModuleIOInputsAutoLogged(), new ModuleIOInputsAutoLogged()};
+    private final ModuleIOInputsAutoLogged[] moduleInputs = new ModuleIOInputsAutoLogged[] {new ModuleIOInputsAutoLogged(), new ModuleIOInputsAutoLogged(), new ModuleIOInputsAutoLogged(), new ModuleIOInputsAutoLogged()};
     private final ProfiledPIDController angleController = new ProfiledPIDController(AngleConstants.P, AngleConstants.I, AngleConstants.D, AngleConstants.CONTROLLER_CONSTRAINTS);
     private final PIDController xController = new PIDController(PoseConstants.P, PoseConstants.I, PoseConstants.D);
     private final PIDController yController = new PIDController(PoseConstants.P, PoseConstants.I, PoseConstants.D);
@@ -33,20 +40,33 @@ public class Drivetrain extends SubsystemBase {
     private final SwerveDriveKinematics kinematics;
     private final SwerveDriveOdometry odometry;
     private SwerveModuleState[] lastStates;
+    private SwerveModuleState[] stateSetpoints;
+
+    private final GyroIO gyro;
+    private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
 
     private Drivetrain() {
         modules = switch (Constants.mode) {
-            case REAL, REPLAY, PRACTICE -> new ModuleIO[] {
+            case REAL, REPLAY, PRACTICE ->
+                new ModuleIO[] {
                     new ModuleIOFalcon500(ModuleIOFalcon500.Module.FL),
                     new ModuleIOFalcon500(ModuleIOFalcon500.Module.FR),
                     new ModuleIOFalcon500(ModuleIOFalcon500.Module.BL),
                     new ModuleIOFalcon500(ModuleIOFalcon500.Module.BR),
                     };
-            case SIM -> new ModuleIO[] {new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {}, new ModuleIO() {}};
+            case SIM -> new ModuleIO[] {
+                    new ModuleIOSim("FL"),
+                    new ModuleIOSim("FR"),
+                    new ModuleIOSim("BL"),
+                    new ModuleIOSim("BR")
+            };
         };
+
+        gyro = new GyroIOPigeon2(Ports.Drivetrain.GYRO);
 
         angleController.enableContinuousInput(-180, 180);
         angleController.setTolerance(0);
+        //TODO Reset angleController
         xController.setTolerance(0);
         yController.setTolerance(0);
         xLimiter.reset(0);
@@ -54,68 +74,54 @@ public class Drivetrain extends SubsystemBase {
 
         kinematics = new SwerveDriveKinematics(getModuleTranslations());
         odometry = new SwerveDriveOdometry(kinematics, Rotation2d.fromDegrees(getYaw()), getModulePositions());
+
+        lastStates = getModuleStates();
+        stateSetpoints = getModuleStates();
     }
 
     @Override
     public void periodic() {
         for (int i = 0; i < modules.length; i++) {
-            modules[i].updateInputs(inputs[i]);
-            Logger.getInstance().processInputs("Drive/Module_" + modules[i].getName(), inputs[i]);
+            modules[i].updateInputs(moduleInputs[i]);
+            Logger.getInstance().processInputs("Drive/" + modules[i].getName() + "_Module", moduleInputs[i]);
 
             modules[i].setBrakeMode(DriverStation.isEnabled());
         }
+        gyro.updateInputs(gyroInputs);
+        Logger.getInstance().processInputs("Gyro", gyroInputs);
         odometry.update(Rotation2d.fromDegrees(getYaw()), getModulePositions());
+        //TODO See if SwerveDrivePoseEstimator could replace resetting the odometry so we could track both
         Logger.getInstance().recordOutput("Odometry", getPose());
-        Logger.getInstance().recordOutput("Drive/TargetStates", lastStates);
-        Logger.getInstance().recordOutput("Drive/RealStates", getModuleStates());
-    }
+        
+        LoggerUtil.recordOutput("Drive/RealStates", getModuleStates());
 
-    public void setPositionGoal(Pose2d pose) {
-        xController.setSetpoint(pose.getX());
-        yController.setSetpoint(pose.getY());
-        angleController.setGoal(pose.getRotation().getDegrees());
-    }
+        var targetStates = new SwerveModuleState[4];
+        for (int i = 0; i < modules.length; i++) {
+            targetStates[i] = new SwerveModuleState(moduleInputs[i].targetSpeedMetersPerSecond, Rotation2d.fromDegrees(moduleInputs[i].targetAngle));
+        }
+        LoggerUtil.recordOutput("Drive/TargetStates", targetStates);
 
-    public ChassisSpeeds calculatePositionalSpeed() {
-        double xAdjustment = xController.calculate(getPose().getX());
-        double yAdjustment = yController.calculate(getPose().getY());
-        double angleAdjustment = angleController.calculate(getYaw());
-        return new ChassisSpeeds(xAdjustment, yAdjustment, angleAdjustment);
+        if (!gyroInputs.connected) {
+            gyro.setYaw(gyroInputs.yaw + Math.toDegrees(getCurrentSpeeds().omegaRadiansPerSecond) * Robot.DEFAULT_PERIOD);
+        }
     }
-
-    public boolean atPositionGoals() {
-        return (Math.abs(xController.getPositionError()) < PoseConstants.EPSILON) && (Math.abs(yController.getPositionError()) < PoseConstants.EPSILON) && atAngleGoal();
-    }
-
-    public void setAngleGoal(double angle) {
-        angleController.setGoal(angle);
-    }
-
-    public double calculateAngularSpeed() {
-        return angleController.calculate(getYaw());
-    }
-
-    public boolean atAngleGoal() {
-        return Math.abs(angleController.getPositionError()) < AngleConstants.EPSILON;
-    }
-
 
     public void drive(double vx, double vy, double degreesPerSecond, boolean fieldOriented) {
         ChassisSpeeds speeds = fieldOriented
                                ? ChassisSpeeds.fromFieldRelativeSpeeds(-vx, -vy, Math.toRadians(degreesPerSecond), getYaw())
                                : new ChassisSpeeds(-vx, -vy, Math.toRadians(degreesPerSecond));
 
-        drive(speeds);
-    }
+        speeds.vxMetersPerSecond = xLimiter.calculate(speeds.vxMetersPerSecond);
+        speeds.vyMetersPerSecond = yLimiter.calculate(speeds.vyMetersPerSecond);
 
-    public void drive(ChassisSpeeds speeds) {
         var states = kinematics.toSwerveModuleStates(speeds);
-        setModuleStates(isIdle() ? lastStates : states);
-    }
 
-    public void X() {
-        var xStates = new SwerveModuleState[] {new SwerveModuleState(0, Rotation2d.fromDegrees(45)), new SwerveModuleState(0, Rotation2d.fromDegrees(-45)), new SwerveModuleState(0, Rotation2d.fromDegrees(-45)), new SwerveModuleState(0, Rotation2d.fromDegrees(45))};
-        setModuleStates(xStates);
+        boolean isIdle = true;
+        for (SwerveModuleState s : states) isIdle = Math.abs(s.speedMetersPerSecond) < 0.001 && isIdle;
+
+        stateSetpoints = /*isIdle ? lastStates :*/ states;
+
+        setModuleStates(stateSetpoints);
     }
 
     public void setModuleStates(SwerveModuleState[] states) {
@@ -123,32 +129,39 @@ public class Drivetrain extends SubsystemBase {
         lastStates = states;
     }
 
-    public boolean isIdle() {
-        boolean isIdle = true;
-        for (SwerveModuleState state : getModuleStates()) isIdle = Math.abs(state.speedMetersPerSecond) < 0.001 && isIdle;
-        return isIdle;
-    }
-
-    public double getYaw() {
-        return 0.0;
-    }
-
     public SwerveModulePosition[] getModulePositions() {
         var positions = new SwerveModulePosition[modules.length];
-        for (int i = 0; i < modules.length; i++) positions[i] = modules[i].getPosition();
+        for (int i = 0; i < modules.length; i++) positions[i] = new SwerveModulePosition(moduleInputs[i].positionMeters, Rotation2d.fromDegrees(moduleInputs[i].angle));
         return positions;
     }
 
     public SwerveModuleState[] getModuleStates() {
         var states = new SwerveModuleState[modules.length];
-        for (int i = 0; i < modules.length; i++) states[i] = modules[i].getState();
+        for (int i = 0; i < modules.length; i++) states[i] = new SwerveModuleState(moduleInputs[i].speedMetersPerSecond, Rotation2d.fromDegrees(moduleInputs[i].angle));
         return states;
     }
 
-    public Pose2d getPose() {return odometry.getPoseMeters();}
-    public void stop() {drive(new ChassisSpeeds(0, 0, 0));}
+    public void setPositionGoal(Pose2d pose) {xController.setSetpoint(pose.getX());yController.setSetpoint(pose.getY());setAngleGoal(pose.getRotation().getDegrees());}
+    public ChassisSpeeds calculatePositionSpeed() {return new ChassisSpeeds(xController.calculate(getPose().getX()), getPose().getY(), calculateAngleSpeed());}
+    public boolean atPositionGoal() {return (Math.abs(xController.getPositionError()) < PoseConstants.EPSILON) && (Math.abs(yController.getPositionError()) < PoseConstants.EPSILON) && atAngleGoal();}
 
-    public Translation2d[] getModuleTranslations() {
+    public void setAngleGoal(double angle) {angleController.setGoal(angle);}
+    public double calculateAngleSpeed() {return angleController.calculate(getYaw());}
+    public boolean atAngleGoal() {return Math.abs(angleController.getPositionError()) < AngleConstants.EPSILON;}
+
+    public Pose2d getPose() {return odometry.getPoseMeters();}
+    public void setPos2e(Pose2d pose) {odometry.resetPosition(Rotation2d.fromDegrees(getYaw()), getModulePositions(), pose);}
+    public double getYaw() {return gyroInputs.yaw;}
+    public void setYaw(double angle) {gyro.setYaw(angle);}
+    /** Return a double array with a value for yaw pitch and roll in that order */
+    public double[] getGyro() {return new double[] {gyroInputs.yaw, gyroInputs.pitch, gyroInputs.roll};}
+
+    public void stop() {drive(0, 0, 0, false);}
+    public void X() {setModuleStates(new SwerveModuleState[] {new SwerveModuleState(0, Rotation2d.fromDegrees(45)), new SwerveModuleState(0, Rotation2d.fromDegrees(-45)), new SwerveModuleState(0, Rotation2d.fromDegrees(-45)), new SwerveModuleState(0, Rotation2d.fromDegrees(45))});}
+
+    public ChassisSpeeds getCurrentSpeeds() {return ChassisSpeeds.fromWPIChassisSpeeds(kinematics.toChassisSpeeds(getModuleStates()));}
+
+    private Translation2d[] getModuleTranslations() {
         double moduleDistance = Units.inchesToMeters(SWERVE_MODULE_DISTANCE_FROM_CENTER);
         Translation2d FL_ModulePosition = new Translation2d(moduleDistance, moduleDistance);
         Translation2d FR_ModulePosition = new Translation2d(moduleDistance, -moduleDistance);

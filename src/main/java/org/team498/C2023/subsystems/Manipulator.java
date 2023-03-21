@@ -10,7 +10,7 @@ import org.team498.C2023.ShootTables;
 
 import static org.team498.C2023.Ports.Manipulator.ROLLERS;
 
-import org.team498.C2023.RobotPositions;
+import org.team498.C2023.RobotPosition;
 
 public class Manipulator extends SubsystemBase {
     private final CANSparkMax rollers;
@@ -34,7 +34,7 @@ public class Manipulator extends SubsystemBase {
 
     @Override
     public void periodic() {        
-        rollers.set(getSetpoint(currentState, RobotPositions.getFutureScoringNodeDistance()));
+        rollers.set(getSetpoint(currentState, RobotPosition.getFutureScoringNodeDistance()));
     }
 
     private double getSetpoint(State.Manipulator state, double interpolatedValue) {

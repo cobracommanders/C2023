@@ -23,12 +23,13 @@ public class DriveToPosition extends CommandBase {
 
     @Override
     public void execute() {
-        drivetrain.drive(drivetrain.calculatePositionalSpeed());
+        var speed = drivetrain.calculatePositionSpeed();
+        drivetrain.drive(speed.vxMetersPerSecond, speed.vyMetersPerSecond, speed.omegaRadiansPerSecond, true);
     }
 
     @Override
     public boolean isFinished() {
-        return drivetrain.atPositionGoals();
+        return drivetrain.atPositionGoal();
     }
 
     @Override

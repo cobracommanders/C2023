@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.DutyCycle;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.team498.C2023.Robot;
-import org.team498.C2023.RobotPositions;
+import org.team498.C2023.RobotPosition;
 import org.team498.C2023.State;
 import org.team498.C2023.ShootTables;
 
@@ -51,7 +51,7 @@ public class ElevatorWrist extends SubsystemBase {
 
     @Override
     public void periodic() {
-        PID.setSetpoint(getSetpoint(currentState, RobotPositions.getFutureScoringNodeDistance()));
+        PID.setSetpoint(getSetpoint(currentState, RobotPosition.getFutureScoringNodeDistance()));
 
         double speed;
         if (controlMode == ControlMode.PID) {

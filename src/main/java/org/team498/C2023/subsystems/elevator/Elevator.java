@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 import org.team498.C2023.*;
+import org.team498.lib.field.Point;
 
 public class Elevator extends SubsystemBase {
     private final ElevatorIO io;
@@ -53,7 +54,7 @@ public class Elevator extends SubsystemBase {
         io.updateInputs(inputs);
         Logger.getInstance().processInputs("Elevator", inputs);
 
-        setpoint = getSetpoint(currentState, RobotPositions.getFutureScoringNodeDistance());
+        setpoint = getSetpoint(currentState, RobotPosition.getFutureScoringNodeDistance());
 
         if (controlMode == ControlMode.PID) {
             var profile = new TrapezoidProfile(constraints, new TrapezoidProfile.State(setpoint, 0),

@@ -10,9 +10,10 @@ import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.sensors.WPI_CANCoder;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+
+import org.team498.lib.drivers.LazyTalonFX;
 import org.team498.lib.util.Falcon500Conversions;
 
 import static org.team498.C2023.Constants.DrivetrainConstants.*;
@@ -42,6 +43,8 @@ public class ModuleIOFalcon500 implements ModuleIO {
     private final WPI_CANCoder encoder;
     private final double angleOffset;
 
+    private SwerveModuleState currentTarget = new SwerveModuleState();
+
     public ModuleIOFalcon500(Module module) {
         this.module = module;
         drive = new WPI_TalonFX(module.driveID);
@@ -58,16 +61,30 @@ public class ModuleIOFalcon500 implements ModuleIO {
 
     @Override
     public void setState(SwerveModuleState state) {
-        SwerveModuleState currentTarget = optimize(state, getState().angle.getDegrees());
+        currentTarget = optimize(state, Falcon500Conversions.falconToDegrees(steer.getSelectedSensorPosition(), MK4I_STEER_REDUCTION_L2));
 
         drive.set(ControlMode.Velocity, Falcon500Conversions.MPSToFalcon(currentTarget.speedMetersPerSecond, Units.inchesToMeters(DRIVE_WHEEL_DIAMETER), MK4I_DRIVE_REDUCTION_L2));
-        steer.set(ControlMode.Position, Falcon500Conversions.degreesToFalcon(currentTarget.angle.getDegrees() - angleOffset, MK4I_STEER_REDUCTION_L2));
+        steer.set(ControlMode.Position, Falcon500Conversions.degreesToFalcon(currentTarget.angle.getDegrees(), MK4I_STEER_REDUCTION_L2));
     }
 
     @Override
     public void updateInputs(ModuleIOInputs inputs) {
-        inputs.drivePositionMeters = getPosition().distanceMeters;
-        inputs.driveVelocityRPM = getState().speedMetersPerSecond;
+        inputs.positionMeters = (Falcon500Conversions.falconToDegrees(drive.getSelectedSensorPosition(), MK4I_DRIVE_REDUCTION_L2) / 360) * Units.inchesToMeters(DRIVE_WHEEL_CIRCUMFERENCE);
+        inputs.speedMetersPerSecond = Falcon500Conversions.falconToMPS(drive.getSelectedSensorVelocity(), Units.inchesToMeters(DRIVE_WHEEL_CIRCUMFERENCE), MK4I_DRIVE_REDUCTION_L2);
+        inputs.angle = Falcon500Conversions.falconToDegrees(steer.getSelectedSensorPosition(), MK4I_STEER_REDUCTION_L2);
+
+        inputs.targetSpeedMetersPerSecond = currentTarget.speedMetersPerSecond;
+        inputs.targetAngle = currentTarget.angle.getDegrees();
+
+        inputs.driveAppliedVolts = drive.getMotorOutputVoltage();
+        inputs.driveCurrentAmps = drive.getStatorCurrent();
+        inputs.driveTemp = (drive.getTemperature() * 1.8) + 32;
+        inputs.driveRawEncoder = drive.getSelectedSensorPosition();
+
+        inputs.steerAppliedVolts = steer.getMotorOutputVoltage();
+        inputs.steerCurrentAmps = steer.getStatorCurrent();
+        inputs.steerTemp = (steer.getTemperature() * 1.8) + 32;
+        inputs.steerRawEncoder = steer.getSelectedSensorPosition();
     }
 
     @Override
@@ -76,32 +93,13 @@ public class ModuleIOFalcon500 implements ModuleIO {
     }
 
     @Override
-    public SwerveModuleState getState() {
-        return new SwerveModuleState(
-                Falcon500Conversions.falconToMPS(drive.getSelectedSensorVelocity(), Units.inchesToMeters(DRIVE_WHEEL_CIRCUMFERENCE), MK4I_DRIVE_REDUCTION_L2),
-                Rotation2d.fromDegrees(Falcon500Conversions.falconToDegrees(steer.getSelectedSensorPosition(), MK4I_STEER_REDUCTION_L2) + angleOffset)
-        );
-    }
-
-    @Override
-    public SwerveModulePosition getPosition() {
-        return new SwerveModulePosition(
-                (Falcon500Conversions.falconToDegrees(drive.getSelectedSensorPosition(), MK4I_DRIVE_REDUCTION_L2) / 360) * Units.inchesToMeters(
-                        DRIVE_WHEEL_CIRCUMFERENCE), getState().angle);
-    }
-
-    private boolean inBrakeMode = false;
-    @Override
     public void setBrakeMode(boolean enable) {
-        if (enable != inBrakeMode) {
-            inBrakeMode = enable;
-            steer.setNeutralMode(enable ? NeutralMode.Brake : NeutralMode.Coast);
-            drive.setNeutralMode(enable ? NeutralMode.Brake : NeutralMode.Coast);
-        }
+        steer.setNeutralMode(enable ? NeutralMode.Brake : NeutralMode.Coast);
+        drive.setNeutralMode(enable ? NeutralMode.Brake : NeutralMode.Coast);        
     }
 
     // Custom optimize method by team 364
-    private static SwerveModuleState optimize(SwerveModuleState desiredState, double currentAngle) {
+    private SwerveModuleState optimize(SwerveModuleState desiredState, double currentAngle) {
         double targetAngle = placeInAppropriate0To360Scope(currentAngle, desiredState.angle.getDegrees());
 
         double targetSpeed = desiredState.speedMetersPerSecond;
@@ -115,7 +113,7 @@ public class ModuleIOFalcon500 implements ModuleIO {
         return new SwerveModuleState(targetSpeed, Rotation2d.fromDegrees(targetAngle));
     }
 
-    private static double placeInAppropriate0To360Scope(double scopeReference, double newAngle) {
+    private double placeInAppropriate0To360Scope(double scopeReference, double newAngle) {
         double lowerBound;
         double upperBound;
         double lowerOffset = scopeReference % 360;
@@ -176,6 +174,7 @@ public class ModuleIOFalcon500 implements ModuleIO {
     }
 
     private void configCANCoder(CANCoder CANCoder) {
+        CANCoder.configFactoryDefault();
         CANCoder.configSensorInitializationStrategy(SensorInitializationStrategy.BootToAbsolutePosition);
         CANCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
     }

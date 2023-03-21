@@ -49,6 +49,7 @@ public class Photonvision {
     private final double acceptedTagRange = 3.75;
 
     private Photonvision() {
+        PhotonCamera.setVersionCheckEnabled(false);
         photonCamera = new PhotonCamera("Arducam_OV9281_USB_Camera");
 
         try {

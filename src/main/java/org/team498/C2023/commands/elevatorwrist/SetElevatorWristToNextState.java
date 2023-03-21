@@ -14,7 +14,7 @@ public class SetElevatorWristToNextState extends CommandBase {
 
     @Override
     public void initialize() {
-        wrist.setState(RobotState.getInstance().getCurrentState().elevatorWrist);
+        wrist.setState(RobotState.getInstance().getState().elevatorWrist);
     }
 
     @Override

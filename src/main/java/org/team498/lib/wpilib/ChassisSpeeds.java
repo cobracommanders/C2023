@@ -58,5 +58,9 @@ public class ChassisSpeeds extends edu.wpi.first.math.kinematics.ChassisSpeeds {
         );
     }
 
+    public static ChassisSpeeds fromWPIChassisSpeeds(edu.wpi.first.math.kinematics.ChassisSpeeds speeds) {
+        return new ChassisSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond);
+    }
+
 
 }

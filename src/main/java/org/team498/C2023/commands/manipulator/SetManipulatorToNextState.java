@@ -13,6 +13,6 @@ public class SetManipulatorToNextState extends InstantCommand {
 
     @Override
     public void initialize() {
-        manipulator.setState(RobotState.getInstance().getCurrentState().manipulator);
+        manipulator.setState(RobotState.getInstance().getState().manipulator);
     }
 }

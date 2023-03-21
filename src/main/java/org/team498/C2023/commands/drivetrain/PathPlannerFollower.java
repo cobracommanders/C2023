@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import org.team498.C2023.Constants;
 import org.team498.C2023.Robot;
+import org.team498.C2023.RobotPosition;
 import org.team498.C2023.subsystems.Drivetrain;
 import org.team498.lib.util.PoseUtil;
 
@@ -38,7 +39,6 @@ public class PathPlannerFollower extends CommandBase {
 
     @Override
     public void initialize() {
-        // Robot.cameraEnabled = false;
         trajectoryTimer.reset();
         trajectoryTimer.start();
 
@@ -61,7 +61,8 @@ public class PathPlannerFollower extends CommandBase {
 
         Robot.field.getObject("Stop Points").setPoses(markerPoses);
 
-        drivetrain.setPose(Robot.alliance == Alliance.Blue ? trajectory.getInitialHolonomicPose() : PoseUtil.flip(trajectory.getInitialHolonomicPose()));
+        drivetrain.setPos2e(Robot.alliance == Alliance.Blue ? trajectory.getInitialHolonomicPose() : PoseUtil.flip(trajectory.getInitialHolonomicPose()));
+        drivetrain.setYaw(Robot.alliance == Alliance.Blue ? trajectory.getInitialHolonomicPose().getRotation().getDegrees() : PoseUtil.flip(trajectory.getInitialHolonomicPose()).getRotation().getDegrees());
 
         // Display the trajectory on the driver station dashboard
         List<Pose2d> poses = new LinkedList<>();
@@ -82,16 +83,17 @@ public class PathPlannerFollower extends CommandBase {
     @Override
     public void execute() {
         if (markerPoses.size() > 0) {
-            if (!drivetrain.isNear(markerPoses.get(0), 0.25)) {
+            if (!RobotPosition.isNear(markerPoses.get(0), 0.25)) {
                 PathPlannerState state = (PathPlannerState) trajectory.sample(trajectoryTimer.get());
 
                 if (Robot.alliance == Alliance.Blue) {
-                    drivetrain.setPositionGoals(new Pose2d(state.poseMeters.getX(), state.poseMeters.getY(), state.holonomicRotation));
+                    drivetrain.setPositionGoal(new Pose2d(state.poseMeters.getX(), state.poseMeters.getY(), state.holonomicRotation));
                 } else {
-                    drivetrain.setPositionGoals(PoseUtil.flip(new Pose2d(state.poseMeters.getX(), state.poseMeters.getY(), state.holonomicRotation)));
+                    drivetrain.setPositionGoal(PoseUtil.flip(new Pose2d(state.poseMeters.getX(), state.poseMeters.getY(), state.holonomicRotation)));
                 }
 
-                drivetrain.driveToPositionGoals();
+                var speed = drivetrain.calculatePositionSpeed();
+                drivetrain.drive(speed.vxMetersPerSecond, speed.vyMetersPerSecond, speed.omegaRadiansPerSecond, true);
             } else {
                 if (!hasReset) {
                     trajectoryTimer.stop();
@@ -113,12 +115,13 @@ public class PathPlannerFollower extends CommandBase {
             PathPlannerState state = (PathPlannerState) trajectory.sample(trajectoryTimer.get());
 
             if (Robot.alliance == Alliance.Blue) {
-                drivetrain.setPositionGoals(new Pose2d(state.poseMeters.getX(), state.poseMeters.getY(), state.holonomicRotation));
+                drivetrain.setPositionGoal(new Pose2d(state.poseMeters.getX(), state.poseMeters.getY(), state.holonomicRotation));
             } else {
-                drivetrain.setPositionGoals(PoseUtil.flip(new Pose2d(state.poseMeters.getX(), state.poseMeters.getY(), state.holonomicRotation)));
+                drivetrain.setPositionGoal(PoseUtil.flip(new Pose2d(state.poseMeters.getX(), state.poseMeters.getY(), state.holonomicRotation)));
             }
 
-            drivetrain.driveToPositionGoals();
+            var speed = drivetrain.calculatePositionSpeed();
+            drivetrain.drive(speed.vxMetersPerSecond, speed.vyMetersPerSecond, speed.omegaRadiansPerSecond, true);
         }
     }
 
@@ -126,15 +129,14 @@ public class PathPlannerFollower extends CommandBase {
     public boolean isFinished() {
         // return trajectoryTimer.get() > trajectory.getTotalTimeSeconds();
         if (Robot.alliance == Alliance.Blue) {
-            return drivetrain.isNear(trajectory.getEndState().poseMeters, Constants.DrivetrainConstants.PoseConstants.EPSILON);
+            return RobotPosition.isNear(trajectory.getEndState().poseMeters, Constants.DrivetrainConstants.PoseConstants.EPSILON);
         } else {
-            return drivetrain.isNear(PoseUtil.flip(trajectory.getEndState().poseMeters), Constants.DrivetrainConstants.PoseConstants.EPSILON);
+            return RobotPosition.isNear(PoseUtil.flip(trajectory.getEndState().poseMeters), Constants.DrivetrainConstants.PoseConstants.EPSILON);
         }
     }
 
     @Override
     public void end(boolean interrupted) {
         drivetrain.stop();
-        // Robot.cameraEnabled = true;
     }
 }

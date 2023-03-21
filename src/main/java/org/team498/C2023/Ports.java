@@ -24,6 +24,7 @@ public final class Ports {
     public static class IntakeRollers {
         public static final int BOTTOM_ROLLER = 20;
         public static final int TOP_ROLLER = 23;
+        public static final int THIRD_ROLLER = 24;
     }
 
     public static class IntakeWrist {
@@ -36,7 +37,7 @@ public final class Ports {
         public static final int F_ELEVATOR_ID = 30;
         public static final int B_ELEVATOR_ID = 31;
 
-        public static final int ENCODER_PORT = 2; // DIO
+        public static final int ENCODER_PORT = 4; // DIO
     }
 
     public static class Manipulator {
