@@ -12,24 +12,18 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.team498.C2023.commands.auto.CubeEngage;
-import org.team498.C2023.commands.auto.JustAutoShot;
+import org.team498.C2023.commands.auto.HighHighCubeEngageBump;
 import org.team498.C2023.commands.auto.JustScore;
 import org.team498.C2023.commands.auto.LeftConeTaxi;
 import org.team498.C2023.commands.auto.LeftCubeTaxi;
-import org.team498.C2023.commands.auto.NoRotationTwoCube;
-import org.team498.C2023.commands.auto.PreloadAndTaxi;
 import org.team498.C2023.commands.auto.RightConeTaxi;
 import org.team498.C2023.commands.auto.RightCubeTaxi;
-import org.team498.C2023.commands.auto.TwoCubeBump;
-import org.team498.C2023.commands.auto.TwoCubeEngageLeft;
-import org.team498.C2023.commands.auto.TwoCubeEngageBump;
-import org.team498.C2023.commands.auto.TwoCubeLeft;
-import org.team498.C2023.commands.auto.TwoCubePickupEngage;
+import org.team498.C2023.commands.auto.HighMidCubeBump;
+import org.team498.C2023.commands.auto.HighMidCubeEngage;
+import org.team498.C2023.commands.auto.HighMidCubeEngageBunp;
+import org.team498.C2023.commands.auto.HighMidCube;
 import org.team498.C2023.commands.auto.TwoPlusOneBump;
 import org.team498.C2023.subsystems.Drivetrain;
-import org.team498.C2023.subsystems.Elevator;
-import org.team498.C2023.subsystems.ElevatorWrist;
-import org.team498.C2023.subsystems.IntakeWrist;
 import org.team498.C2023.subsystems.Manipulator;
 import org.team498.C2023.subsystems.Photonvision;
 import org.team498.lib.auto.Auto;
@@ -58,11 +52,19 @@ public class Robot extends TimedRobot {
 
     private final SendableChooser<Auto> autoChooser = new SendableChooser<Auto>();
 
-    private final List<Auto> autoOptions = List.of(new JustScore(), new CubeEngage(), new PreloadAndTaxi(),
-            new TwoCubeEngageLeft(), new TwoCubeEngageBump(), new TwoCubePickupEngage(), new JustAutoShot(),
-            new NoRotationTwoCube(), new TwoCubeBump(), new LeftConeTaxi(), new LeftCubeTaxi(), new RightConeTaxi(),
-            new RightCubeTaxi(), new TwoPlusOneBump(),
-            new TwoCubeLeft());
+    private final List<Auto> autoOptions = List.of(
+            new JustScore(),
+            new CubeEngage(),
+            new HighMidCubeEngage(),
+            new HighMidCubeEngageBunp(),
+            new LeftConeTaxi(),
+            new LeftCubeTaxi(),
+            new RightConeTaxi(),
+            new RightCubeTaxi(),
+            new TwoPlusOneBump(),
+            new HighMidCube(),
+            new HighMidCubeBump(),
+            new HighHighCubeEngageBump());
 
     private Auto autoToRun;
 
@@ -165,6 +167,11 @@ public class Robot extends TimedRobot {
             }
             controls.driver.rumble(0);
         }
+    }
+
+    @Override
+    public void teleopExit() {
+        controls.driver.rumble(0);
     }
 
     @Override

@@ -5,7 +5,6 @@ import org.team498.lib.util.Trajectories;
 
 public class PathLib {
     public static final PathPlannerTrajectory noRotationTwoCubeEngage = Trajectories.getPathPlannerTrajectory("No rotation two cube engage");
-    public static final PathPlannerTrajectory singleCubeTaxi = Trajectories.getPathPlannerTrajectory("Single Cube Taxi");
 
     public static final PathPlannerTrajectory secondNodeToTopCube = Trajectories.getPathPlannerTrajectory("Second Node To Top Cube");
     public static final PathPlannerTrajectory topCubeToSecondNode = Trajectories.getPathPlannerTrajectory("Top Cube To Second Node");
@@ -21,10 +20,10 @@ public class PathLib {
     public static final PathPlannerTrajectory rightCubeTaxi = Trajectories.getPathPlannerTrajectory("Right Cube Taxi");
 
     public static final PathPlannerTrajectory eighthNodeToFourthCube = Trajectories.getPathPlannerTrajectory("Eighth Node To Fourth Cube");
-    public static final PathPlannerTrajectory eighthNodeToFourthCube2 = Trajectories.getPathPlannerTrajectory("Eighth Node To Fourth Cube 2");
     public static final PathPlannerTrajectory fourthCubeToEighthNode  = Trajectories.getPathPlannerTrajectory("Fourth Cube To Eighth Node");
     public static final PathPlannerTrajectory eighthNodeToChargeStation  = Trajectories.getPathPlannerTrajectory("Eighth Node To Charge Station");
+    public static final PathPlannerTrajectory eigthNodeToThirdCube = Trajectories.getPathPlannerTrajectory("Eigth Node To Third Cube");
+    public static final PathPlannerTrajectory fourthCubeToFithNode = Trajectories.getPathPlannerTrajectory("Fourth Cube To Fith Node");
 
-    public static final PathPlannerTrajectory reverse  = Trajectories.getPathPlannerTrajectory("Reverse");
 
 }

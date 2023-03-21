@@ -12,7 +12,7 @@ import org.team498.C2023.RobotState;
 import org.team498.C2023.State;
 import org.team498.C2023.RobotState.ScoringOption;
 import org.team498.C2023.RobotState.GameMode;
-import org.team498.C2023.commands.drivetrain.BangBangEngage;
+import org.team498.C2023.commands.drivetrain.AutoEngageBangBang;
 import org.team498.C2023.commands.robot.FullScore;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -26,7 +26,7 @@ public class CubeEngage implements Auto {
                 new InstantCommand(() -> RobotState.getInstance().setCurrentGameMode(GameMode.CUBE)),
                 new InstantCommand(() -> RobotState.getInstance().setNextScoringOption(ScoringOption.TOP)),
                 new FullScore(),
-                new BangBangEngage(false)
+                new AutoEngageBangBang()
         );
     }
 

@@ -7,7 +7,7 @@ import org.team498.C2023.RobotState.GameMode;
 import org.team498.C2023.RobotState.ScoringOption;
 import org.team498.C2023.commands.SetRobotState;
 import org.team498.C2023.commands.drivetrain.AutoEngage;
-import org.team498.C2023.commands.drivetrain.AutoEngageBangBang;
+import org.team498.C2023.commands.drivetrain.LockWheels;
 import org.team498.C2023.commands.drivetrain.PathPlannerFollower;
 import org.team498.C2023.commands.robot.FullScore;
 import org.team498.C2023.commands.robot.GroundIntake;
@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
-public class TwoCubeEngageLeft implements Auto {
+public class HighMidCube implements Auto {
     @Override
     public Command getCommand() {
         return new SequentialCommandGroup(
@@ -42,18 +42,17 @@ public class TwoCubeEngageLeft implements Auto {
                         new SequentialCommandGroup(
                                 new WaitCommand(1),
                                 new ReturnToIdle(),
-                                new InstantCommand(() -> RobotState.getInstance().setCurrentGameMode(GameMode.CUBE)),
+                                new InstantCommand(() -> RobotState.getInstance()
+                                        .setCurrentGameMode(GameMode.CUBE)),
                                 new InstantCommand(
-                                        () -> RobotState.getInstance().setNextScoringOption(ScoringOption.MID)),
+                                        () -> RobotState.getInstance()
+                                                .setNextScoringOption(
+                                                        ScoringOption.MID)),
                                 new WaitCommand(1),
                                 new PrepareToScore())),
-                new ParallelCommandGroup(
-                        new Score(),
-                        new SequentialCommandGroup(
-                                new ConditionalCommand(new WaitCommand(0.3), new WaitCommand(0),
-                                        () -> RobotState.getInstance().inConeMode()),
-                                new PathPlannerFollower(PathLib.secondNodeToChargeStation))),
-                new AutoEngageBangBang());
+                new ConditionalCommand(new WaitCommand(0.3), new WaitCommand(0),
+                        () -> RobotState.getInstance().inConeMode()),
+                new Score());
     }
 
     @Override

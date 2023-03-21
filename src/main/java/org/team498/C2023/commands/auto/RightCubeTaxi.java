@@ -26,17 +26,10 @@ public class RightCubeTaxi implements Auto {
         return new SequentialCommandGroup(
                 new InstantCommand(() -> RobotState.getInstance().setCurrentGameMode(GameMode.CUBE)),
                 new InstantCommand(() -> RobotState.getInstance().setNextScoringOption(ScoringOption.TOP)),
-                // new FullScore(),
-                new SetRobotState(State.OUTTAKE),
-                new GroundIntake(),
+                new FullScore(),
                 new WaitCommand(1),
                 new ReturnToIdle(),
-                new ParallelCommandGroup(
-                new PathPlannerFollower(PathLib.rightCubeTaxi),
-                new PathPlannerFollower(PathLib.reverse),
-                new PathPlannerFollower(PathLib.eighthNodeToChargeStation),
-                new AutoEngageBangBang())
-        );
+                new PathPlannerFollower(PathLib.rightCubeTaxi));
     }
 
     @Override
