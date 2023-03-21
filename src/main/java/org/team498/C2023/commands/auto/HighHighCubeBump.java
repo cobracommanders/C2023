@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
-public class HighMidCubeEngageBunp implements Auto {
+public class HighHighCubeBump implements Auto {
     @Override
     public Command getCommand() {
         return new SequentialCommandGroup(
@@ -36,21 +36,15 @@ public class HighMidCubeEngageBunp implements Auto {
                                 new WaitCommand(2),
                                 new GroundIntake())),
                 new ParallelCommandGroup(
-                        new PathPlannerFollower(PathLib.fourthCubeToEighthNode),
+                        new PathPlannerFollower(PathLib.fourthCubeToFithNode),
                         new SequentialCommandGroup(
                                 new WaitCommand(.75),
                                 new ReturnToIdle(),
                                 new InstantCommand(() -> RobotState.getInstance().setCurrentGameMode(GameMode.CUBE)),
-                                new InstantCommand(() -> RobotState.getInstance().setNextScoringOption(ScoringOption.MID)),
-                                new WaitCommand(1),
+                                new InstantCommand(() -> RobotState.getInstance().setNextScoringOption(ScoringOption.TOP)),
+                                new WaitCommand(2.5),
                                 new PrepareToScore())),
-                new ParallelCommandGroup(
-                        new Score(),
-                        new SequentialCommandGroup(
-                                new WaitCommand(0.1),
-                                new PathPlannerFollower(PathLib.eighthNodeToChargeStation)
-                        )),
-                new AutoEngageBangBang());
+                new Score());
     }
 
     @Override

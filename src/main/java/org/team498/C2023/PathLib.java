@@ -25,5 +25,7 @@ public class PathLib {
     public static final PathPlannerTrajectory eigthNodeToThirdCube = Trajectories.getPathPlannerTrajectory("Eigth Node To Third Cube");
     public static final PathPlannerTrajectory fourthCubeToFithNode = Trajectories.getPathPlannerTrajectory("Fourth Cube To Fith Node");
 
+    public static final PathPlannerTrajectory topCubeToFithNode = Trajectories.getPathPlannerTrajectory("Top Cube To Fith Node");
+
 
 }

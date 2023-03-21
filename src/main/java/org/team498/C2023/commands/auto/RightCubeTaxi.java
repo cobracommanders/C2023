@@ -13,7 +13,6 @@ import org.team498.C2023.State;
 import org.team498.C2023.RobotState.GameMode;
 import org.team498.C2023.RobotState.ScoringOption;
 import org.team498.C2023.commands.SetRobotState;
-import org.team498.C2023.commands.drivetrain.AutoEngageBangBang;
 import org.team498.C2023.commands.drivetrain.PathPlannerFollower;
 import org.team498.C2023.commands.robot.FullScore;
 import org.team498.C2023.commands.robot.GroundIntake;
@@ -27,9 +26,14 @@ public class RightCubeTaxi implements Auto {
                 new InstantCommand(() -> RobotState.getInstance().setCurrentGameMode(GameMode.CUBE)),
                 new InstantCommand(() -> RobotState.getInstance().setNextScoringOption(ScoringOption.TOP)),
                 new FullScore(),
-                new WaitCommand(1),
-                new ReturnToIdle(),
-                new PathPlannerFollower(PathLib.rightCubeTaxi));
+                new ParallelCommandGroup(
+                        new PathPlannerFollower(PathLib.rightCubeTaxi),
+                        new SequentialCommandGroup(
+                                new WaitCommand(2),
+                                new SetRobotState(State.GROUND_CUBE),
+                                new GroundIntake())),
+                new WaitCommand(5),
+                new ReturnToIdle());
     }
 
     @Override

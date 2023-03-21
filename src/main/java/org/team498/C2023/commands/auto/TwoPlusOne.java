@@ -21,18 +21,19 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
-public class TwoPlusOneBump implements Auto {
+public class TwoPlusOne implements Auto {
     @Override
     public Command getCommand() {
         return new SequentialCommandGroup(
                 new InstantCommand(() -> RobotState.getInstance().setCurrentGameMode(GameMode.CUBE)),
-                new InstantCommand(() -> RobotState.getInstance().setNextScoringOption(ScoringOption.TOP)),
+                new InstantCommand(
+                        () -> RobotState.getInstance().setNextScoringOption(ScoringOption.TOP)),
                 new PrepareToScore(),
                 new WaitCommand(0.1),
                 new Score(),
                 new WaitCommand(0.1),
                 new ParallelCommandGroup(
-                        new PathPlannerFollower(PathLib.eighthNodeToFourthCube),
+                        new PathPlannerFollower(PathLib.secondNodeToTopCube),
                         new SequentialCommandGroup(
                                 new ParallelCommandGroup(
                                         new ReturnToIdle(),
@@ -40,7 +41,7 @@ public class TwoPlusOneBump implements Auto {
                                 new SetRobotState(State.GROUND_CUBE),
                                 new GroundIntake())),
                 new ParallelCommandGroup(
-                        new PathPlannerFollower(PathLib.fourthCubeToEighthNode),
+                        new PathPlannerFollower(PathLib.topCubeToSecondNode),
                         new SequentialCommandGroup(
                                 new WaitCommand(.75),
                                 new ReturnToIdle(),
@@ -52,7 +53,7 @@ public class TwoPlusOneBump implements Auto {
                 new Score(),
                 new WaitCommand(0.1),
                 new ParallelCommandGroup(
-                        new PathPlannerFollower(PathLib.eigthNodeToThirdCube),
+                        new PathPlannerFollower(PathLib.secondNodeToSecondCube),
                         new SequentialCommandGroup(
                                 new ParallelCommandGroup(
                                         new ReturnToIdle(),
@@ -67,7 +68,7 @@ public class TwoPlusOneBump implements Auto {
 
     @Override
     public Pose2d getInitialPose() {
-        return PathLib.eighthNodeToFourthCube.getInitialHolonomicPose();
+        return PathLib.secondNodeToTopCube.getInitialHolonomicPose();
     }
 
     @Override

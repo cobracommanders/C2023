@@ -12,6 +12,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.team498.C2023.commands.auto.CubeEngage;
+import org.team498.C2023.commands.auto.HighHighCube;
+import org.team498.C2023.commands.auto.HighHighCubeBump;
+import org.team498.C2023.commands.auto.HighHighCubeEngage;
 import org.team498.C2023.commands.auto.HighHighCubeEngageBump;
 import org.team498.C2023.commands.auto.JustScore;
 import org.team498.C2023.commands.auto.LeftConeTaxi;
@@ -20,7 +23,7 @@ import org.team498.C2023.commands.auto.RightConeTaxi;
 import org.team498.C2023.commands.auto.RightCubeTaxi;
 import org.team498.C2023.commands.auto.HighMidCubeBump;
 import org.team498.C2023.commands.auto.HighMidCubeEngage;
-import org.team498.C2023.commands.auto.HighMidCubeEngageBunp;
+import org.team498.C2023.commands.auto.HighMidCubeEngageBump;
 import org.team498.C2023.commands.auto.HighMidCube;
 import org.team498.C2023.commands.auto.TwoPlusOneBump;
 import org.team498.C2023.subsystems.Drivetrain;
@@ -55,16 +58,19 @@ public class Robot extends TimedRobot {
     private final List<Auto> autoOptions = List.of(
             new JustScore(),
             new CubeEngage(),
-            new HighMidCubeEngage(),
-            new HighMidCubeEngageBunp(),
             new LeftConeTaxi(),
             new LeftCubeTaxi(),
             new RightConeTaxi(),
             new RightCubeTaxi(),
             new TwoPlusOneBump(),
+            new HighMidCubeEngage(),
+            new HighMidCubeEngageBump(),
             new HighMidCube(),
             new HighMidCubeBump(),
-            new HighHighCubeEngageBump());
+            new HighHighCubeEngage(),
+            new HighHighCubeEngageBump(),
+            new HighHighCube(),
+            new HighHighCubeBump());
 
     private Auto autoToRun;
 

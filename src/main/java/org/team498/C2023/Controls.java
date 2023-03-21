@@ -9,12 +9,8 @@ import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 import org.team498.C2023.Constants.OIConstants;
-import org.team498.C2023.Ports.Elevator;
 import org.team498.C2023.RobotState.GameMode;
-import org.team498.C2023.commands.drivetrain.AutoEngage;
-import org.team498.C2023.commands.drivetrain.AutoEngage2;
 import org.team498.C2023.commands.drivetrain.DefenseDrive;
-import org.team498.C2023.commands.drivetrain.DriveToTipAndBalance;
 import org.team498.C2023.commands.elevator.ManualElevator;
 import org.team498.C2023.commands.elevator.SetElevatorToNextState;
 import org.team498.C2023.commands.elevatorwrist.ManualElevatorWrist;

@@ -6,7 +6,6 @@ import org.team498.C2023.State;
 import org.team498.C2023.RobotState.GameMode;
 import org.team498.C2023.RobotState.ScoringOption;
 import org.team498.C2023.commands.SetRobotState;
-import org.team498.C2023.commands.drivetrain.AutoEngage;
 import org.team498.C2023.commands.drivetrain.AutoEngageBangBang;
 import org.team498.C2023.commands.drivetrain.PathPlannerFollower;
 import org.team498.C2023.commands.robot.FullScore;
@@ -43,15 +42,13 @@ public class HighMidCubeEngage implements Auto {
                                 new WaitCommand(1),
                                 new ReturnToIdle(),
                                 new InstantCommand(() -> RobotState.getInstance().setCurrentGameMode(GameMode.CUBE)),
-                                new InstantCommand(
-                                        () -> RobotState.getInstance().setNextScoringOption(ScoringOption.MID)),
+                                new InstantCommand(() -> RobotState.getInstance().setNextScoringOption(ScoringOption.MID)),
                                 new WaitCommand(1),
                                 new PrepareToScore())),
                 new ParallelCommandGroup(
                         new Score(),
                         new SequentialCommandGroup(
-                                new ConditionalCommand(new WaitCommand(0.3), new WaitCommand(0),
-                                        () -> RobotState.getInstance().inConeMode()),
+                                new ConditionalCommand(new WaitCommand(0.3), new WaitCommand(0), () -> RobotState.getInstance().inConeMode()),
                                 new PathPlannerFollower(PathLib.secondNodeToChargeStation))),
                 new AutoEngageBangBang());
     }
