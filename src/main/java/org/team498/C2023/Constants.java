@@ -7,7 +7,7 @@ public final class Constants {
         REAL, SIM, REPLAY, PRACTICE
     }
 
-    public static final Mode mode = Mode.REAL;
+    public static final Mode mode = Mode.SIM;
 
     public static final class OIConstants {
         public static final int DRIVER_CONTROLLER_ID = 0;

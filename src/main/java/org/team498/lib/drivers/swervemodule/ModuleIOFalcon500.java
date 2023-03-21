@@ -144,9 +144,9 @@ public class ModuleIOFalcon500 implements ModuleIO {
         TalonFXConfiguration driveConfig = new TalonFXConfiguration();
         driveConfig.supplyCurrLimit.currentLimit = 35;
         driveConfig.supplyCurrLimit.enable = true;
-        driveConfig.openloopRamp = 1;
         motor.configAllSettings(driveConfig);
 
+        motor.configOpenloopRamp(1);
         motor.setSelectedSensorPosition(0);
         motor.setInverted(false);
 
@@ -161,9 +161,9 @@ public class ModuleIOFalcon500 implements ModuleIO {
         TalonFXConfiguration steerConfig = new TalonFXConfiguration();
         steerConfig.supplyCurrLimit.currentLimit = 20;
         steerConfig.supplyCurrLimit.enable = true;
-        steerConfig.openloopRamp = 1;
         motor.configAllSettings(steerConfig);
 
+        motor.configOpenloopRamp(1);
         motor.setSelectedSensorPosition(0);
         motor.setSensorPhase(true);
         motor.setInverted(true);

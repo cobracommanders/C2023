@@ -11,7 +11,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 import org.team498.C2023.Constants;
@@ -85,7 +85,11 @@ public class Drivetrain extends SubsystemBase {
             modules[i].updateInputs(moduleInputs[i]);
             Logger.getInstance().processInputs("Drive/" + modules[i].getName() + "_Module", moduleInputs[i]);
 
-            modules[i].setBrakeMode(DriverStation.isEnabled());
+            modules[i].setBrakeMode(RobotState.isEnabled());
+
+            if (RobotState.isDisabled()) {
+                modules[i].updateIntegratedEncoder();
+            }
         }
         gyro.updateInputs(gyroInputs);
         Logger.getInstance().processInputs("Gyro", gyroInputs);
@@ -104,6 +108,7 @@ public class Drivetrain extends SubsystemBase {
         if (!gyroInputs.connected) {
             gyro.setYaw(gyroInputs.yaw + Math.toDegrees(getCurrentSpeeds().omegaRadiansPerSecond) * Robot.DEFAULT_PERIOD);
         }
+
     }
 
     public void drive(double vx, double vy, double degreesPerSecond, boolean fieldOriented) {
@@ -116,10 +121,14 @@ public class Drivetrain extends SubsystemBase {
 
         var states = kinematics.toSwerveModuleStates(speeds);
 
+
+        //TODO See if the 2023 kinematics automatically don't reset the module rotations to 0 when not driving
         boolean isIdle = true;
         for (SwerveModuleState s : states) isIdle = Math.abs(s.speedMetersPerSecond) < 0.001 && isIdle;
+        isIdle = false;
 
-        stateSetpoints = /*isIdle ? lastStates :*/ states;
+
+        stateSetpoints = isIdle ? lastStates : states;
 
         setModuleStates(stateSetpoints);
     }

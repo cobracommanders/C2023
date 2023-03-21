@@ -1,5 +1,6 @@
 package org.team498.lib.drivers.swervemodule;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -8,7 +9,7 @@ import edu.wpi.first.math.util.Units;
 
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import org.team498.C2023.Robot;
-import org.team498.lib.util.Falcon500Conversions;
+import org.team498.lib.util.RotationUtil;
 
 import static org.team498.C2023.Constants.DrivetrainConstants.*;
 
@@ -27,12 +28,16 @@ public class ModuleIOSim implements ModuleIO {
         steerSim = new FlywheelSim(DCMotor.getFalcon500(1), MK4I_STEER_REDUCTION_L2, 0.004096955);
         driveSim = new FlywheelSim(DCMotor.getFalcon500(1), MK4I_DRIVE_REDUCTION_L2, 0.025);
 
+        drivePID.setTolerance(0.1);
+        steerPID.setTolerance(0.1);
+
         this.name = name;
     }
 
     @Override
     public void setState(SwerveModuleState state) {
-        currentTarget = SwerveModuleState.optimize(state, Rotation2d.fromDegrees(angle));
+        currentTarget = optimize(state, angle);
+        // currentTarget = SwerveModuleState.optimize(state, Rotation2d.fromDegrees(angle));
 
         drivePID.setSetpoint(currentTarget.speedMetersPerSecond);
         steerPID.setSetpoint(currentTarget.angle.getDegrees());
@@ -43,18 +48,23 @@ public class ModuleIOSim implements ModuleIO {
         steerPID.calculate(inputs.angle);
         drivePID.calculate(inputs.speedMetersPerSecond);
         
-        double driveVoltage = drivePID.calculate(inputs.speedMetersPerSecond);
-        double steerVoltage = steerPID.calculate(inputs.angle);
+        double driveVoltage = MathUtil.applyDeadband(MathUtil.clamp(drivePID.calculate(inputs.speedMetersPerSecond), -1, 1), 0.001);
+        double steerVoltage = MathUtil.applyDeadband(MathUtil.clamp(steerPID.calculate(inputs.angle), -1, 1), 0.001);
         driveSim.setInputVoltage(driveVoltage * 12);
         steerSim.setInputVoltage(steerVoltage * 12);
 
         driveSim.update(Robot.DEFAULT_PERIOD);
         steerSim.update(Robot.DEFAULT_PERIOD);
-        angle = inputs.angle;
+        angle = RotationUtil.toSignedDegrees(inputs.angle);
 
         inputs.positionMeters = inputs.positionMeters + (Units.inchesToMeters(DRIVE_WHEEL_CIRCUMFERENCE) * ((Math.toDegrees(driveSim.getAngularVelocityRadPerSec()) * Robot.DEFAULT_PERIOD) / 360));
         inputs.speedMetersPerSecond = Units.inchesToMeters(DRIVE_WHEEL_CIRCUMFERENCE) * (Math.toDegrees(driveSim.getAngularVelocityRadPerSec()) / 360);
         inputs.angle = inputs.angle + Math.toDegrees(steerSim.getAngularVelocityRadPerSec()) * Robot.DEFAULT_PERIOD;
+
+        // inputs.positionMeters = inputs.positionMeters + (inputs.speedMetersPerSecond * Robot.DEFAULT_PERIOD);
+        // inputs.speedMetersPerSecond = drivePID.getSetpoint();
+        // inputs.angle = steerPID.getSetpoint();
+
 
         inputs.targetSpeedMetersPerSecond = currentTarget.speedMetersPerSecond;
         inputs.targetAngle = currentTarget.angle.getDegrees();
