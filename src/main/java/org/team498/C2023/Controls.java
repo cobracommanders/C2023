@@ -19,7 +19,7 @@ import org.team498.C2023.commands.intakerollers.SetIntakeRollersToNextState;
 import org.team498.C2023.commands.intakewrist.SetIntakeWristToNextState;
 import org.team498.C2023.commands.robot.*;
 import org.team498.C2023.subsystems.Drivetrain;
-import org.team498.C2023.subsystems.Manipulator;
+import org.team498.C2023.subsystems.manipulator.Manipulator;
 import org.team498.lib.drivers.Gyro;
 import org.team498.lib.drivers.Xbox;
 import org.team498.lib.wpilib.ChoiceCommand;
