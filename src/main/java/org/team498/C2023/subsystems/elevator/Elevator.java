@@ -59,7 +59,9 @@ public class Elevator extends SubsystemBase {
         };
     }
 
-    public void updateInitialPosition(boolean inAutoPose) {IO.updateInitialPosition(inAutoPose);}
+    public void updateInitialPosition(boolean inAutoPose) {
+        IO.updateInitialPosition(inAutoPose);
+    }
 
 
     private static Elevator instance;

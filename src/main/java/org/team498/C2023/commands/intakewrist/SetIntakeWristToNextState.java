@@ -3,7 +3,7 @@ package org.team498.C2023.commands.intakewrist;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 import org.team498.C2023.RobotState;
-import org.team498.C2023.subsystems.IntakeWrist;
+import org.team498.C2023.subsystems.intakewrist.IntakeWrist;
 
 public class SetIntakeWristToNextState extends CommandBase {
     private final IntakeWrist intake = IntakeWrist.getInstance();

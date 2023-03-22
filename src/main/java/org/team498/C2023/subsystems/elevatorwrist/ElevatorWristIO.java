@@ -13,7 +13,6 @@ public interface ElevatorWristIO {
         public double motorAppliedVolts = 0.0;
         public double motorCurrentAmps = 0.0;
         public double motorTemp = 0.0;
-        public double motorRawEncoder = 0.0;
     }
 
     default void updateInputs(ElevatorWristIOInputs inputs) {}

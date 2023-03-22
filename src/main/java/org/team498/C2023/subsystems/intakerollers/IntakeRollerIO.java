@@ -1,7 +1,6 @@
 package org.team498.C2023.subsystems.intakerollers;
 
 import org.littletonrobotics.junction.AutoLog;
-import org.team498.C2023.State;
 
 public interface IntakeRollerIO {
     @AutoLog
@@ -18,5 +17,5 @@ public interface IntakeRollerIO {
 
     default void updateInputs(IntakeRollerIOInputs inputs) {}
 
-    default void setState(State.IntakeRollers state) {}
+    default void setSpeed(double bottom, double top, double third) {}
 }

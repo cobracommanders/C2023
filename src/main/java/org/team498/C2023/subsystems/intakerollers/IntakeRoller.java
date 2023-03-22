@@ -27,7 +27,7 @@ public class IntakeRoller extends SubsystemBase {
     }
 
     public void setState(State.IntakeRollers state) {
-        IO.setState(state);
+        IO.setSpeed(state.bottomRollerSpeed, state.topRollerSpeed, state.thirdRollerSpeed);
         Logger.getInstance().recordOutput("IntakeRoller State", state.name());
     }
 

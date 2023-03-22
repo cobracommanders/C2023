@@ -8,7 +8,6 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import org.team498.C2023.State;
 
 import static org.team498.C2023.Ports.IntakeRollers.*;
 
@@ -46,9 +45,9 @@ public class IntakeRollerIOFalcon500NEO extends SubsystemBase implements IntakeR
     }
 
     @Override
-    public void setState(State.IntakeRollers state) {
-        bottom.set(ControlMode.PercentOutput, state.bottomRollerSpeed);
-        top.set(ControlMode.PercentOutput, state.topRollerSpeed);
-        third.set(state.thirdRollerSpeed);
+    public void setSpeed(double bottomSpeed, double topSpeed, double thirdSpeed) {
+        bottom.set(ControlMode.PercentOutput, bottomSpeed);
+        top.set(ControlMode.PercentOutput, topSpeed);
+        third.set(thirdSpeed);
     }
 }
