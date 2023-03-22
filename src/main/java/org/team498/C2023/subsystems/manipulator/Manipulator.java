@@ -8,7 +8,6 @@ import org.team498.C2023.Constants;
 import org.team498.C2023.RobotPosition;
 import org.team498.C2023.ShootTables;
 import org.team498.C2023.State;
-import org.team498.C2023.subsystems.manipulator.ManipulatorIOInputsAutoLogged;
 
 public class Manipulator extends SubsystemBase {
     private final ManipulatorIO IO;
@@ -41,6 +40,10 @@ public class Manipulator extends SubsystemBase {
             case SHOOT_DRIVE_CONE_MID -> ShootTables.midCone.shooterRPM.getInterpolatedValue(interpolatedValue);
             default -> state.setpoint;
         };
+    }
+
+    public boolean isStalling() {
+        return inputs.motorCurrentAmps > 20;
     }
 
 

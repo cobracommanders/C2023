@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 import org.team498.C2023.Constants;
 import org.team498.C2023.State;
-import org.team498.C2023.subsystems.intakewrist.IntakeWristIOInputsAutoLogged;
 
 public class IntakeWrist extends SubsystemBase {
     private final IntakeWristIO IO;
