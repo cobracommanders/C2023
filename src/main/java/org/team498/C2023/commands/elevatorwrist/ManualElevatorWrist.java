@@ -1,9 +1,10 @@
 package org.team498.C2023.commands.elevatorwrist;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import org.team498.C2023.subsystems.ElevatorWrist;
 
 import java.util.function.DoubleSupplier;
+
+import org.team498.C2023.subsystems.elevatorwrist.ElevatorWrist;
 
 public class ManualElevatorWrist extends CommandBase {
     private final ElevatorWrist wrist = ElevatorWrist.getInstance();
@@ -16,11 +17,11 @@ public class ManualElevatorWrist extends CommandBase {
 
     @Override
     public void execute() {
-        wrist.setSpeed(speedSupplier.getAsDouble());
+        wrist.setManual(speedSupplier.getAsDouble());
     }
 
     @Override
     public void end(boolean interrupted) {
-        wrist.setSpeed(0);
+        wrist.setManual(0);
     }
 }

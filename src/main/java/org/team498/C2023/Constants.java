@@ -80,7 +80,7 @@ public final class Constants {
         public static final double F = 0;
     }
 
-    public static final class WristConstants {
+    public static final class ElevatorWristConstants {
         public static final double P = 6;
         public static final double I = 0;
         public static final double D = 0;

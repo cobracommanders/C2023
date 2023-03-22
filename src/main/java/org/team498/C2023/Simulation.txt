@@ -3,7 +3,6 @@ package org.team498.C2023;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -77,10 +76,10 @@ public class Simulation {
     }
 
     public void update() {
-        // elevatorSim.setInput(elevator.getPower() * RobotController.getBatteryVoltage());
-        // elevatorSim.update(Robot.DEFAULT_PERIOD);
-        // elevator.setEncoderPosition(elevatorSim.getPositionMeters() * Constants.ElevatorConstants.MOTOR_ROTATION_TO_METERS);
-        // elevatorMechanism.setLength(elevator.getPosition());
+        elevatorSim.setInput(elevator.getPower() * RobotController.getBatteryVoltage());
+        elevatorSim.update(Robot.DEFAULT_PERIOD);
+        elevator.setEncoderPosition(elevatorSim.getPositionMeters() * Constants.ElevatorConstants.MOTOR_ROTATION_TO_METERS);
+        elevatorMechanism.setLength(elevator.getPosition());
 
         elevatorWristSim.setInput(elevatorWrist.getPower() * RobotController.getBatteryVoltage());
         elevatorWristSim.update(Robot.DEFAULT_PERIOD);

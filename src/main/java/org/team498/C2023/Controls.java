@@ -19,7 +19,6 @@ import org.team498.C2023.commands.intakerollers.SetIntakeRollersToNextState;
 import org.team498.C2023.commands.intakewrist.SetIntakeWristToNextState;
 import org.team498.C2023.commands.robot.*;
 import org.team498.C2023.subsystems.Drivetrain;
-import org.team498.C2023.subsystems.ElevatorWrist;
 import org.team498.C2023.subsystems.Manipulator;
 import org.team498.lib.drivers.Gyro;
 import org.team498.lib.drivers.Xbox;
@@ -61,12 +60,6 @@ public class Controls {
                     return command;
                 }
             ));
-
-        driver.back().onTrue(new InstantCommand(() -> ElevatorWrist.getInstance().setEnabled(!ElevatorWrist.getInstance().getEnabled())));
-        driver.start().onTrue(new InstantCommand(() -> {
-            ElevatorWrist.getInstance().PID.reset();
-            ElevatorWrist.getInstance().PID.setSetpoint(0);
-        }));
 
         driver.X().onTrue(new Spit());
 

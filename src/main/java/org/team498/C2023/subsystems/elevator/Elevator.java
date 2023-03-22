@@ -9,14 +9,13 @@ import org.team498.C2023.Constants;
 import org.team498.C2023.RobotPosition;
 import org.team498.C2023.ShootTables;
 import org.team498.C2023.State;
-import org.team498.C2023.subsystems.elevator.ElevatorIOInputsAutoLogged;
 
 public class Elevator extends SubsystemBase {
-    private final ElevatorIO elevatorIO;
+    private final ElevatorIO IO;
     private final ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
 
     private Elevator() {
-        elevatorIO = switch (Constants.mode) {
+        IO = switch (Constants.mode) {
             case REAL, REPLAY, PRACTICE -> new ElevatorIOFalcon500();
             case SIM -> new ElevatorIO() {};
         };
@@ -24,9 +23,9 @@ public class Elevator extends SubsystemBase {
 
     @Override
     public void periodic() {
-        elevatorIO.updateInputs(inputs);
+        IO.updateInputs(inputs);
         Logger.getInstance().processInputs("Elevator", inputs);
-        elevatorIO.setBrakeMode(RobotState.isEnabled());
+        IO.setBrakeMode(RobotState.isEnabled());
 
         SmartDashboard.putData(this);
         SmartDashboard.putBoolean("Elevator at Setpoint", atSetpoint());
@@ -39,11 +38,11 @@ public class Elevator extends SubsystemBase {
     }
 
     public void setManual(double speed) {
-        elevatorIO.setManual(speed);
+        IO.setManual(speed);
     }
 
     public void setState(State.Elevator state) {
-        elevatorIO.setPosition(getSetpoint(state, RobotPosition.getFutureScoringNodeDistance()));
+        IO.setPosition(getSetpoint(state, RobotPosition.getFutureScoringNodeDistance()));
     }
 
     public boolean aboveIntakeHeight() {
@@ -59,7 +58,7 @@ public class Elevator extends SubsystemBase {
         };
     }
 
-    public void updateInitialPosition(boolean inAutoPose) {elevatorIO.updateInitialPosition(inAutoPose);}
+    public void updateInitialPosition(boolean inAutoPose) {IO.updateInitialPosition(inAutoPose);}
 
 
     private static Elevator instance;

@@ -114,11 +114,6 @@ public class Robot extends LoggedRobot {
     }
 
     @Override
-    public void simulationPeriodic() {
-        Simulation.getInstance().update();
-    }
-
-    @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
 
@@ -203,6 +198,12 @@ public class Robot extends LoggedRobot {
     @Override
     public void testInit() {
         CommandScheduler.getInstance().cancelAll();
+    }
+
+    
+    @Override
+    public void simulationPeriodic() {
+        // Simulation.getInstance().update();
     }
 
     public static void main(String... args) {
