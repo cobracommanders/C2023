@@ -30,7 +30,7 @@ public class RightConeTaxi implements Auto {
                         new PathPlannerFollower(PathLib.rightConeTaxi),
                         new SequentialCommandGroup(
                                 new WaitCommand(2.25),
-                                new SetRobotState(State.GROUND_CUBE),
+                                new SetRobotState(State.INTAKE),
                                 new GroundIntake())),
                 new WaitCommand(5),
                 new ReturnToIdle());

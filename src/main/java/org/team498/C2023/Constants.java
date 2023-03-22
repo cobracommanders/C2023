@@ -69,7 +69,7 @@ public final class Constants {
     public static final class IntakeWristConstants {
         public static final double P = 2.5;
         public static final double I = 0;
-        public static final double D = 0;
+        public static final double D = 0.01;
 
         public static final double F = 0;
     }

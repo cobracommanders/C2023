@@ -63,11 +63,11 @@ public class ElevatorWrist extends SubsystemBase {
             speed = this.speed;
         }
 
-        // if (isEnabled) {
-            // wrist.set(speed);
-        // } else {
-            // wrist.set(0);
-        // }
+        if (isEnabled) {
+            wrist.set(speed);
+        } else {
+            wrist.set(0);
+        }
 
         SmartDashboard.putData(this);
         SmartDashboard.putNumber("Wrist Angle", getAngle());
@@ -117,11 +117,11 @@ public class ElevatorWrist extends SubsystemBase {
     }
 
     public boolean atSetpoint() {
-        // if (isEnabled) {
-            // return Math.abs(PID.getSetpoint() - getAngle()) < 0.02;
-        // } else {
+        if (isEnabled) {
+            return Math.abs(PID.getSetpoint() - getAngle()) < 0.02;
+        } else {
             return true;
-        // }
+        }
     }
 
     public double getPower() {

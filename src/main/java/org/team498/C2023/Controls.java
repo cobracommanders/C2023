@@ -43,7 +43,7 @@ public class Controls {
     }
 
     public void configureDriverCommands() {
-        driver.leftTrigger().onTrue(new InstantCommand(() -> robotState.setState(State.GROUND_CUBE)).andThen(new GroundIntake())).onFalse(new ReturnToIdle());
+        driver.leftTrigger().onTrue(new InstantCommand(() -> robotState.setState(State.INTAKE)).andThen(new GroundIntake())).onFalse(new ReturnToIdle());
         driver.leftBumper().onTrue(new InstantCommand(() -> robotState.setState(State.OUTTAKE)).andThen(new GroundIntake())).onFalse(new ReturnToIdle());
         driver.A().onTrue(new InstantCommand(() -> Gyro.getInstance().setYaw(0)));
 

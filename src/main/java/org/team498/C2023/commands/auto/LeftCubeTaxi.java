@@ -30,7 +30,7 @@ public class LeftCubeTaxi implements Auto {
                         new PathPlannerFollower(PathLib.leftCubeTaxi),
                         new SequentialCommandGroup(
                                 new WaitCommand(2),
-                                new SetRobotState(State.GROUND_CUBE),
+                                new SetRobotState(State.INTAKE),
                                 new GroundIntake())),
                 new WaitCommand(5),
                 new ReturnToIdle());

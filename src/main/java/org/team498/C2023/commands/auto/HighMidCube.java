@@ -29,7 +29,7 @@ public class HighMidCube implements Auto {
                 new InstantCommand(() -> RobotState.getInstance().setCurrentGameMode(GameMode.CUBE)),
                 new InstantCommand(() -> RobotState.getInstance().setNextScoringOption(ScoringOption.TOP)),
                 new FullScore(),
-                new SetRobotState(State.GROUND_CUBE),
+                new SetRobotState(State.INTAKE),
                 new ParallelCommandGroup(
                         new PathPlannerFollower(PathLib.secondNodeToTopCube),
                         new SequentialCommandGroup(

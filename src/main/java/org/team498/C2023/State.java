@@ -14,7 +14,7 @@ public enum State {
 
     OUTTAKE(Elevator.IDLE, ElevatorWrist.OUTTAKE, IntakeWrist.OUTTAKE, IntakeRollers.OUTTAKE, Manipulator.SPIT),
 
-    GROUND_CUBE(Elevator.INTAKE, ElevatorWrist.INTAKE, IntakeWrist.INTAKE, IntakeRollers.INTAKE, Manipulator.INTAKE_CUBE),
+    INTAKE(Elevator.INTAKE, ElevatorWrist.INTAKE, IntakeWrist.INTAKE, IntakeRollers.INTAKE, Manipulator.INTAKE_CUBE),
 
     UNSTICK_CUBE(Elevator.UNSTICK_CUBE, ElevatorWrist.TRAVEL, IntakeWrist.TRAVEL_CUBE, IntakeRollers.IDLE, Manipulator.INTAKE_CUBE),
 
@@ -119,7 +119,7 @@ public enum State {
     }
 
     public enum IntakeRollers {
-        INTAKE(0.5, 0.5, 0.5),
+        INTAKE(1, 1, 0.5),
         SPIT(-1, 1, 0),
         IDLE(0, 0, 0),
         OUTTAKE(-0.5, -0.5, -0.5);
@@ -136,7 +136,7 @@ public enum State {
     }
 
     public enum IntakeWrist {
-        INTAKE(0),
+        INTAKE(0.1),
         SPIT(0.4),
         IDLE_OUT(0.1),
         TRAVEL_CUBE(0.3),

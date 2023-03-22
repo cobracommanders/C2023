@@ -37,7 +37,7 @@ public class TwoPlusOneBump implements Auto {
                                 new ParallelCommandGroup(
                                         new ReturnToIdle(),
                                         new WaitCommand(2)),
-                                new SetRobotState(State.GROUND_CUBE),
+                                new SetRobotState(State.INTAKE),
                                 new GroundIntake())),
                 new ParallelCommandGroup(
                         new PathPlannerFollower(PathLib.fourthCubeToEighthNode),
@@ -57,7 +57,7 @@ public class TwoPlusOneBump implements Auto {
                                 new ParallelCommandGroup(
                                         new ReturnToIdle(),
                                         new WaitCommand(2)),
-                                new SetRobotState(State.GROUND_CUBE),
+                                new SetRobotState(State.INTAKE),
                                 new GroundIntake())),
                 new WaitCommand(0.3),
                 new ReturnToIdle()

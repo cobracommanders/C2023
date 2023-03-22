@@ -57,11 +57,11 @@ public class IntakeWrist extends SubsystemBase {
     }
 
     public double getAngle() {
-        double angle = encoder.getOutput() + 0.15;
-        if (angle > 1)
-            angle -= 1;
+        double angle = encoder.getOutput() + 0.75;
+        if (angle < 1)
+            angle += 1;
 
-        return Robot.isReal() ? angle - 0.15 - 0.330891: simAngle;
+        return Robot.isReal() ? angle - 0.75 - 0.685961 : simAngle;
     }
 
     public void setState(State.IntakeWrist state) {

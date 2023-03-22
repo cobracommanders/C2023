@@ -38,7 +38,7 @@ public class TwoPlusOne implements Auto {
                                 new ParallelCommandGroup(
                                         new ReturnToIdle(),
                                         new WaitCommand(2)),
-                                new SetRobotState(State.GROUND_CUBE),
+                                new SetRobotState(State.INTAKE),
                                 new GroundIntake())),
                 new ParallelCommandGroup(
                         new PathPlannerFollower(PathLib.topCubeToSecondNode),
@@ -58,7 +58,7 @@ public class TwoPlusOne implements Auto {
                                 new ParallelCommandGroup(
                                         new ReturnToIdle(),
                                         new WaitCommand(2)),
-                                new SetRobotState(State.GROUND_CUBE),
+                                new SetRobotState(State.INTAKE),
                                 new GroundIntake())),
                 new WaitCommand(0.3),
                 new ReturnToIdle()
