@@ -136,7 +136,7 @@ public enum State {
     }
 
     public enum IntakeWrist {
-        INTAKE(0.1),
+        INTAKE(0.05),
         SPIT(0.4),
         IDLE_OUT(0.1),
         TRAVEL_CUBE(0.3),
