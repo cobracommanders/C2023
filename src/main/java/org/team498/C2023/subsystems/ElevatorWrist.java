@@ -21,14 +21,16 @@ public class ElevatorWrist extends SubsystemBase {
     private final CANSparkMax wrist;
     private final DutyCycle encoder;
 
-    private final PIDController PID;
+    public final PIDController PID;
 
     private State.ElevatorWrist currentState = State.ElevatorWrist.IDLE_CUBE;
 
-    private ControlMode controlMode = ControlMode.MANUAL;
+    private ControlMode controlMode = ControlMode.PID;
     private double speed = 0;
 
     private double simAngle = 0;
+
+    private boolean isEnabled = true;
 
     public enum ControlMode {
         PID,
@@ -40,6 +42,7 @@ public class ElevatorWrist extends SubsystemBase {
         wrist.restoreFactoryDefaults();
         wrist.setIdleMode(IdleMode.kBrake);
         wrist.setInverted(true);
+        wrist.burnFlash(); 
 
         encoder = new DutyCycle(new DigitalInput(ENCODER_PORT));
 
@@ -59,12 +62,27 @@ public class ElevatorWrist extends SubsystemBase {
         } else {
             speed = this.speed;
         }
-        wrist.set(speed);
+
+        if (isEnabled) {
+            wrist.set(speed);
+        } else {
+            wrist.set(0);
+        }
 
         SmartDashboard.putData(this);
         SmartDashboard.putNumber("Wrist Angle", getAngle());
         SmartDashboard.putBoolean("Wrist at Setpoint", atSetpoint());
         SmartDashboard.putNumber("Wrist Error", PID.getPositionError());
+        SmartDashboard.putNumber("Wrist Output", speed);
+        SmartDashboard.putNumber("Wrist PID Setpoint", PID.getSetpoint());
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.isEnabled = enabled;
+    }
+
+    public boolean getEnabled() {
+        return isEnabled;
     }
 
     public void setState(State.ElevatorWrist state) {
@@ -99,7 +117,11 @@ public class ElevatorWrist extends SubsystemBase {
     }
 
     public boolean atSetpoint() {
-        return Math.abs(PID.getSetpoint() - getAngle()) < 0.02;
+        if (isEnabled) {
+            return Math.abs(PID.getSetpoint() - getAngle()) < 0.02;
+        } else {
+            return true;
+        }
     }
 
     public double getPower() {

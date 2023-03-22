@@ -150,16 +150,24 @@ public class Drivetrain extends SubsystemBase {
         return states;
     }
 
-    public void setPositionGoal(Pose2d pose) {xController.setSetpoint(pose.getX());yController.setSetpoint(pose.getY());setAngleGoal(pose.getRotation().getDegrees());}
+    public void setPositionGoal(Pose2d pose) {xController.setSetpoint(pose.getX()); yController.setSetpoint(pose.getY()); setAngleGoal(pose.getRotation().getDegrees());}
     public ChassisSpeeds calculatePositionSpeed() {return new ChassisSpeeds(xController.calculate(getPose().getX()), getPose().getY(), calculateAngleSpeed());}
     public boolean atPositionGoal() {return (Math.abs(xController.getPositionError()) < PoseConstants.EPSILON) && (Math.abs(yController.getPositionError()) < PoseConstants.EPSILON) && atAngleGoal();}
+
+    public void setXGoal(double pose) {xController.setSetpoint(pose);}
+    public double calculateXSpeed() {return xController.calculate(getPose().getX());}
+    public boolean atXGoal() {return Math.abs(xController.getPositionError()) < PoseConstants.EPSILON;}
+    
+    public void setYGoal(double pose) {yController.setSetpoint(pose);}
+    public double calculateYSpeed() {return yController.calculate(getPose().getY());}
+    public boolean atYGoal() {return Math.abs(yController.getPositionError()) < PoseConstants.EPSILON;}
 
     public void setAngleGoal(double angle) {angleController.setGoal(angle);}
     public double calculateAngleSpeed() {return angleController.calculate(getYaw());}
     public boolean atAngleGoal() {return Math.abs(angleController.getPositionError()) < AngleConstants.EPSILON;}
 
     public Pose2d getPose() {return odometry.getPoseMeters();}
-    public void setPos2e(Pose2d pose) {odometry.resetPosition(Rotation2d.fromDegrees(getYaw()), getModulePositions(), pose);}
+    public void setPose(Pose2d pose) {odometry.resetPosition(Rotation2d.fromDegrees(getYaw()), getModulePositions(), pose);}
     public double getYaw() {return gyroInputs.yaw;}
     public void setYaw(double angle) {gyro.setYaw(angle);}
     /** Return a double array with a value for yaw pitch and roll in that order */

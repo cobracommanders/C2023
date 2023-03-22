@@ -14,7 +14,7 @@ import org.team498.C2023.RobotState.GameMode;
 import org.team498.C2023.commands.SetRobotState;
 import org.team498.C2023.commands.manipulator.SetManipulatorToNextState;
 import org.team498.C2023.commands.robot.ReturnToIdle;
-import org.team498.C2023.subsystems.elevator.Elevator;
+import org.team498.C2023.subsystems.Elevator;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;

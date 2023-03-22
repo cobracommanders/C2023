@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-import org.team498.C2023.Constants;
 import org.team498.C2023.Robot;
 import org.team498.C2023.RobotPosition;
 import org.team498.C2023.subsystems.Drivetrain;
@@ -61,8 +60,7 @@ public class PathPlannerFollower extends CommandBase {
 
         Robot.field.getObject("Stop Points").setPoses(markerPoses);
 
-        drivetrain.setPos2e(Robot.alliance == Alliance.Blue ? trajectory.getInitialHolonomicPose() : PoseUtil.flip(trajectory.getInitialHolonomicPose()));
-        drivetrain.setYaw(Robot.alliance == Alliance.Blue ? trajectory.getInitialHolonomicPose().getRotation().getDegrees() : PoseUtil.flip(trajectory.getInitialHolonomicPose()).getRotation().getDegrees());
+        drivetrain.setPose(Robot.alliance == Alliance.Blue ? trajectory.getInitialHolonomicPose() : PoseUtil.flip(trajectory.getInitialHolonomicPose()));
 
         // Display the trajectory on the driver station dashboard
         List<Pose2d> poses = new LinkedList<>();
@@ -92,8 +90,8 @@ public class PathPlannerFollower extends CommandBase {
                     drivetrain.setPositionGoal(PoseUtil.flip(new Pose2d(state.poseMeters.getX(), state.poseMeters.getY(), state.holonomicRotation)));
                 }
 
-                var speed = drivetrain.calculatePositionSpeed();
-                drivetrain.drive(speed.vxMetersPerSecond, speed.vyMetersPerSecond, speed.omegaRadiansPerSecond, true);
+                var speeds = drivetrain.calculatePositionSpeed();
+                drivetrain.drive(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond, true);
             } else {
                 if (!hasReset) {
                     trajectoryTimer.stop();
@@ -120,19 +118,19 @@ public class PathPlannerFollower extends CommandBase {
                 drivetrain.setPositionGoal(PoseUtil.flip(new Pose2d(state.poseMeters.getX(), state.poseMeters.getY(), state.holonomicRotation)));
             }
 
-            var speed = drivetrain.calculatePositionSpeed();
-            drivetrain.drive(speed.vxMetersPerSecond, speed.vyMetersPerSecond, speed.omegaRadiansPerSecond, true);
+            var speeds = drivetrain.calculatePositionSpeed();
+            drivetrain.drive(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond, true);
         }
     }
 
     @Override
     public boolean isFinished() {
-        // return trajectoryTimer.get() > trajectory.getTotalTimeSeconds();
-        if (Robot.alliance == Alliance.Blue) {
-            return RobotPosition.isNear(trajectory.getEndState().poseMeters, Constants.DrivetrainConstants.PoseConstants.EPSILON);
-        } else {
-            return RobotPosition.isNear(PoseUtil.flip(trajectory.getEndState().poseMeters), Constants.DrivetrainConstants.PoseConstants.EPSILON);
-        }
+        return trajectoryTimer.get() > trajectory.getTotalTimeSeconds();
+        // if (Robot.alliance == Alliance.Blue) {
+            // return drivetrain.isNear(trajectory.getEndState().poseMeters, Constants.DrivetrainConstants.PoseConstants.EPSILON);
+        // } else {
+            // return drivetrain.isNear(PoseUtil.flip(trajectory.getEndState().poseMeters), Constants.DrivetrainConstants.PoseConstants.EPSILON);
+        // }
     }
 
     @Override

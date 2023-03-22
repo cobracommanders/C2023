@@ -17,10 +17,8 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import org.team498.C2023.commands.auto.*;
 import org.team498.C2023.subsystems.Drivetrain;
-import org.team498.C2023.subsystems.ElevatorWrist;
 import org.team498.C2023.subsystems.Manipulator;
 import org.team498.C2023.subsystems.Photonvision;
-import org.team498.C2023.subsystems.elevator.Elevator;
 import org.team498.lib.auto.Auto;
 import org.team498.lib.drivers.Blinkin;
 import org.team498.lib.drivers.Blinkin.Color;
@@ -48,14 +46,24 @@ public class Robot extends LoggedRobot {
     private final RobotState robotState = RobotState.getInstance();
 
     private final SendableChooser<Auto> autoChooser = new SendableChooser<Auto>();
+    private Auto autoToRun;
 
-    private final List<Auto> autoOptions = List.of(new JustScore(),
-                                                   new CubeEngage(),
-                                                   new PreloadAndTaxi(),
-                                                   new TwoCubeEngage(),
-                                                   new TwoCubePickupEngage(),
-                                                   new JustAutoShot()
-    );
+    private final List<Auto> autoOptions = List.of(
+            new JustScore(),
+            new CubeEngage(),
+            new LeftConeTaxi(),
+            new LeftCubeTaxi(),
+            new RightConeTaxi(),
+            new RightCubeTaxi(),
+            new TwoPlusOneBump(),
+            new HighMidCubeEngage(),
+            new HighMidCubeEngageBump(),
+            new HighMidCube(),
+            new HighMidCubeBump(),
+            new HighHighCubeEngage(),
+            new HighHighCubeEngageBump(),
+            new HighHighCube(),
+            new HighHighCubeBump());
 
 
     @Override
@@ -101,6 +109,8 @@ public class Robot extends LoggedRobot {
         controls.configureOperatorCommands();
 
         SmartDashboard.putData(autoChooser);
+
+        PathLib.eighthNodeToChargeStation.getClass();
     }
 
     @Override
@@ -112,7 +122,7 @@ public class Robot extends LoggedRobot {
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
 
-        photonvision.getEstimatedGlobalPose().ifPresent(pose -> drivetrain.setPos2e(PoseUtil.toPose2d(pose.estimatedPose)));
+        photonvision.getEstimatedGlobalPose().ifPresent(pose -> drivetrain.setPose(PoseUtil.toPose2d(pose.estimatedPose)));
 
         field.getObject("Scoring Target").setPose(RobotPosition.getNextScoringNodePosition());
 
@@ -143,17 +153,17 @@ public class Robot extends LoggedRobot {
         rotationOffset = alliance == Alliance.Blue
                          ? 0
                          : 180;
+
+
+        autoToRun = autoChooser.getSelected();
     }
 
     @Override
     public void teleopPeriodic() {
-        SmartDashboard.putNumber("anlge error",
-                                 RotationUtil.toSignedDegrees(Math.abs(drivetrain.getYaw() - RobotPosition.calculateDegreesToTarget(
-                                         RobotPosition.getNextScoringNodePosition())))
-        );
-        if ((Math.abs(RotationUtil.toSignedDegrees(Math.abs(drivetrain.getYaw() - RobotPosition.calculateDegreesToTarget(
-                RobotPosition.getNextScoringNodePosition())))) < 5) && (RobotPosition.distanceTo(
-                Point.fromPose2d(RobotPosition.getClosestScoringPosition())) < Units.inchesToMeters(25))) {
+        if ((Math.abs(RotationUtil.toSignedDegrees(Math.abs(drivetrain.getYaw()
+                - RobotPosition.calculateDegreesToTarget(RobotPosition.getNextScoringNodePosition())))) < 3.5)
+                && (RobotPosition.distanceTo(Point.fromPose2d(RobotPosition.getClosestScoringPosition())) < Units
+                        .inchesToMeters(25))) {
             blinkin.setColor(Blinkin.Color.LIME);
             controls.driver.rumble(0.5);
         } else if (robotState.inShootDriveMode() && RobotPosition.inCommunity()) {
@@ -163,34 +173,31 @@ public class Robot extends LoggedRobot {
                 blinkin.setColor(Color.BLUE);
             } else {
                 blinkin.setColor(RobotState.getInstance().inConeMode()
-                                 ? Blinkin.Color.YELLOW
-                                 : Blinkin.Color.PURPLE);
+                        ? Blinkin.Color.YELLOW
+                        : Blinkin.Color.PURPLE);
             }
+            controls.driver.rumble(0);
         }
+    }
+
+    
+    @Override
+    public void teleopExit() {
+        controls.driver.rumble(0);
     }
 
     @Override
     public void autonomousInit() {
-        Auto auto = autoChooser.getSelected();
-
-        if (auto == null) auto = new JustScore();
+        if (autoToRun == null)
+            autoToRun = new JustScore();
 
         if (alliance == Alliance.Blue) {
-            Drivetrain.getInstance().setPos2e(auto.getInitialPose());
-            Drivetrain.getInstance().setYaw(auto.getInitialPose().getRotation().getDegrees());
+            Drivetrain.getInstance().setPose(autoToRun.getInitialPose());
         } else {
-            Drivetrain.getInstance().setPos2e(PoseUtil.flip(auto.getInitialPose()));
-            Drivetrain.getInstance().setYaw(PoseUtil.flip(auto.getInitialPose()).getRotation().getDegrees());
-            
+            Drivetrain.getInstance().setPose(PoseUtil.flip(autoToRun.getInitialPose()));
         }
 
-        Elevator.getInstance().updateInitialPosition(auto.getInitialState() == State.AUTO_SHOT);
-
-        Elevator.getInstance().setState(auto.getInitialState().elevator);
-        ElevatorWrist.getInstance().setState(auto.getInitialState().elevatorWrist);
-
-
-        auto.getCommand().schedule();
+        autoToRun.getCommand().schedule();
     }
 
     @Override
