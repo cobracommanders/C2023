@@ -13,7 +13,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 
-import org.team498.lib.drivers.LazyTalonFX;
 import org.team498.lib.util.Falcon500Conversions;
 
 import static org.team498.C2023.Constants.DrivetrainConstants.*;
@@ -55,8 +54,6 @@ public class ModuleIOFalcon500 implements ModuleIO {
         configDriveMotor(drive);
         configSteerMotor(steer);
         configCANCoder(encoder);
-
-        setBrakeMode(true);
     }
 
     @Override

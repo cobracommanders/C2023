@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.team498.C2023.subsystems.ElevatorWrist;
 import org.team498.C2023.subsystems.IntakeWrist;
-import org.team498.C2023.subsystems.Elevator;
+import org.team498.C2023.subsystems.elevator.Elevator;
 
 public class Simulation {
     private final Elevator elevator = Elevator.getInstance();
