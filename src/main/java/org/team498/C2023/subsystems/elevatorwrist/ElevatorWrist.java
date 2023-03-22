@@ -9,7 +9,6 @@ import org.team498.C2023.Constants;
 import org.team498.C2023.RobotPosition;
 import org.team498.C2023.ShootTables;
 import org.team498.C2023.State;
-import org.team498.C2023.subsystems.elevatorwrist.ElevatorWristIOInputsAutoLogged;
 
 public class ElevatorWrist extends SubsystemBase {
     private final ElevatorWristIO IO;
@@ -44,6 +43,7 @@ public class ElevatorWrist extends SubsystemBase {
 
     public void setState(State.ElevatorWrist state) {
         IO.setPosition(getSetpoint(state, RobotPosition.getFutureScoringNodeDistance()));
+        Logger.getInstance().recordOutput("ElevatorWrist State", state.name());
     }
 
     private double getSetpoint(State.ElevatorWrist state, double interpolatedValue) {

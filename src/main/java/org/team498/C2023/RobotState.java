@@ -1,6 +1,7 @@
 package org.team498.C2023;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class RobotState extends SubsystemBase {
@@ -13,14 +14,14 @@ public class RobotState extends SubsystemBase {
     public enum ScoringOption {TOP, MID, SPIT}
 
 
-    public void setCurrentGameMode(GameMode gameMode) {currentGameMode = gameMode;}
+    public void setCurrentGameMode(GameMode gameMode) {currentGameMode = gameMode; Logger.getInstance().recordOutput("Game Mode", gameMode.name());}
     public boolean inCubeMode() {return currentGameMode == GameMode.CUBE;}
     public boolean inConeMode() {return currentGameMode == GameMode.CONE;}
 
-    public void setState(State state) {currentState = state;}
+    public void setState(State state) {currentState = state; Logger.getInstance().recordOutput("Robot State", state.name());}
     public State getState() {return currentState;}
 
-    public void setNextScoringOption(ScoringOption scoringOption) {nextScoringOption = scoringOption;}
+    public void setNextScoringOption(ScoringOption scoringOption) {nextScoringOption = scoringOption; Logger.getInstance().recordOutput("Scoring Option", scoringOption.name());}
     public ScoringOption getNextScoringOption() {return nextScoringOption;}
 
     public void setShootDrive(boolean enable) {shootDrive = enable;}
@@ -43,7 +44,6 @@ public class RobotState extends SubsystemBase {
             };
         }
 
-        SmartDashboard.putString("Driveteam State", state.name());
         return state;
     }
 

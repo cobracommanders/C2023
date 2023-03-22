@@ -43,6 +43,7 @@ public class Elevator extends SubsystemBase {
 
     public void setState(State.Elevator state) {
         IO.setPosition(getSetpoint(state, RobotPosition.getFutureScoringNodeDistance()));
+        Logger.getInstance().recordOutput("Elevator State", state.name());
     }
 
     public boolean aboveIntakeHeight() {
