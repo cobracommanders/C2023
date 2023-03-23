@@ -8,7 +8,7 @@ public interface ElevatorIO {
         public double positionMeters = 0.0;
         public double targetPositionMeters = 0.0;
 
-        public double rawAbsouluteEncoder = 0.0;
+        public double rawAbsoluteEncoder = 0.0;
 
         public double frontAppliedVolts = 0.0;
         public double frontCurrentAmps = 0.0;

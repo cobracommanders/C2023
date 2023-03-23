@@ -73,7 +73,7 @@ public class Robot extends LoggedRobot {
         if (isReal()) {
             Logger.getInstance().addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB stick
             Logger.getInstance().addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
-            new PowerDistribution(1, PowerDistribution.ModuleType.kRev); // Enables power distribution logging //TODO Check CAN ID
+            new PowerDistribution(1, PowerDistribution.ModuleType.kRev).close();; // Enables power distribution logging //TODO Check CAN ID
         } else {
             switch (Constants.mode) {
                 case SIM -> {

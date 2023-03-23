@@ -59,7 +59,7 @@ public class ElevatorIOFalcon500 extends SubsystemBase implements ElevatorIO {
 
     @Override
     public void periodic() {
-        double precentOutput = switch (controlMode) {
+        double percentOutput = switch (controlMode) {
             case PID: 
                 double speed = PID.calculate(getPositionMeters());
                 yield speed + feedforward.calculate(speed);
@@ -69,7 +69,7 @@ public class ElevatorIOFalcon500 extends SubsystemBase implements ElevatorIO {
             // TODO change ControlMode to ElevatorMode and add a disabled state
         };
     
-        front.set(TalonFXControlMode.PercentOutput, precentOutput);
+        front.set(TalonFXControlMode.PercentOutput, percentOutput);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class ElevatorIOFalcon500 extends SubsystemBase implements ElevatorIO {
         inputs.positionMeters = getPositionMeters();
         inputs.targetPositionMeters = PID.getGoal().position;
 
-        inputs.rawAbsouluteEncoder = encoder.getOutput();
+        inputs.rawAbsoluteEncoder = encoder.getOutput();
 
         inputs.frontAppliedVolts = front.getMotorOutputVoltage();
         inputs.frontCurrentAmps = front.getStatorCurrent();

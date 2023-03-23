@@ -49,14 +49,14 @@ public class ElevatorWristIONEO extends SubsystemBase implements ElevatorWristIO
 
     @Override
     public void periodic() {
-        double precentOutput = switch (controlMode) {
+        double percentOutput = switch (controlMode) {
             case PID: 
                 yield PID.calculate(getAngle());
             case MANUAL:
                 yield this.speed;
         };
     
-        motor.set(precentOutput);
+        motor.set(percentOutput);
     }
 
     @Override
