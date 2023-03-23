@@ -4,9 +4,10 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 // Credit to team 254 for inspiring this class
-public class LazyTalonFX extends com.ctre.phoenix.motorcontrol.can.WPI_TalonFX {
+public class LazyTalonFX extends TalonFX {
     private ControlMode currentControlMode = null;
     private double currentSetpoint = Double.NaN;
     private DemandType currentDemandType = null;
@@ -18,11 +19,11 @@ public class LazyTalonFX extends com.ctre.phoenix.motorcontrol.can.WPI_TalonFX {
     }
 
     @Override
-    public void set(ControlMode mode, double outputValue) {
-        if (outputValue != currentSetpoint || mode != currentControlMode) {
+    public void set(ControlMode mode, double setpoint) {
+        if (setpoint != currentSetpoint|| mode != currentControlMode) {
             this.currentControlMode = mode;
-            this.currentSetpoint = outputValue;
-            super.set(mode, outputValue);
+            this.currentSetpoint = setpoint;
+            super.set(mode, setpoint);
         }
     }
 

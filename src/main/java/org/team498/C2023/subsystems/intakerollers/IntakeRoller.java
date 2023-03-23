@@ -22,8 +22,6 @@ public class IntakeRoller extends SubsystemBase {
     public void periodic() {
         IO.updateInputs(inputs);
         Logger.getInstance().processInputs("IntakeRoller", inputs);
-
-        SmartDashboard.putData(this);
     }
 
     public void setState(State.IntakeRollers state) {

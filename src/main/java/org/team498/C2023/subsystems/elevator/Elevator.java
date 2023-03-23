@@ -27,10 +27,10 @@ public class Elevator extends SubsystemBase {
         Logger.getInstance().processInputs("Elevator", inputs);
         IO.setBrakeMode(RobotState.isEnabled());
 
-        SmartDashboard.putData(this);
-        SmartDashboard.putBoolean("Elevator at Setpoint", atSetpoint());
-        SmartDashboard.putNumber("Elevator Error", inputs.targetPositionMeters - inputs.positionMeters);
-        SmartDashboard.putNumber("Elevator Position", inputs.positionMeters);
+        // SmartDashboard.putData(this);
+        // SmartDashboard.putBoolean("Elevator at Setpoint", atSetpoint());
+        // SmartDashboard.putNumber("Elevator Error", inputs.targetPositionMeters - inputs.positionMeters);
+        // SmartDashboard.putNumber("Elevator Position", inputs.positionMeters);
     }
 
     public boolean atSetpoint() {

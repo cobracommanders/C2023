@@ -7,7 +7,7 @@ public final class Constants {
         REAL, SIM, REPLAY, PRACTICE
     }
 
-    public static final Mode mode = Mode.SIM;
+    public static final Mode mode = Mode.REPLAY;
 
     public static final class OIConstants {
         public static final int DRIVER_CONTROLLER_ID = 0;
@@ -75,7 +75,7 @@ public final class Constants {
     public static final class IntakeWristConstants {
         public static final double P = 2.5;
         public static final double I = 0;
-        public static final double D = 0;
+        public static final double D = 0.025;
 
         public static final double F = 0;
     }

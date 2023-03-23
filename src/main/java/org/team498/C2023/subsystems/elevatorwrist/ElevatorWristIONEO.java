@@ -11,11 +11,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.DigitalInput;
 
 import static org.team498.C2023.Ports.ElevatorWrist.*;
+
+import org.team498.lib.drivers.LazySparkMax;
+
 import static org.team498.C2023.Constants.ElevatorWristConstants.*;
 
 
 public class ElevatorWristIONEO extends SubsystemBase implements ElevatorWristIO {
-    private final CANSparkMax motor;
+    private final LazySparkMax motor;
     private final DutyCycle encoder;
 
     private final PIDController PID;
@@ -25,7 +28,7 @@ public class ElevatorWristIONEO extends SubsystemBase implements ElevatorWristIO
     private double speed = 0;
 
     public ElevatorWristIONEO() {
-        motor = new CANSparkMax(WRIST, MotorType.kBrushless);
+        motor = new LazySparkMax(WRIST, MotorType.kBrushless);
 
         configMotor(motor);
 
@@ -56,7 +59,7 @@ public class ElevatorWristIONEO extends SubsystemBase implements ElevatorWristIO
                 yield this.speed;
         };
     
-        motor.set(percentOutput);
+        motor.set(-percentOutput);
     }
 
     @Override
@@ -66,9 +69,9 @@ public class ElevatorWristIONEO extends SubsystemBase implements ElevatorWristIO
 
         inputs.encoder = encoder.getOutput();
 
-        inputs.motorAppliedVolts = motor.getBusVoltage() * motor.get();
-        inputs.motorCurrentAmps = motor.getOutputCurrent();
-        inputs.motorTemp = (motor.getMotorTemperature() * 1.8) + 32;
+        // inputs.motorAppliedVolts = motor.getBusVoltage() * motor.get();
+        // inputs.motorCurrentAmps = motor.getOutputCurrent();
+        // inputs.motorTemp = (motor.getMotorTemperature() * 1.8) + 32;
     }
 
     @Override
@@ -78,7 +81,7 @@ public class ElevatorWristIONEO extends SubsystemBase implements ElevatorWristIO
 
     private void configMotor(CANSparkMax motor) {
         motor.restoreFactoryDefaults();
-        motor.setInverted(true);
+        motor.setInverted(false);
         motor.burnFlash(); 
     }
 

@@ -1,6 +1,5 @@
 package org.team498.C2023.subsystems.intakewrist;
 
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
@@ -15,24 +14,25 @@ import static org.team498.C2023.Constants.IntakeWristConstants.*;
 import static org.team498.C2023.Ports.IntakeWrist.*;
 
 import org.team498.C2023.State;
+import org.team498.lib.drivers.LazySparkMax;
 
 public class IntakeWristIONEO extends SubsystemBase implements IntakeWristIO {
-    private final CANSparkMax left;
-    private final CANSparkMax right;
+    private final LazySparkMax left;
+    private final LazySparkMax right;
     private final DutyCycle encoder;
 
     private final ProfiledPIDController PID;
 
     public IntakeWristIONEO() {
-        left = new CANSparkMax(L_WRIST, MotorType.kBrushless);
-        right = new CANSparkMax(R_WRIST, MotorType.kBrushless);
+        left = new LazySparkMax(L_WRIST, MotorType.kBrushless);
+        right = new LazySparkMax(R_WRIST, MotorType.kBrushless);
 
         left.restoreFactoryDefaults();
         right.restoreFactoryDefaults();
 
         right.follow(left, true);
 
-        PID = new ProfiledPIDController(P, I, D, new TrapezoidProfile.Constraints(2, 1));
+        PID = new ProfiledPIDController(P, I, D, new TrapezoidProfile.Constraints(2.5, 6));
         PID.reset(State.IntakeWrist.IDLE_IN.position);
         PID.setTolerance(0);
 
@@ -56,13 +56,13 @@ public class IntakeWristIONEO extends SubsystemBase implements IntakeWristIO {
 
         inputs.encoder = encoder.getOutput();
 
-        inputs.leftAppliedVolts = left.getBusVoltage() * left.get();
-        inputs.leftCurrentAmps = left.getOutputCurrent();
-        inputs.leftTemp = (left.getMotorTemperature() * 1.8) + 32;
+        // inputs.leftAppliedVolts = left.getBusVoltage() * left.get();
+        // inputs.leftCurrentAmps = left.getOutputCurrent();
+        // inputs.leftTemp = (left.getMotorTemperature() * 1.8) + 32;
 
-        inputs.rightAppliedVolts = right.getBusVoltage() * right.get();
-        inputs.rightCurrentAmps = right.getOutputCurrent();
-        inputs.rightTemp = (right.getMotorTemperature() * 1.8) + 32;
+        // inputs.rightAppliedVolts = right.getBusVoltage() * right.get();
+        // inputs.rightCurrentAmps = right.getOutputCurrent();
+        // inputs.rightTemp = (right.getMotorTemperature() * 1.8) + 32;
     }
 
     @Override

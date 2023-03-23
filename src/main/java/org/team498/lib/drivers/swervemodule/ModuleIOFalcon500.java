@@ -73,12 +73,12 @@ public class ModuleIOFalcon500 implements ModuleIO {
         inputs.targetSpeedMetersPerSecond = currentTarget.speedMetersPerSecond;
         inputs.targetAngle = currentTarget.angle.getDegrees();
 
-        inputs.driveAppliedVolts = drive.getMotorOutputVoltage();
+        // inputs.driveAppliedVolts = drive.getMotorOutputVoltage();
         inputs.driveCurrentAmps = drive.getStatorCurrent();
         inputs.driveTemp = (drive.getTemperature() * 1.8) + 32;
         inputs.driveRawEncoder = drive.getSelectedSensorPosition();
 
-        inputs.steerAppliedVolts = steer.getMotorOutputVoltage();
+        // inputs.steerAppliedVolts = steer.getMotorOutputVoltage();
         inputs.steerCurrentAmps = steer.getStatorCurrent();
         inputs.steerTemp = (steer.getTemperature() * 1.8) + 32;
         inputs.steerRawEncoder = steer.getSelectedSensorPosition();
@@ -144,7 +144,6 @@ public class ModuleIOFalcon500 implements ModuleIO {
         motor.configAllSettings(driveConfig);
 
         motor.configOpenloopRamp(1);
-        motor.setSelectedSensorPosition(0);
         motor.setInverted(false);
 
         motor.config_kP(0, 0.025);
@@ -161,7 +160,6 @@ public class ModuleIOFalcon500 implements ModuleIO {
         motor.configAllSettings(steerConfig);
 
         motor.configOpenloopRamp(1);
-        motor.setSelectedSensorPosition(0);
         motor.setSensorPhase(true);
         motor.setInverted(true);
 

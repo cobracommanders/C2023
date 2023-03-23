@@ -19,18 +19,19 @@ public class ElevatorWrist extends SubsystemBase {
             case REAL, REPLAY, PRACTICE -> new ElevatorWristIONEO();
             case SIM -> new ElevatorWristIO() {};
         };
+        IO.setBrakeMode(true);
     }
 
     @Override
     public void periodic() {
         IO.updateInputs(inputs);
         Logger.getInstance().processInputs("ElevatorWrist", inputs);
-        IO.setBrakeMode(RobotState.isEnabled());
+        // IO.setBrakeMode(RobotState.isEnabled());
 
-        SmartDashboard.putData(this);
-        SmartDashboard.putBoolean("ElevatorWrist at Setpoint", atSetpoint());
-        SmartDashboard.putNumber("ElevatorWrist Error", inputs.targetAngle - inputs.angle);
-        SmartDashboard.putNumber("ElevatorWrist Angle", inputs.angle);
+        // SmartDashboard.putData(this);
+        // SmartDashboard.putBoolean("ElevatorWrist at Setpoint", atSetpoint());
+        // SmartDashboard.putNumber("ElevatorWrist Error", inputs.targetAngle - inputs.angle);
+        // SmartDashboard.putNumber("ElevatorWrist Angle", inputs.angle);
     }
 
     public boolean atSetpoint() {

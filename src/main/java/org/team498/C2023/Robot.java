@@ -48,6 +48,8 @@ public class Robot extends LoggedRobot {
     private final SendableChooser<Auto> autoChooser = new SendableChooser<Auto>();
     private Auto autoToRun;
 
+    private final Logger logger = Logger.getInstance();
+
     private final List<Auto> autoOptions = List.of(
             new JustScore(),
             new CubeEngage(),
@@ -68,30 +70,37 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void robotInit() {
-        Logger.getInstance().recordMetadata("ProjectName", "C2023"); // Set a metadata value
+        logger.recordMetadata("ProjectName", "C2023");
+        logger.recordMetadata("RuntimeType", getRuntimeType().toString());
+        logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
+        logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
+        logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
+        logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
+        logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
 
         if (isReal()) {
-            Logger.getInstance().addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB stick
-            Logger.getInstance().addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
-            new PowerDistribution(1, PowerDistribution.ModuleType.kRev).close();; // Enables power distribution logging //TODO Check CAN ID
+            // Use /media/sda1/ for logging to a thumb drive
+            logger.addDataReceiver(new WPILOGWriter("/home/lvuser/logs")); // Log to a USB stick
+            logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+            new PowerDistribution(1, PowerDistribution.ModuleType.kRev).close(); // Enables power distribution logging //TODO Check CAN ID
         } else {
             switch (Constants.mode) {
                 case SIM -> {
-                    Logger.getInstance().addDataReceiver(new WPILOGWriter("/"));
-                    Logger.getInstance().addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+                    logger.addDataReceiver(new WPILOGWriter("/"));
+                    logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
                 }
                 case REPLAY -> {
-                    setUseTiming(true); // Set to false to run as fast as possible when replaying logs
+                    setUseTiming(false); // Set to false to run as fast as possible when replaying logs
                     String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
-                    Logger.getInstance().setReplaySource(new WPILOGReader(logPath)); // Read replay log
-                    Logger.getInstance().addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
+                    logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
+                    logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
                 }
                 default -> {}
             }
 
         }
 
-        Logger.getInstance().start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
+        logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
 
         gyro.setYaw(0);
 

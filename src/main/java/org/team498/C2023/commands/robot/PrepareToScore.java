@@ -11,6 +11,7 @@ import org.team498.C2023.commands.intakewrist.SetIntakeWristToNextState;
 import org.team498.C2023.commands.manipulator.SetManipulatorToNextState;
 import org.team498.C2023.subsystems.elevator.Elevator;
 import org.team498.C2023.commands.elevatorwrist.SetElevatorWristToNextState;
+import org.team498.C2023.commands.intakerollers.SetIntakeRollersToNextState;
 
 public class PrepareToScore extends SequentialCommandGroup {
     public PrepareToScore() {
@@ -19,6 +20,7 @@ public class PrepareToScore extends SequentialCommandGroup {
                 new SetManipulatorToNextState(),
                 new ParallelCommandGroup(
                         new SetIntakeWristToNextState(),
+                        new SetIntakeRollersToNextState(),
                         new SetElevatorWristToNextState()
                 ),
                 new SetRobotToNextScoringState(),

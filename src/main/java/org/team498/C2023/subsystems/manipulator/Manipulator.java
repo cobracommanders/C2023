@@ -24,8 +24,6 @@ public class Manipulator extends SubsystemBase {
     public void periodic() {
         IO.updateInputs(inputs);
         Logger.getInstance().processInputs("Manipulator", inputs);
-
-        SmartDashboard.putData(this);
     }
 
     public void setState(State.Manipulator state) {

@@ -1,7 +1,6 @@
 package org.team498.C2023.subsystems.intakewrist;
 
 import edu.wpi.first.wpilibj.RobotState;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import org.littletonrobotics.junction.Logger;
@@ -17,22 +16,26 @@ public class IntakeWrist extends SubsystemBase {
             case REAL, REPLAY, PRACTICE -> new IntakeWristIONEO();
             case SIM -> new IntakeWristIO() {};
         };
+
+        IO.setPosition(State.IntakeWrist.IDLE_IN.position);
+        IO.setBrakeMode(true);
     }
 
     @Override
     public void periodic() {
         IO.updateInputs(inputs);
         Logger.getInstance().processInputs("IntakeWrist", inputs);
-        IO.setBrakeMode(RobotState.isEnabled());
+        // IO.setBrakeMode(RobotState.isEnabled());
 
-        SmartDashboard.putData(this);
-        SmartDashboard.putBoolean("IntakeWrist at Setpoint", atSetpoint());
-        SmartDashboard.putNumber("IntakeWrist Error", inputs.targetAngle - inputs.angle);
-        SmartDashboard.putNumber("IntakeWrist Angle", inputs.angle);
+        // SmartDashboard.putData(this);
+        // SmartDashboard.putBoolean("IntakeWrist at Setpoint", atSetpoint());
+        // SmartDashboard.putNumber("IntakeWrist Error", inputs.targetAngle - inputs.angle);
+        // SmartDashboard.putNumber("IntakeWrist Angle", inputs.angle);
     }
 
     public boolean atSetpoint() {
         return Math.abs(inputs.targetAngle - inputs.angle) < 0.05;
+        // return true;
     }
 
     public void setState(State.IntakeWrist state) {

@@ -14,7 +14,7 @@ public class ManipulatorIONEO extends SubsystemBase implements ManipulatorIO {
     public ManipulatorIONEO() {
         motor = new CANSparkMax(ROLLERS, MotorType.kBrushless);
         motor.restoreFactoryDefaults();
-        motor.setInverted(true);
+        motor.setInverted(false);
         motor.setIdleMode(IdleMode.kCoast);
     }
 
@@ -26,6 +26,6 @@ public class ManipulatorIONEO extends SubsystemBase implements ManipulatorIO {
 
     @Override
     public void setSpeed(double speed) {
-        motor.set(speed);
+        motor.set(-speed);
     }
 }
