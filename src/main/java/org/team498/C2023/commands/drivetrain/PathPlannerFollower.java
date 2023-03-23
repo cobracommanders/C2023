@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
+import org.littletonrobotics.junction.Logger;
 import org.team498.C2023.Robot;
 import org.team498.C2023.RobotPosition;
 import org.team498.C2023.subsystems.Drivetrain;
@@ -60,7 +61,7 @@ public class PathPlannerFollower extends CommandBase {
 
         Robot.field.getObject("Stop Points").setPoses(markerPoses);
 
-        drivetrain.setPose(Robot.alliance == Alliance.Blue ? trajectory.getInitialHolonomicPose() : PoseUtil.flip(trajectory.getInitialHolonomicPose()));
+        // drivetrain.setPose(Robot.alliance == Alliance.Blue ? trajectory.getInitialHolonomicPose() : PoseUtil.flip(trajectory.getInitialHolonomicPose()));
 
         // Display the trajectory on the driver station dashboard
         List<Pose2d> poses = new LinkedList<>();
@@ -73,6 +74,8 @@ public class PathPlannerFollower extends CommandBase {
             }
         }
         Robot.field.getObject("Trajectory").setPoses(poses);
+
+        Logger.getInstance().recordOutput("CurrentTrajectory", trajectory);
 
     }
 

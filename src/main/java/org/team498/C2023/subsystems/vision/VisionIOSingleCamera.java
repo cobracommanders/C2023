@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package org.team498.C2023.subsystems;
+package org.team498.C2023.subsystems.vision;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -36,45 +36,77 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import org.team498.C2023.FieldPositions;
+import org.team498.lib.util.PoseUtil;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-public class Photonvision {
+public class VisionIOSingleCamera implements VisionIO {
     private PhotonPoseEstimator photonPoseEstimator;
     private final PhotonCamera photonCamera;
 
-    private final double acceptedTagRange = 3.75;
+    private final double acceptedTagRange = 3.5;
 
-    private Photonvision() {
+    public VisionIOSingleCamera() {
         PhotonCamera.setVersionCheckEnabled(false);
         photonCamera = new PhotonCamera("Arducam_OV9281_USB_Camera");
 
         try {
-            // Attempt to load the AprilTagFieldLayout that will tell us where the tags are on the field.
+            // Attempt to load the AprilTagFieldLayout that will tell us where the tags are
+            // on the field.
             AprilTagFieldLayout fieldLayout = AprilTagFields.k2023ChargedUp.loadAprilTagLayoutField();
             // Create pose estimator
             photonPoseEstimator = new PhotonPoseEstimator(fieldLayout,
-                                                          PoseStrategy.MULTI_TAG_PNP,
-                                                          photonCamera,
-                                                          new Transform3d(new Translation3d(Units.inchesToMeters(2.5),
-                                                                                            -Units.inchesToMeters(5.6875),
-                                                                                            Units.inchesToMeters(22)
-                                                          ), new Rotation3d())
-            );
+                    PoseStrategy.MULTI_TAG_PNP,
+                    photonCamera,
+                    new Transform3d(new Translation3d(Units.inchesToMeters(2.5),
+                            -Units.inchesToMeters(5.6875),
+                            Units.inchesToMeters(22)), new Rotation3d()));
             photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
         } catch (IOException e) {
-            // The AprilTagFieldLayout failed to load. We won't be able to estimate poses if we don't know
+            // The AprilTagFieldLayout failed to load. We won't be able to estimate poses if
+            // we don't know
             // where the tags are.
             DriverStation.reportError("Failed to load AprilTagFieldLayout", e.getStackTrace());
             photonPoseEstimator = null;
         }
     }
 
+    @Override
+    public void updateInputs(VisionIOInputs inputs) {
+        var optionalPose = getEstimatedGlobalPose();
+        if (optionalPose.isPresent()) {
+            inputs.estimatedPose = PoseUtil.toPose2d(optionalPose.get().estimatedPose);
+        } else {
+            inputs.estimatedPose = new Pose2d();
+        }
+
+
+
+        PhotonPipelineResult result = photonCamera.getLatestResult();
+
+        if (result.hasTargets()) {
+            double[][] targetData = new double[result.getTargets().size()][2];
+
+            /* {target ID, target ambiguity}, */
+            List<PhotonTrackedTarget> targets = result.getTargets();
+            for (int i = 0; i < targets.size(); i++) {
+                PhotonTrackedTarget target = targets.get(i);
+                targetData[i][0] = target.getFiducialId();
+                targetData[i][1] = target.getPoseAmbiguity();
+            }
+
+            inputs.targets = targetData;
+        } else {
+            inputs.targets = new double[][] {};
+        }
+    }
+
     /**
-     * @return an EstimatedRobotPose with an estimated pose, the timestamp, and targets used to create the estimate
+     * @return an EstimatedRobotPose with an estimated pose, the timestamp, and
+     *         targets used to create the estimate
      */
     public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
         if (photonPoseEstimator == null) {
@@ -88,9 +120,11 @@ public class Photonvision {
         if (result.hasTargets()) {
             target = result.getBestTarget();
         }
-        if (target == null) return Optional.empty();
+        if (target == null)
+            return Optional.empty();
 
-        // Don't return a new position if the closest target is further than 3.75 meters away
+        // Don't return a new position if the closest target is further than 3.75 meters
+        // away
         if (Math.abs(target.getBestCameraToTarget().getTranslation().getNorm()) >= acceptedTagRange) {
             return Optional.empty();
         }
@@ -123,15 +157,5 @@ public class Photonvision {
         }
         final int tag = closestTag;
         return () -> FieldPositions.aprilTags.get(tag);
-    }
-
-
-    private static Photonvision instance;
-
-    public static Photonvision getInstance() {
-        if (instance == null) {
-            instance = new Photonvision();
-        }
-        return instance;
     }
 }

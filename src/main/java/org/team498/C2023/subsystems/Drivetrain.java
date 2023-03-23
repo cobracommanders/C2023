@@ -77,6 +77,8 @@ public class Drivetrain extends SubsystemBase {
 
         lastStates = getModuleStates();
         stateSetpoints = getModuleStates();
+
+        for (ModuleIO m : modules) m.setBrakeMode(true);
     }
 
     @Override
@@ -85,7 +87,7 @@ public class Drivetrain extends SubsystemBase {
             modules[i].updateInputs(moduleInputs[i]);
             Logger.getInstance().processInputs("Drive/" + modules[i].getName() + "_Module", moduleInputs[i]);
 
-            modules[i].setBrakeMode(RobotState.isEnabled());
+            // modules[i].setBrakeMode(RobotState.isEnabled());
 
             if (RobotState.isDisabled()) {
                 modules[i].updateIntegratedEncoder();
@@ -108,6 +110,8 @@ public class Drivetrain extends SubsystemBase {
         if (!gyroInputs.connected) {
             gyro.setYaw(gyroInputs.yaw + Math.toDegrees(getCurrentSpeeds().omegaRadiansPerSecond) * Robot.DEFAULT_PERIOD);
         }
+
+        Robot.field.setRobotPose(getPose());
 
     }
 
@@ -150,8 +154,8 @@ public class Drivetrain extends SubsystemBase {
         return states;
     }
 
-    public void setPositionGoal(Pose2d pose) {xController.setSetpoint(pose.getX()); yController.setSetpoint(pose.getY()); setAngleGoal(pose.getRotation().getDegrees());}
-    public ChassisSpeeds calculatePositionSpeed() {return new ChassisSpeeds(xController.calculate(getPose().getX()), getPose().getY(), calculateAngleSpeed());}
+    public void setPositionGoal(Pose2d pose) {xController.setSetpoint(pose.getX()); yController.setSetpoint(pose.getY()); setAngleGoal(pose.getRotation().getDegrees()); Robot.field.getObject("targetPose").setPose(pose); Logger.getInstance().recordOutput("TargetPose", pose);}
+    public ChassisSpeeds calculatePositionSpeed() {return new ChassisSpeeds(xController.calculate(getPose().getX()) * Robot.coordinateFlip, yController.calculate(getPose().getY()) * Robot.coordinateFlip, calculateAngleSpeed());}
     public boolean atPositionGoal() {return (Math.abs(xController.getPositionError()) < PoseConstants.EPSILON) && (Math.abs(yController.getPositionError()) < PoseConstants.EPSILON) && atAngleGoal();}
 
     public void setXGoal(double pose) {xController.setSetpoint(pose);}
@@ -167,7 +171,7 @@ public class Drivetrain extends SubsystemBase {
     public boolean atAngleGoal() {return Math.abs(angleController.getPositionError()) < AngleConstants.EPSILON;}
 
     public Pose2d getPose() {return odometry.getPoseMeters();}
-    public void setPose(Pose2d pose) {odometry.resetPosition(Rotation2d.fromDegrees(getYaw()), getModulePositions(), pose);}
+    public void setPose(Pose2d pose) {odometry.resetPosition(Rotation2d.fromDegrees(0), getModulePositions(), pose);}
     public double getYaw() {return gyroInputs.yaw;}
     public void setYaw(double angle) {gyro.setYaw(angle);}
     /** Return a double array with a value for yaw pitch and roll in that order */

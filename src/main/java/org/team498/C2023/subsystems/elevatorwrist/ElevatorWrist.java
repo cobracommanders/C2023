@@ -1,11 +1,10 @@
 package org.team498.C2023.subsystems.elevatorwrist;
 
-import edu.wpi.first.wpilibj.RobotState;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import org.littletonrobotics.junction.Logger;
 import org.team498.C2023.Constants;
+import org.team498.C2023.Robot;
 import org.team498.C2023.RobotPosition;
 import org.team498.C2023.ShootTables;
 import org.team498.C2023.State;
@@ -26,6 +25,8 @@ public class ElevatorWrist extends SubsystemBase {
     public void periodic() {
         IO.updateInputs(inputs);
         Logger.getInstance().processInputs("ElevatorWrist", inputs);
+
+        Robot.elevatorWristMechanism.setAngle(inputs.angle * 360 - 60);
         // IO.setBrakeMode(RobotState.isEnabled());
 
         // SmartDashboard.putData(this);

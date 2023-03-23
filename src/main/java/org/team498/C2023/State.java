@@ -122,7 +122,7 @@ public enum State {
         INTAKE(1, 1, 0.5),
         SPIT(-1, 1, 0),
         IDLE(0, 0, 0),
-        OUTTAKE(-0.5, -0.5, -0.5);
+        OUTTAKE(-0.3, -0.3, -0.3);
 
         public final double bottomRollerSpeed;
         public final double topRollerSpeed;

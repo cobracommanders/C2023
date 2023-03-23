@@ -1,11 +1,11 @@
 package org.team498.C2023.subsystems.elevator;
 
 import edu.wpi.first.wpilibj.RobotState;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import org.littletonrobotics.junction.Logger;
 import org.team498.C2023.Constants;
+import org.team498.C2023.Robot;
 import org.team498.C2023.RobotPosition;
 import org.team498.C2023.ShootTables;
 import org.team498.C2023.State;
@@ -27,10 +27,7 @@ public class Elevator extends SubsystemBase {
         Logger.getInstance().processInputs("Elevator", inputs);
         IO.setBrakeMode(RobotState.isEnabled());
 
-        // SmartDashboard.putData(this);
-        // SmartDashboard.putBoolean("Elevator at Setpoint", atSetpoint());
-        // SmartDashboard.putNumber("Elevator Error", inputs.targetPositionMeters - inputs.positionMeters);
-        // SmartDashboard.putNumber("Elevator Position", inputs.positionMeters);
+        Robot.elevatorMechanism.setLength(inputs.positionMeters);
     }
 
     public boolean atSetpoint() {

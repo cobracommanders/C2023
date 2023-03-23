@@ -1,10 +1,10 @@
 package org.team498.C2023.subsystems.intakewrist;
 
-import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import org.littletonrobotics.junction.Logger;
 import org.team498.C2023.Constants;
+import org.team498.C2023.Robot;
 import org.team498.C2023.State;
 
 public class IntakeWrist extends SubsystemBase {
@@ -25,6 +25,8 @@ public class IntakeWrist extends SubsystemBase {
     public void periodic() {
         IO.updateInputs(inputs);
         Logger.getInstance().processInputs("IntakeWrist", inputs);
+
+        Robot.intakeWristMechanism.setAngle(inputs.angle * 360 - 20);
         // IO.setBrakeMode(RobotState.isEnabled());
 
         // SmartDashboard.putData(this);

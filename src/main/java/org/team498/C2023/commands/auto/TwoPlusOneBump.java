@@ -60,9 +60,7 @@ public class TwoPlusOneBump implements Auto {
                                 new SetRobotState(State.INTAKE),
                                 new GroundIntake())),
                 new WaitCommand(0.3),
-                new ReturnToIdle()
-
-        );
+                new ReturnToIdle());
     }
 
     @Override

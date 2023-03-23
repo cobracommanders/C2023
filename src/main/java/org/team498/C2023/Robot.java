@@ -6,6 +6,9 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -17,8 +20,8 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import org.team498.C2023.commands.auto.*;
 import org.team498.C2023.subsystems.Drivetrain;
-import org.team498.C2023.subsystems.Photonvision;
 import org.team498.C2023.subsystems.manipulator.Manipulator;
+import org.team498.C2023.subsystems.vision.Vision;
 import org.team498.lib.auto.Auto;
 import org.team498.lib.drivers.Blinkin;
 import org.team498.lib.drivers.Blinkin.Color;
@@ -41,7 +44,7 @@ public class Robot extends LoggedRobot {
 
     private final Drivetrain drivetrain = Drivetrain.getInstance();
     private final Gyro gyro = Gyro.getInstance();
-    private final Photonvision photonvision = Photonvision.getInstance();
+    private final Vision photonvision = Vision.getInstance();
     private final Blinkin blinkin = Blinkin.getInstance();
     private final RobotState robotState = RobotState.getInstance();
 
@@ -49,6 +52,18 @@ public class Robot extends LoggedRobot {
     private Auto autoToRun;
 
     private final Logger logger = Logger.getInstance();
+
+    public static final Mechanism2d mechanism2d = new Mechanism2d(Units.inchesToMeters(35), Units.inchesToMeters(65));
+    public static final MechanismRoot2d root = mechanism2d.getRoot("Root", Units.inchesToMeters(1), Units.inchesToMeters(1));
+    public static final MechanismLigament2d base = root.append(new MechanismLigament2d("Drivetrain", Units.inchesToMeters(28), 0));
+
+    public static final MechanismLigament2d elevatorBase = Robot.root.append(new MechanismLigament2d("Elevator Base", Units.inchesToMeters(3), 90));
+    public static final MechanismLigament2d elevatorBase2 = elevatorBase.append(new MechanismLigament2d("Elevator", Units.inchesToMeters(4), -30));
+    public static final MechanismLigament2d elevatorMechanism = elevatorBase2.append(new MechanismLigament2d("Elevator", 0, 0));
+    public static final MechanismLigament2d elevatorWristMechanism = elevatorMechanism.append(new MechanismLigament2d("Elevator Wrist", Units.inchesToMeters(15), 90));
+    public static final MechanismLigament2d intakeWristMechanism = Robot.base.append(new MechanismLigament2d("Intake Wrist", Units.inchesToMeters(18), 0));
+    
+
 
     private final List<Auto> autoOptions = List.of(
             new JustScore(),
@@ -126,7 +141,7 @@ public class Robot extends LoggedRobot {
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
 
-        photonvision.getEstimatedGlobalPose().ifPresent(pose -> drivetrain.setPose(PoseUtil.toPose2d(pose.estimatedPose)));
+        photonvision.getEstimatedPose().ifPresent(pose -> drivetrain.setPose(pose));
 
         field.getObject("Scoring Target").setPose(RobotPosition.getNextScoringNodePosition());
 
@@ -142,6 +157,8 @@ public class Robot extends LoggedRobot {
                              ? 0
                              : 180;
         }
+
+        Logger.getInstance().recordOutput("Mechanism2d", mechanism2d);
     }
 
     @Override
@@ -197,8 +214,10 @@ public class Robot extends LoggedRobot {
 
         if (alliance == Alliance.Blue) {
             Drivetrain.getInstance().setPose(autoToRun.getInitialPose());
+            Drivetrain.getInstance().setYaw(autoToRun.getInitialPose().getRotation().getDegrees());
         } else {
             Drivetrain.getInstance().setPose(PoseUtil.flip(autoToRun.getInitialPose()));
+            Drivetrain.getInstance().setYaw(PoseUtil.flip(autoToRun.getInitialPose()).getRotation().getDegrees());
         }
 
         autoToRun.getCommand().schedule();

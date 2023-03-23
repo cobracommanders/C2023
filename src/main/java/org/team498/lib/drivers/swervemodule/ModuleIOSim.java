@@ -39,7 +39,7 @@ public class ModuleIOSim implements ModuleIO {
         currentTarget = optimize(state, angle);
         // currentTarget = SwerveModuleState.optimize(state, Rotation2d.fromDegrees(angle));
 
-        drivePID.setSetpoint(currentTarget.speedMetersPerSecond);
+        drivePID.setSetpoint(-currentTarget.speedMetersPerSecond);
         steerPID.setSetpoint(currentTarget.angle.getDegrees());
     }
 
