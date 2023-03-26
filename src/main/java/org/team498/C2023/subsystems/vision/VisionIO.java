@@ -1,7 +1,5 @@
 package org.team498.C2023.subsystems.vision;
 
-import java.util.List;
-
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 

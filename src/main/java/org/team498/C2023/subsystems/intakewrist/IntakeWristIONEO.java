@@ -30,8 +30,6 @@ public class IntakeWristIONEO extends SubsystemBase implements IntakeWristIO {
         left.restoreFactoryDefaults();
         right.restoreFactoryDefaults();
 
-        right.follow(left, true);
-
         PID = new ProfiledPIDController(P, I, D, new TrapezoidProfile.Constraints(2.5, 6));
         PID.reset(State.IntakeWrist.IDLE_IN.position);
         PID.setTolerance(0);
@@ -46,7 +44,9 @@ public class IntakeWristIONEO extends SubsystemBase implements IntakeWristIO {
 
     @Override
     public void periodic() {
-        left.set(-PID.calculate(getAngle()));
+        double speed = PID.calculate(getAngle());
+        left.set(-speed);
+        right.set(speed);
     }
 
     @Override

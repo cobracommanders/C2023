@@ -50,6 +50,6 @@ public final class Ports {
     }
 
     public static class Accessories {
-        public static final int BLINKIN = 8; // PWM
+        public static final int BLINKIN = 9; // PWM
     }
 }

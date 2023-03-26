@@ -64,7 +64,8 @@ public enum State {
 
         AUTO_SHOT(0),
 
-        INTAKE(0),
+        INTAKE(0.1),
+        // INTAKE(0),
 
         IDLE(0),
 
@@ -96,7 +97,8 @@ public enum State {
 
         TRAVEL(0.041067),
 
-        INTAKE(-0.04),
+        INTAKE(-0.075),
+        // INTAKE(-0.03),
         OUTTAKE(-0.05),
 
         AUTO_SHOT(0),
@@ -122,7 +124,7 @@ public enum State {
         INTAKE(1, 1, 0.5),
         SPIT(-1, 1, 0),
         IDLE(0, 0, 0),
-        OUTTAKE(-0.3, -0.3, -0.3);
+        OUTTAKE(-0.4, -0.4, -0.5);
 
         public final double bottomRollerSpeed;
         public final double topRollerSpeed;

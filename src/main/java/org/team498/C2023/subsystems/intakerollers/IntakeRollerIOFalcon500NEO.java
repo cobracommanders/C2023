@@ -3,7 +3,6 @@ package org.team498.C2023.subsystems.intakerollers;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
@@ -12,7 +11,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static org.team498.C2023.Ports.IntakeRollers.*;
 
 import org.team498.lib.drivers.LazySparkMax;
-import org.team498.lib.drivers.LazyTalonFX;
 
 public class IntakeRollerIOFalcon500NEO extends SubsystemBase implements IntakeRollerIO {
     private final TalonFX bottom;

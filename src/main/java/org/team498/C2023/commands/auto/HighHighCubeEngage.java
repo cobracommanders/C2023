@@ -6,8 +6,8 @@ import org.team498.C2023.State;
 import org.team498.C2023.RobotState.GameMode;
 import org.team498.C2023.RobotState.ScoringOption;
 import org.team498.C2023.commands.SetRobotState;
-import org.team498.C2023.commands.drivetrain.PathPlannerFollower;
 import org.team498.C2023.commands.drivetrain.chargestation.AutoEngageBangBang;
+import org.team498.C2023.commands.drivetrain.PathPlannerFollower;
 import org.team498.C2023.commands.robot.FullScore;
 import org.team498.C2023.commands.robot.GroundIntake;
 import org.team498.C2023.commands.robot.PrepareToScore;
@@ -44,6 +44,7 @@ public class HighHighCubeEngage implements Auto {
                                 new InstantCommand(() -> RobotState.getInstance().setNextScoringOption(ScoringOption.TOP)),
                                 new WaitCommand(2.5),
                                 new PrepareToScore())),
+                new WaitCommand(0.2),
                 new Score(),
                 new WaitCommand(0.1),
                 new AutoEngageBangBang());

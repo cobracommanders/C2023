@@ -23,6 +23,6 @@ public class Trajectories {
     }
 
     public static PathPlannerTrajectory getPathPlannerTrajectory(String name) {
-        return PathPlanner.loadPath(name, 1, 1);
+        return PathPlanner.loadPath(name, 3, 2.4);
     }
 }

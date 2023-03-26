@@ -145,7 +145,6 @@ public class Robot extends LoggedRobot {
 
         field.getObject("Scoring Target").setPose(RobotPosition.getNextScoringNodePosition());
 
-        //TODO: Check if alliance is actually invalid when the FMS is not connected
         if (alliance == Alliance.Invalid) {
             alliance = DriverStation.getAlliance();
             // This reverses the coordinates/direction of the drive commands on the red alliance

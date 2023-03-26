@@ -39,7 +39,6 @@ public class Drivetrain extends SubsystemBase {
     private final SlewRateLimiter yLimiter = new SlewRateLimiter(MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     private final SwerveDriveKinematics kinematics;
     private final SwerveDriveOdometry odometry;
-    private SwerveModuleState[] lastStates;
     private SwerveModuleState[] stateSetpoints;
 
     private final GyroIO gyro;
@@ -75,7 +74,6 @@ public class Drivetrain extends SubsystemBase {
         kinematics = new SwerveDriveKinematics(getModuleTranslations());
         odometry = new SwerveDriveOdometry(kinematics, Rotation2d.fromDegrees(getYaw()), getModulePositions());
 
-        lastStates = getModuleStates();
         stateSetpoints = getModuleStates();
 
         for (ModuleIO m : modules) m.setBrakeMode(true);
@@ -125,21 +123,13 @@ public class Drivetrain extends SubsystemBase {
 
         var states = kinematics.toSwerveModuleStates(speeds);
 
-
-        //TODO See if the 2023 kinematics automatically don't reset the module rotations to 0 when not driving
-        boolean isIdle = true;
-        for (SwerveModuleState s : states) isIdle = Math.abs(s.speedMetersPerSecond) < 0.001 && isIdle;
-        isIdle = false;
-
-
-        stateSetpoints = isIdle ? lastStates : states;
+        stateSetpoints = states;
 
         setModuleStates(stateSetpoints);
     }
 
     public void setModuleStates(SwerveModuleState[] states) {
         for (int i = 0; i < modules.length; i++) modules[i].setState(states[i]);
-        lastStates = states;
     }
 
     public SwerveModulePosition[] getModulePositions() {
