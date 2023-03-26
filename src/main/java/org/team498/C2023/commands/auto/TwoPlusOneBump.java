@@ -7,6 +7,7 @@ import org.team498.C2023.RobotState.GameMode;
 import org.team498.C2023.RobotState.ScoringOption;
 import org.team498.C2023.commands.SetRobotState;
 import org.team498.C2023.commands.drivetrain.PathPlannerFollower;
+import org.team498.C2023.commands.manipulator.SetManipulatorToNextState;
 import org.team498.C2023.commands.robot.GroundIntake;
 import org.team498.C2023.commands.robot.PrepareToScore;
 import org.team498.C2023.commands.robot.ReturnToIdle;
@@ -26,10 +27,11 @@ public class TwoPlusOneBump implements Auto {
     public Command getCommand() {
         return new SequentialCommandGroup(
                 new InstantCommand(() -> RobotState.getInstance().setCurrentGameMode(GameMode.CUBE)),
-                new InstantCommand(() -> RobotState.getInstance().setNextScoringOption(ScoringOption.TOP)),
+                new InstantCommand(
+                        () -> RobotState.getInstance().setNextScoringOption(ScoringOption.TOP)),
                 new PrepareToScore(),
                 new WaitCommand(0.1),
-                new Score(),
+                new SetManipulatorToNextState(),
                 new WaitCommand(0.1),
                 new ParallelCommandGroup(
                         new PathPlannerFollower(PathLib.eighthNodeToFourthCube),
@@ -44,11 +46,16 @@ public class TwoPlusOneBump implements Auto {
                         new SequentialCommandGroup(
                                 new WaitCommand(.75),
                                 new ReturnToIdle(),
-                                new InstantCommand(() -> RobotState.getInstance().setCurrentGameMode(GameMode.CUBE)),
-                                new InstantCommand(() -> RobotState.getInstance().setNextScoringOption(ScoringOption.MID)),
+                                new InstantCommand(() -> RobotState.getInstance()
+                                        .setCurrentGameMode(GameMode.CUBE)),
+                                new InstantCommand(
+                                        () -> RobotState.getInstance()
+                                                .setNextScoringOption(
+                                                        ScoringOption.MID)),
                                 new WaitCommand(1.5),
                                 new PrepareToScore())),
-                new ConditionalCommand(new WaitCommand(0.3), new WaitCommand(0.1), () -> RobotState.getInstance().inConeMode()),
+                new ConditionalCommand(new WaitCommand(0.3), new WaitCommand(0.1),
+                        () -> RobotState.getInstance().inConeMode()),
                 new Score(),
                 new WaitCommand(0.1),
                 new ParallelCommandGroup(

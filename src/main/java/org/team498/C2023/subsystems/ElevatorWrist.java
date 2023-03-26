@@ -41,7 +41,7 @@ public class ElevatorWrist extends SubsystemBase {
         wrist = new CANSparkMax(WRIST, MotorType.kBrushless);
         wrist.restoreFactoryDefaults();
         wrist.setIdleMode(IdleMode.kBrake);
-        wrist.setInverted(true);
+        wrist.setInverted(false);
         wrist.burnFlash(); 
 
         encoder = new DutyCycle(new DigitalInput(ENCODER_PORT));
@@ -64,7 +64,7 @@ public class ElevatorWrist extends SubsystemBase {
         }
 
         if (isEnabled) {
-            wrist.set(speed);
+            wrist.set(-speed);
         } else {
             wrist.set(0);
         }

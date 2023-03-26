@@ -43,6 +43,7 @@ public class HighHighCube implements Auto {
                                 new InstantCommand(() -> RobotState.getInstance().setNextScoringOption(ScoringOption.TOP)),
                                 new WaitCommand(2.5),
                                 new PrepareToScore())),
+                new WaitCommand(0.2),
                 new Score());
     }
 

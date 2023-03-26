@@ -37,7 +37,8 @@ public class IntakeWrist extends SubsystemBase {
         leftWrist.setIdleMode(IdleMode.kBrake);
         rightWrist.setIdleMode(IdleMode.kBrake);
 
-        rightWrist.follow(leftWrist, true);
+        // rightWrist.follow(leftWrist, true);
+        // leftWrist.follow(rightWrist, true);
 
         PID = new ProfiledPIDController(P, I, D, new TrapezoidProfile.Constraints(2, 1));
         PID.reset(State.IntakeWrist.IDLE_IN.position);
@@ -49,7 +50,9 @@ public class IntakeWrist extends SubsystemBase {
 
     @Override
     public void periodic() {
-        leftWrist.set(-PID.calculate(getAngle()));
+        double speed = PID.calculate(getAngle());
+        rightWrist.set(speed);
+        leftWrist.set(-speed);
         SmartDashboard.putNumber("Intake Encoder", getAngle());
         SmartDashboard.putNumber("Intake Output", PID.calculate(getAngle()));
         SmartDashboard.putNumber("Intake Error", PID.getPositionError());

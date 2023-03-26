@@ -21,8 +21,9 @@ public class Manipulator extends SubsystemBase {
     private Manipulator() {
         rollers = new CANSparkMax(ROLLERS, MotorType.kBrushless);
         rollers.restoreFactoryDefaults();
-        rollers.setInverted(true);
+        rollers.setInverted(false);
         rollers.setIdleMode(IdleMode.kCoast);
+        rollers.burnFlash();
     }
 
     public boolean isStalling() {
@@ -35,7 +36,7 @@ public class Manipulator extends SubsystemBase {
 
     @Override
     public void periodic() {        
-        rollers.set(getSetpoint(currentState, RobotPositions.getFutureScoringNodeDistance()));
+        rollers.set(-getSetpoint(currentState, RobotPositions.getFutureScoringNodeDistance()));
         SmartDashboard.putNumber("Manipulator current", rollers.getOutputCurrent());
     }
 

@@ -6,8 +6,8 @@ import org.team498.C2023.State;
 import org.team498.C2023.RobotState.GameMode;
 import org.team498.C2023.RobotState.ScoringOption;
 import org.team498.C2023.commands.SetRobotState;
-import org.team498.C2023.commands.drivetrain.AutoEngageBangBang;
 import org.team498.C2023.commands.drivetrain.PathPlannerFollower;
+import org.team498.C2023.commands.manipulator.SetManipulatorToNextState;
 import org.team498.C2023.commands.robot.FullScore;
 import org.team498.C2023.commands.robot.GroundIntake;
 import org.team498.C2023.commands.robot.PrepareToScore;
@@ -28,12 +28,16 @@ public class HighHighCubeBump implements Auto {
         return new SequentialCommandGroup(
                 new InstantCommand(() -> RobotState.getInstance().setCurrentGameMode(GameMode.CUBE)),
                 new InstantCommand(() -> RobotState.getInstance().setNextScoringOption(ScoringOption.TOP)),
-                new FullScore(),
-                new SetRobotState(State.INTAKE),
+                new PrepareToScore(),
+                new WaitCommand(0.1),
+                new SetManipulatorToNextState(),
                 new ParallelCommandGroup(
                         new PathPlannerFollower(PathLib.eighthNodeToFourthCube),
                         new SequentialCommandGroup(
-                                new WaitCommand(2),
+                                new ParallelCommandGroup(
+                                        new ReturnToIdle(),
+                                        new WaitCommand(2)),
+                                new SetRobotState(State.INTAKE),
                                 new GroundIntake())),
                 new ParallelCommandGroup(
                         new PathPlannerFollower(PathLib.fourthCubeToFithNode),
@@ -44,6 +48,7 @@ public class HighHighCubeBump implements Auto {
                                 new InstantCommand(() -> RobotState.getInstance().setNextScoringOption(ScoringOption.TOP)),
                                 new WaitCommand(2.5),
                                 new PrepareToScore())),
+                new WaitCommand(0.2),
                 new Score());
     }
 
