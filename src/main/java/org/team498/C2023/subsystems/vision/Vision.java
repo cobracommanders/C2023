@@ -17,7 +17,7 @@ public class Vision extends SubsystemBase {
 
     private Vision() {
         vision = switch (Constants.mode) {
-            case REAL, REPLAY, PRACTICE ->
+            case REAL, REPLAY ->
                 new VisionIOSingleCamera();
             case SIM -> new VisionIO() {};
         };

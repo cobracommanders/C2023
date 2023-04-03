@@ -8,7 +8,7 @@ public interface IntakeWristIO {
         public double angle = 0.0;
         public double targetAngle = 0.0;
 
-        public double encoder = 0.0;
+        public double rawAbsoluteEncoder = 0.0;
 
         public double leftAppliedVolts = 0.0;
         public double leftCurrentAmps = 0.0;

@@ -4,10 +4,10 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
 public final class Constants {
     public enum Mode {
-        REAL, SIM, REPLAY, PRACTICE
+        REAL, SIM, REPLAY
     }
 
-    public static final Mode mode = Mode.REAL;
+    public static Mode mode = Mode.SIM;
 
     public static final class OIConstants {
         public static final int DRIVER_CONTROLLER_ID = 0;
@@ -37,7 +37,7 @@ public final class Constants {
             public static final double P = 5;
             public static final double I = 0;
             public static final double D = 0;
-            public static final double EPSILON = 1.0;
+            public static final double EPSILON = Constants.mode == Mode.SIM ? 5.0 : 1.0;
 
 
             // Constraints for the profiled angle controller

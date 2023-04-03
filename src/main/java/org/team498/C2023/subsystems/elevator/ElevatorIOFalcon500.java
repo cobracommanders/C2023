@@ -8,7 +8,6 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.DutyCycle;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import com.ctre.phoenix.motorcontrol.FollowerType;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -35,8 +34,6 @@ public class ElevatorIOFalcon500 extends SubsystemBase implements ElevatorIO {
 
         configMotor(front);
         configMotor(back);
-
-        back.follow(front, FollowerType.PercentOutput);
 
         encoder = new DutyCycle(new DigitalInput(ENCODER_PORT));
 
@@ -69,7 +66,8 @@ public class ElevatorIOFalcon500 extends SubsystemBase implements ElevatorIO {
             // TODO change ControlMode to ElevatorMode and add a disabled state
         };
     
-        front.set(TalonFXControlMode.PercentOutput, percentOutput);
+        front.set(TalonFXControlMode.PercentOutput, -percentOutput);
+        back.set(TalonFXControlMode.PercentOutput, -percentOutput);
     }
 
     @Override
@@ -115,7 +113,7 @@ public class ElevatorIOFalcon500 extends SubsystemBase implements ElevatorIO {
     private void configMotor(TalonFX motor) {
         motor.configFactoryDefault();
         motor.setNeutralMode(NeutralMode.Brake);
-        motor.setInverted(true);
+        motor.setInverted(false);
     }
 
     private double getPositionMeters() {return (front.getSelectedSensorPosition() / 2048) / MOTOR_ROTATION_TO_METERS;}

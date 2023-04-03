@@ -33,6 +33,7 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.common.dataflow.structures.Packet;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import org.team498.C2023.FieldPositions;
@@ -82,8 +83,6 @@ public class VisionIOSingleCamera implements VisionIO {
         } else {
             inputs.estimatedPose = new Pose2d();
         }
-
-
 
         PhotonPipelineResult result = photonCamera.getLatestResult();
 

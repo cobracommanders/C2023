@@ -37,7 +37,7 @@ public class Line extends Line2D.Double implements BaseRegion {
      */
     @Override
     public void displayOnDashboard(String name) {
-        Robot.field.getObject(name).setPoses(new Pose2d(x1, y1, new Rotation2d()), new Pose2d(x2, y2, new Rotation2d()));
+        // Robot.field.getObject(name).setPoses(new Pose2d(x1, y1, new Rotation2d()), new Pose2d(x2, y2, new Rotation2d()));
     }
 
     /**

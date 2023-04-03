@@ -17,9 +17,11 @@ import org.littletonrobotics.junction.Logger;
 import org.team498.C2023.Constants;
 import org.team498.C2023.Ports;
 import org.team498.C2023.Robot;
+import org.team498.C2023.Constants.Mode;
 import org.team498.lib.drivers.gyro.GyroIO;
 import org.team498.lib.drivers.gyro.GyroIOInputsAutoLogged;
 import org.team498.lib.drivers.gyro.GyroIOPigeon2;
+import org.team498.lib.drivers.gyro.GyroIOSim;
 import org.team498.lib.drivers.swervemodule.ModuleIO;
 import org.team498.lib.drivers.swervemodule.ModuleIOFalcon500;
 import org.team498.lib.drivers.swervemodule.ModuleIOInputsAutoLogged;
@@ -46,7 +48,7 @@ public class Drivetrain extends SubsystemBase {
 
     private Drivetrain() {
         modules = switch (Constants.mode) {
-            case REAL, REPLAY, PRACTICE ->
+            case REAL, REPLAY ->
                 new ModuleIO[] {
                     new ModuleIOFalcon500(ModuleIOFalcon500.Module.FL),
                     new ModuleIOFalcon500(ModuleIOFalcon500.Module.FR),
@@ -61,11 +63,13 @@ public class Drivetrain extends SubsystemBase {
             };
         };
 
-        gyro = new GyroIOPigeon2(Ports.Drivetrain.GYRO);
+        gyro = switch (Constants.mode) {
+            case REAL, REPLAY -> new GyroIOPigeon2(Ports.Drivetrain.GYRO);
+            case SIM -> new GyroIOSim();
+        };
 
         angleController.enableContinuousInput(-180, 180);
         angleController.setTolerance(0);
-        //TODO Reset angleController
         xController.setTolerance(0);
         yController.setTolerance(0);
         xLimiter.reset(0);
@@ -105,12 +109,9 @@ public class Drivetrain extends SubsystemBase {
         }
         LoggerUtil.recordOutput("Drive/TargetStates", targetStates);
 
-        if (!gyroInputs.connected) {
-            gyro.setYaw(gyroInputs.yaw + Math.toDegrees(getCurrentSpeeds().omegaRadiansPerSecond) * Robot.DEFAULT_PERIOD);
+        if (Constants.mode == Mode.SIM) {
+            gyro.setYaw(gyroInputs.yaw + Math.toDegrees(kinematics.toChassisSpeeds(stateSetpoints).omegaRadiansPerSecond) * Robot.DEFAULT_PERIOD);
         }
-
-        Robot.field.setRobotPose(getPose());
-
     }
 
     public void drive(double vx, double vy, double degreesPerSecond, boolean fieldOriented) {
@@ -121,9 +122,7 @@ public class Drivetrain extends SubsystemBase {
         speeds.vxMetersPerSecond = xLimiter.calculate(speeds.vxMetersPerSecond);
         speeds.vyMetersPerSecond = yLimiter.calculate(speeds.vyMetersPerSecond);
 
-        var states = kinematics.toSwerveModuleStates(speeds);
-
-        stateSetpoints = states;
+        stateSetpoints = kinematics.toSwerveModuleStates(speeds);
 
         setModuleStates(stateSetpoints);
     }
@@ -144,8 +143,8 @@ public class Drivetrain extends SubsystemBase {
         return states;
     }
 
-    public void setPositionGoal(Pose2d pose) {xController.setSetpoint(pose.getX()); yController.setSetpoint(pose.getY()); setAngleGoal(pose.getRotation().getDegrees()); Robot.field.getObject("targetPose").setPose(pose); Logger.getInstance().recordOutput("TargetPose", pose);}
-    public ChassisSpeeds calculatePositionSpeed() {return new ChassisSpeeds(xController.calculate(getPose().getX()) * Robot.coordinateFlip, yController.calculate(getPose().getY()) * Robot.coordinateFlip, calculateAngleSpeed());}
+    public void setPositionGoal(Pose2d pose) {xController.setSetpoint(pose.getX()); yController.setSetpoint(pose.getY()); setAngleGoal(pose.getRotation().getDegrees()); Logger.getInstance().recordOutput("TargetPose", pose);}
+    public ChassisSpeeds calculatePositionSpeed() {return new ChassisSpeeds(xController.calculate(getPose().getX()), yController.calculate(getPose().getY()), calculateAngleSpeed());}
     public boolean atPositionGoal() {return (Math.abs(xController.getPositionError()) < PoseConstants.EPSILON) && (Math.abs(yController.getPositionError()) < PoseConstants.EPSILON) && atAngleGoal();}
 
     public void setXGoal(double pose) {xController.setSetpoint(pose);}
@@ -161,9 +160,9 @@ public class Drivetrain extends SubsystemBase {
     public boolean atAngleGoal() {return Math.abs(angleController.getPositionError()) < AngleConstants.EPSILON;}
 
     public Pose2d getPose() {return odometry.getPoseMeters();}
-    public void setPose(Pose2d pose) {odometry.resetPosition(Rotation2d.fromDegrees(0), getModulePositions(), pose);}
+    public void setPose(Pose2d pose) {odometry.resetPosition(Rotation2d.fromDegrees(getYaw()), getModulePositions(), pose);}
     public double getYaw() {return gyroInputs.yaw;}
-    public void setYaw(double angle) {gyro.setYaw(angle);}
+    public void setYaw(double angle) {gyro.setYaw(angle); angleController.reset(angle);}
     /** Return a double array with a value for yaw pitch and roll in that order */
     public double[] getGyro() {return new double[] {gyroInputs.yaw, gyroInputs.pitch, gyroInputs.roll};}
 

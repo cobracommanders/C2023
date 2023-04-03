@@ -12,7 +12,7 @@ public class IntakeRoller extends SubsystemBase {
 
     private IntakeRoller() {
         IO = switch (Constants.mode) {
-            case REAL, REPLAY, PRACTICE -> new IntakeRollerIOFalcon500NEO();
+            case REAL, REPLAY -> new IntakeRollerIOFalcon500NEO();
             case SIM -> new IntakeRollerIO() {};
         };
     }
@@ -25,9 +25,17 @@ public class IntakeRoller extends SubsystemBase {
 
     public void setState(State.IntakeRollers state) {
         IO.setSpeed(state.bottomRollerSpeed, state.topRollerSpeed, state.thirdRollerSpeed);
-        Logger.getInstance().recordOutput("IntakeRoller State", state.name());
+        Logger.getInstance().recordOutput("IntakeRoller/State", state.name());
     }
 
+    /** top, bottom, third */
+    public double[] getCurrentDraws() {
+        return new double[] {
+                inputs.topCurrentAmps,
+                inputs.bottomCurrentAmps,
+                inputs.thirdCurrentAmps
+        };
+    }
 
     private static IntakeRoller instance;
 

@@ -11,10 +11,11 @@ import org.team498.C2023.State;
 public class Manipulator extends SubsystemBase {
     private final ManipulatorIO IO;
     private final ManipulatorIOInputsAutoLogged inputs = new ManipulatorIOInputsAutoLogged();
+    private State.Manipulator state;
 
     private Manipulator() {
         IO = switch (Constants.mode) {
-            case REAL, REPLAY, PRACTICE -> new ManipulatorIONEO();
+            case REAL, REPLAY -> new ManipulatorIONEO();
             case SIM -> new ManipulatorIO() {};
         };
     }
@@ -23,11 +24,16 @@ public class Manipulator extends SubsystemBase {
     public void periodic() {
         IO.updateInputs(inputs);
         Logger.getInstance().processInputs("Manipulator", inputs);
+
+        if (state == State.Manipulator.SHOOT_DRIVE_CUBE_MID || state == State.Manipulator.SHOOT_DRIVE_CUBE_TOP || state == State.Manipulator.SHOOT_DRIVE_CONE_MID) {
+            IO.setSpeed(getSetpoint(state, RobotPosition.getFutureScoringNodeDistance()));
+        }
     }
 
     public void setState(State.Manipulator state) {
         IO.setSpeed(getSetpoint(state, RobotPosition.getFutureScoringNodeDistance()));
-        Logger.getInstance().recordOutput("Manipulator State", state.name());
+        Logger.getInstance().recordOutput("Manipulator/State", state.name());
+        this.state = state;
     }
 
     private double getSetpoint(State.Manipulator state, double interpolatedValue) {
@@ -43,6 +49,9 @@ public class Manipulator extends SubsystemBase {
         return inputs.motorCurrentAmps > 20;
     }
 
+    public double getCurrentDraw() {
+        return inputs.motorCurrentAmps;
+    }
 
     private static Manipulator instance;
 

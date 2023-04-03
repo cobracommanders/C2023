@@ -1,22 +1,26 @@
 package org.team498.C2023.subsystems.elevatorwrist;
 
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import org.littletonrobotics.junction.Logger;
-import org.team498.C2023.Constants;
-import org.team498.C2023.Robot;
-import org.team498.C2023.RobotPosition;
-import org.team498.C2023.ShootTables;
-import org.team498.C2023.State;
+import org.team498.C2023.*;
+import org.team498.C2023.subsystems.elevator.Elevator;
 
 public class ElevatorWrist extends SubsystemBase {
     private final ElevatorWristIO IO;
     private final ElevatorWristIOInputsAutoLogged inputs = new ElevatorWristIOInputsAutoLogged();
+    private State.ElevatorWrist state;
+
+    // Offsets all the wrist setpoints during a match to adjust scoring if necessary
+    private double onTheFlyOffset = 0.0;
 
     private ElevatorWrist() {
         IO = switch (Constants.mode) {
-            case REAL, REPLAY, PRACTICE -> new ElevatorWristIONEO();
-            case SIM -> new ElevatorWristIO() {};
+            case REAL, REPLAY -> new ElevatorWristIONEO();
+            case SIM -> new ElevatorWristIOSim();
         };
         IO.setBrakeMode(true);
     }
@@ -27,12 +31,21 @@ public class ElevatorWrist extends SubsystemBase {
         Logger.getInstance().processInputs("ElevatorWrist", inputs);
 
         Robot.elevatorWristMechanism.setAngle(inputs.angle * 360 - 60);
+
+        Logger.getInstance().recordOutput("ElevatorWrist/Pose", getPose());
+
         // IO.setBrakeMode(RobotState.isEnabled());
 
-        // SmartDashboard.putData(this);
-        // SmartDashboard.putBoolean("ElevatorWrist at Setpoint", atSetpoint());
-        // SmartDashboard.putNumber("ElevatorWrist Error", inputs.targetAngle - inputs.angle);
-        // SmartDashboard.putNumber("ElevatorWrist Angle", inputs.angle);
+        if (state == State.ElevatorWrist.SHOOT_DRIVE_CUBE_MID || state == State.ElevatorWrist.SHOOT_DRIVE_CUBE_TOP || state == State.ElevatorWrist.SHOOT_DRIVE_CONE_MID) {
+            IO.setPosition(getSetpoint(state, RobotPosition.getFutureScoringNodeDistance()));
+        }
+    }
+
+    public Pose3d getPose() {
+        return Elevator.getInstance().getStageTwoPose().transformBy(new Transform3d(
+                new Translation3d(0.0254, 0.130073, 0),
+                new Rotation3d(Math.toRadians(inputs.angle * 360 - 30), Math.toRadians(0), Math.toRadians(0))
+        ));
     }
 
     public boolean atSetpoint() {
@@ -45,7 +58,13 @@ public class ElevatorWrist extends SubsystemBase {
 
     public void setState(State.ElevatorWrist state) {
         IO.setPosition(getSetpoint(state, RobotPosition.getFutureScoringNodeDistance()));
-        Logger.getInstance().recordOutput("ElevatorWrist State", state.name());
+        Logger.getInstance().recordOutput("ElevatorWrist/State", state.name());
+        this.state = state;
+    }
+
+    public void incrementOffset(double increment) {
+        onTheFlyOffset += increment;
+        Logger.getInstance().recordOutput("ElevatorWrist/OnTheFlyOffset", onTheFlyOffset);
     }
 
     private double getSetpoint(State.ElevatorWrist state, double interpolatedValue) {
@@ -54,7 +73,16 @@ public class ElevatorWrist extends SubsystemBase {
             case SHOOT_DRIVE_CUBE_TOP -> ShootTables.topCube.wristAngle.getInterpolatedValue(interpolatedValue);
             case SHOOT_DRIVE_CONE_MID -> ShootTables.midCone.wristAngle.getInterpolatedValue(interpolatedValue);
             default -> state.setpoint;
-        };
+        }
+                + onTheFlyOffset;
+    }
+
+    public void setBrakeMode(boolean enable) {
+        IO.setBrakeMode(enable);
+    }
+
+    public boolean checkEncoderConnection() {
+        return inputs.rawAbsoluteEncoder != 0.0;
     }
 
     private static ElevatorWrist instance;

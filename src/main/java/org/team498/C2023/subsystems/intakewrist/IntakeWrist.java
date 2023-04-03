@@ -13,7 +13,7 @@ public class IntakeWrist extends SubsystemBase {
 
     private IntakeWrist() {
         IO = switch (Constants.mode) {
-            case REAL, REPLAY, PRACTICE -> new IntakeWristIONEO();
+            case REAL, REPLAY -> new IntakeWristIONEO();
             case SIM -> new IntakeWristIO() {};
         };
 
@@ -42,9 +42,12 @@ public class IntakeWrist extends SubsystemBase {
 
     public void setState(State.IntakeWrist state) {
         IO.setPosition(state.position);
-        Logger.getInstance().recordOutput("IntakeWrist State", state.name());
+        Logger.getInstance().recordOutput("IntakeWrist/State", state.name());
     }
 
+    public boolean checkEncoderConnection() {
+        return inputs.rawAbsoluteEncoder != 0.0;
+    }
 
     private static IntakeWrist instance;
 

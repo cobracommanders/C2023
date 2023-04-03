@@ -16,8 +16,7 @@ import org.team498.C2023.subsystems.elevator.Elevator;
 public class PrepareToScore extends SequentialCommandGroup {
     public PrepareToScore() {
         super(
-                new ConditionalCommand(new SetRobotState(State.TRAVEL_CONE),
-                        new SetRobotState(State.TRAVEL_CUBE), () -> RobotState.getInstance().inConeMode()),
+                new ConditionalCommand(new SetRobotState(State.TRAVEL_CONE), new SetRobotState(State.TRAVEL_CUBE), () -> RobotState.getInstance().inConeMode()),
                 new SetManipulatorToNextState(),
                 new ParallelCommandGroup(
                         new SetIntakeWristToNextState(),

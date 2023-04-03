@@ -54,7 +54,7 @@ public class IntakeWristIONEO extends SubsystemBase implements IntakeWristIO {
         inputs.angle = getAngle();
         inputs.targetAngle = PID.getGoal().position;
 
-        inputs.encoder = encoder.getOutput();
+        inputs.rawAbsoluteEncoder = encoder.getOutput();
 
         // inputs.leftAppliedVolts = left.getBusVoltage() * left.get();
         // inputs.leftCurrentAmps = left.getOutputCurrent();

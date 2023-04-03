@@ -1,6 +1,5 @@
 package org.team498.lib.drivers.gyro;
 
-import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.sensors.Pigeon2;
 
 public class GyroIOPigeon2 implements GyroIO {
@@ -11,7 +10,6 @@ public class GyroIOPigeon2 implements GyroIO {
 
     @Override
     public void updateInputs(GyroIOInputs inputs) {
-        inputs.connected = pigeon.getLastError().equals(ErrorCode.OK);
         inputs.pitch = pigeon.getPitch();
         inputs.roll = pigeon.getRoll();
         inputs.yaw = pigeon.getYaw();

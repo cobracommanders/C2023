@@ -1,36 +1,41 @@
 package org.team498.C2023;
 
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+import org.team498.C2023.commands.SystemsCheck;
 import org.team498.C2023.commands.auto.*;
 import org.team498.C2023.subsystems.Drivetrain;
+import org.team498.C2023.subsystems.elevator.Elevator;
+import org.team498.C2023.subsystems.elevatorwrist.ElevatorWrist;
 import org.team498.C2023.subsystems.manipulator.Manipulator;
 import org.team498.C2023.subsystems.vision.Vision;
 import org.team498.lib.auto.Auto;
 import org.team498.lib.drivers.Blinkin;
 import org.team498.lib.drivers.Blinkin.Color;
 import org.team498.lib.drivers.Gyro;
-import org.team498.lib.field.Point;
 import org.team498.lib.util.PoseUtil;
 import org.team498.lib.util.RotationUtil;
 
 import java.util.List;
+
+import static org.team498.C2023.Ports.Accessories.SETUP_SWITCH;
 
 
 public class Robot extends LoggedRobot {
@@ -38,7 +43,7 @@ public class Robot extends LoggedRobot {
     public static int coordinateFlip = 1;
     public static int rotationOffset = 0;
 
-    public static final Field2d field = new Field2d();
+    // public static final Field2d field = new Field2d();
     public static Alliance alliance = Alliance.Invalid;
     public static final Controls controls = new Controls();
 
@@ -48,10 +53,13 @@ public class Robot extends LoggedRobot {
     private final Blinkin blinkin = Blinkin.getInstance();
     private final RobotState robotState = RobotState.getInstance();
 
-    private final SendableChooser<Auto> autoChooser = new SendableChooser<Auto>();
+    // private final SendableChooser<Auto> autoChooser = new SendableChooser<Auto>();
+    private final LoggedDashboardChooser<Auto> autoChooser = new LoggedDashboardChooser<Auto>("AutoChooser");
     private Auto autoToRun;
 
     private final Logger logger = Logger.getInstance();
+
+    private boolean matchStarted = false;
 
     public static final Mechanism2d mechanism2d = new Mechanism2d(Units.inchesToMeters(35), Units.inchesToMeters(65));
     public static final MechanismRoot2d root = mechanism2d.getRoot("Root", Units.inchesToMeters(1), Units.inchesToMeters(1));
@@ -62,16 +70,14 @@ public class Robot extends LoggedRobot {
     public static final MechanismLigament2d elevatorMechanism = elevatorBase2.append(new MechanismLigament2d("Elevator", 0, 0));
     public static final MechanismLigament2d elevatorWristMechanism = elevatorMechanism.append(new MechanismLigament2d("Elevator Wrist", Units.inchesToMeters(15), 90));
     public static final MechanismLigament2d intakeWristMechanism = Robot.base.append(new MechanismLigament2d("Intake Wrist", Units.inchesToMeters(18), 0));
-    
-
 
     private final List<Auto> autoOptions = List.of(
             new JustScore(),
             new CubeEngage(),
-            new LeftConeTaxi(),
-            new LeftCubeTaxi(),
-            new RightConeTaxi(),
-            new RightCubeTaxi(),
+            new ConeTaxi(),
+            new CubeTaxi(),
+            new ConeTaxiBump(),
+            new CubeTaxiBump(),
             new TwoPlusOneBump(),
             new HighMidCubeEngage(),
             new HighMidCubeEngageBump(),
@@ -80,11 +86,18 @@ public class Robot extends LoggedRobot {
             new HighHighCubeEngage(),
             new HighHighCubeEngageBump(),
             new HighHighCube(),
-            new HighHighCubeBump());
+            new HighHighCubeBump(),
+            new ThreeBump(),
+            new ThreeBumpEngage()
+                                                  );
+
+    private final DigitalInput setupSwitch = new DigitalInput(SETUP_SWITCH);
 
 
     @Override
     public void robotInit() {
+        if (isReal()) Constants.mode = Constants.Mode.REAL;
+
         logger.recordMetadata("ProjectName", "C2023");
         logger.recordMetadata("RuntimeType", getRuntimeType().toString());
         logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
@@ -94,8 +107,8 @@ public class Robot extends LoggedRobot {
         logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
 
         if (isReal()) {
-            // Use /media/sda1/ for logging to a thumb drive
-            logger.addDataReceiver(new WPILOGWriter("/home/lvuser/logs")); // Log to a USB stick
+            //            logger.addDataReceiver(new WPILOGWriter("/home/lvuser/logs")); // Log to the rio directly
+            logger.addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB stick
             logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
             new PowerDistribution(1, PowerDistribution.ModuleType.kRev).close(); // Enables power distribution logging //TODO Check CAN ID
         } else {
@@ -105,45 +118,54 @@ public class Robot extends LoggedRobot {
                     logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
                 }
                 case REPLAY -> {
-                    setUseTiming(false); // Set to false to run as fast as possible when replaying logs
+                    setUseTiming(false); // Set as false to run as fast as possible when replaying logs
                     String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
                     logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
                     logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
                 }
-                default -> {}
             }
-
         }
 
         logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
 
         gyro.setYaw(0);
 
-        SmartDashboard.putData(field);
+        // SmartDashboard.putData(field);
         FieldPositions.displayAll();
 
-        autoChooser.setDefaultOption("Score", new JustScore());
+        autoChooser.addDefaultOption("Score", new JustScore());
 
-        autoOptions.forEach(auto -> {
-            autoChooser.addOption(auto.getName(), auto);
-        });
+        autoOptions.forEach(auto -> autoChooser.addOption(auto.getName(), auto));
 
         controls.configureDefaultCommands();
         controls.configureDriverCommands();
         controls.configureOperatorCommands();
 
-        SmartDashboard.putData(autoChooser);
-
         PathLib.eighthNodeToChargeStation.getClass();
+
+        Elevator.getInstance().setBrakeMode(false);
+        ElevatorWrist.getInstance().setBrakeMode(false);
+
+        new Trigger(() -> setupSwitch.get() && isDisabled())
+                .toggleOnTrue(Commands.startEnd(() -> {
+                                                    Elevator.getInstance().setBrakeMode(true);
+                                                    ElevatorWrist.getInstance().setBrakeMode(true);
+                                                },
+                                                () -> {
+                                                    Elevator.getInstance().setBrakeMode(false);
+                                                    ElevatorWrist.getInstance().setBrakeMode(false);
+                                                }
+                                               ));
+        ;
     }
 
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
 
-        photonvision.getEstimatedPose().ifPresent(pose -> drivetrain.setPose(pose));
+        photonvision.getEstimatedPose().ifPresent(drivetrain::setPose);
 
-        field.getObject("Scoring Target").setPose(RobotPosition.getNextScoringNodePosition());
+        // field.getObject("Scoring Target").setPose(RobotPosition.getNextScoringNodePosition());
 
         if (alliance == Alliance.Invalid) {
             alliance = DriverStation.getAlliance();
@@ -157,13 +179,16 @@ public class Robot extends LoggedRobot {
                              : 180;
         }
 
-        Logger.getInstance().recordOutput("Mechanism2d", mechanism2d);
+        logger.recordOutput("Mechanism2d", mechanism2d);
+
+        logger.recordOutput("Targets/NextScoringPose", RobotPosition.getNextScoringNodePosition());
+        logger.recordOutput("Targets/FutureScoringPose", RobotPosition.getFutureScoringNodePosition());
+        logger.recordOutput("Targets/FutureRobotPose", RobotPosition.getFuturePose(20));
+        logger.recordOutput("Targets/Distance", RobotPosition.getFutureScoringNodeDistance());
     }
 
     @Override
     public void disabledPeriodic() {
-        // blinkin.setColor(Blinkin.Color.BLUE);
-
         alliance = DriverStation.getAlliance();
         // This reverses the coordinates/direction of the drive commands on the red alliance
         coordinateFlip = alliance == Alliance.Blue
@@ -175,15 +200,27 @@ public class Robot extends LoggedRobot {
                          : 180;
 
 
-        autoToRun = autoChooser.getSelected();
+        if (!matchStarted) {
+            autoToRun = autoChooser.get();
+            robotState.setState(autoToRun.getInitialState());
+            Elevator.getInstance().setState(autoToRun.getInitialState().elevator);
+            ElevatorWrist.getInstance().setState(autoToRun.getInitialState().elevatorWrist);
+        }
+
+        Drivetrain.getInstance().stop();
+    }
+
+    @Override
+    public void teleopInit() {
+        matchStarted = true;
     }
 
     @Override
     public void teleopPeriodic() {
         if ((Math.abs(RotationUtil.toSignedDegrees(Math.abs(drivetrain.getYaw()
-                - RobotPosition.calculateDegreesToTarget(RobotPosition.getNextScoringNodePosition())))) < 3.5)
-                && (RobotPosition.distanceTo(Point.fromPose2d(RobotPosition.getClosestScoringPosition())) < Units
-                        .inchesToMeters(25))) {
+                                                                    - RobotPosition.calculateDegreesToTarget(
+                RobotPosition.getNextScoringNodePosition())))) < 3.5)
+                && (RobotPosition.getClosestScoringDistance()) < Units.inchesToMeters(25)) {
             blinkin.setColor(Blinkin.Color.LIME);
             controls.driver.rumble(0.5);
         } else if (robotState.inShootDriveMode() && RobotPosition.inCommunity()) {
@@ -193,14 +230,14 @@ public class Robot extends LoggedRobot {
                 blinkin.setColor(Color.BLUE);
             } else {
                 blinkin.setColor(RobotState.getInstance().inConeMode()
-                        ? Blinkin.Color.YELLOW
-                        : Blinkin.Color.PURPLE);
+                                 ? Blinkin.Color.YELLOW
+                                 : Blinkin.Color.PURPLE);
             }
             controls.driver.rumble(0);
         }
     }
 
-    
+
     @Override
     public void teleopExit() {
         controls.driver.rumble(0);
@@ -208,33 +245,40 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void autonomousInit() {
+        matchStarted = true;
+
         if (autoToRun == null)
             autoToRun = new JustScore();
 
         if (alliance == Alliance.Blue) {
-            Drivetrain.getInstance().setPose(autoToRun.getInitialPose());
             Drivetrain.getInstance().setYaw(autoToRun.getInitialPose().getRotation().getDegrees());
+            Drivetrain.getInstance().setPose(autoToRun.getInitialPose());
         } else {
-            Drivetrain.getInstance().setPose(PoseUtil.flip(autoToRun.getInitialPose()));
             Drivetrain.getInstance().setYaw(PoseUtil.flip(autoToRun.getInitialPose()).getRotation().getDegrees());
+            Drivetrain.getInstance().setPose(PoseUtil.flip(autoToRun.getInitialPose()));
         }
 
         autoToRun.getCommand().schedule();
+
+        CommandScheduler.getInstance().run();
+
+        if (alliance == Alliance.Blue) {
+            Drivetrain.getInstance().setYaw(autoToRun.getInitialPose().getRotation().getDegrees());
+            Drivetrain.getInstance().setPose(autoToRun.getInitialPose());
+        } else {
+            Drivetrain.getInstance().setYaw(PoseUtil.flip(autoToRun.getInitialPose()).getRotation().getDegrees());
+            Drivetrain.getInstance().setPose(PoseUtil.flip(autoToRun.getInitialPose()));
+        }
     }
 
     @Override
     public void testInit() {
         CommandScheduler.getInstance().cancelAll();
-    }
+        new SystemsCheck().getCommand().schedule();
 
-    
-    @Override
-    public void simulationPeriodic() {
-        // Simulation.getInstance().update();
     }
 
     public static void main(String... args) {
         RobotBase.startRobot(Robot::new);
     }
-
 }

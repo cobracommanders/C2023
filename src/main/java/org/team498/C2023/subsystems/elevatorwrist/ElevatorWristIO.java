@@ -8,7 +8,7 @@ public interface ElevatorWristIO {
         public double angle = 0.0;
         public double targetAngle = 0.0;
 
-        public double encoder = 0.0;
+        public double rawAbsoluteEncoder = 0.0;
 
         public double motorAppliedVolts = 0.0;
         public double motorCurrentAmps = 0.0;

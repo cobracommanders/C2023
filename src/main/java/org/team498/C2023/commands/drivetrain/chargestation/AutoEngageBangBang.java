@@ -9,4 +9,11 @@ public class AutoEngageBangBang extends SequentialCommandGroup {
             new BangBangBalance()
         );
     }
+
+    public AutoEngageBangBang(double y) {
+        super(
+            new AutoEngage(y),
+            new BangBangBalance()
+        );
+    }
 }

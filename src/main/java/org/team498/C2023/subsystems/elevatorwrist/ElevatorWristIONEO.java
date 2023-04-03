@@ -67,7 +67,7 @@ public class ElevatorWristIONEO extends SubsystemBase implements ElevatorWristIO
         inputs.angle = getAngle();
         inputs.targetAngle = PID.getSetpoint();
 
-        inputs.encoder = encoder.getOutput();
+        inputs.rawAbsoluteEncoder = encoder.getOutput();
 
         // inputs.motorAppliedVolts = motor.getBusVoltage() * motor.get();
         // inputs.motorCurrentAmps = motor.getOutputCurrent();

@@ -8,8 +8,7 @@ import org.team498.C2023.RobotState.ScoringOption;
 import org.team498.C2023.commands.SetRobotState;
 import org.team498.C2023.commands.drivetrain.LockWheels;
 import org.team498.C2023.commands.drivetrain.PathPlannerFollower;
-import org.team498.C2023.commands.drivetrain.chargestation.AutoEngageBangBang;
-import org.team498.C2023.commands.robot.FullScore;
+import org.team498.C2023.commands.manipulator.SetManipulatorToNextState;
 import org.team498.C2023.commands.robot.GroundIntake;
 import org.team498.C2023.commands.robot.PrepareToScore;
 import org.team498.C2023.commands.robot.ReturnToIdle;
@@ -24,42 +23,66 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
-public class HighMidCubeEngage implements Auto {
+public class ThreeBump implements Auto {
     @Override
     public Command getCommand() {
         return new SequentialCommandGroup(
                 new InstantCommand(() -> RobotState.getInstance().setCurrentGameMode(GameMode.CUBE)),
                 new InstantCommand(() -> RobotState.getInstance().setNextScoringOption(ScoringOption.TOP)),
-                new FullScore(),
-                new SetRobotState(State.INTAKE),
+                new PrepareToScore(),
+                new WaitCommand(0.1),
+                new SetManipulatorToNextState(),
+                new WaitCommand(0.1),
                 new ParallelCommandGroup(
-                        new PathPlannerFollower(PathLib.secondNodeToTopCube),
+                        new PathPlannerFollower(PathLib.eighthNodeToFourthCube),
                         new SequentialCommandGroup(
-                                new WaitCommand(2),
+                                new ParallelCommandGroup(
+                                        new ReturnToIdle(),
+                                        new WaitCommand(2)),
+                                new SetRobotState(State.INTAKE),
                                 new GroundIntake())),
                 new ParallelCommandGroup(
                         new SequentialCommandGroup(
-                            new PathPlannerFollower(PathLib.topCubeToSecondNode),
-                            new LockWheels()
-                        ),
+                                new PathPlannerFollower(PathLib.fourthCubeToEighthNode),
+                                new LockWheels()),
                         new SequentialCommandGroup(
-                                new WaitCommand(1),
+                                new WaitCommand(.75),
                                 new ReturnToIdle(),
                                 new InstantCommand(() -> RobotState.getInstance().setCurrentGameMode(GameMode.CUBE)),
                                 new InstantCommand(() -> RobotState.getInstance().setNextScoringOption(ScoringOption.MID)),
-                                new WaitCommand(1),
+                                new WaitCommand(1.5),
                                 new PrepareToScore())),
+                new ConditionalCommand(new WaitCommand(0.3), new WaitCommand(0.1), () -> RobotState.getInstance().inConeMode()),
+                new Score(),
+                new WaitCommand(0.1),
                 new ParallelCommandGroup(
-                        new Score(),
+                        new PathPlannerFollower(PathLib.eigthNodeToThirdCube),
                         new SequentialCommandGroup(
-                                new ConditionalCommand(new WaitCommand(0.3), new WaitCommand(0), () -> RobotState.getInstance().inConeMode()),
-                                new PathPlannerFollower(PathLib.secondNodeToChargeStation))),
-                new AutoEngageBangBang());
+                                new ParallelCommandGroup(
+                                        new ReturnToIdle(),
+                                        new WaitCommand(2)),
+                                new SetRobotState(State.INTAKE),
+                                new GroundIntake())),
+
+                new ParallelCommandGroup(
+                        new SequentialCommandGroup(
+                                new PathPlannerFollower(PathLib.thirdCubeToEigthNode),
+                                new LockWheels()),
+                        new SequentialCommandGroup(
+                                new WaitCommand(.75),
+                                new ReturnToIdle(),
+                                new SetRobotState(State.OUTTAKE),
+                                new WaitCommand(1.5),
+                                new GroundIntake())),
+                new WaitCommand(0.2),
+                new ReturnToIdle()
+
+        );
     }
 
     @Override
     public Pose2d getInitialPose() {
-        return PathLib.secondNodeToTopCube.getInitialHolonomicPose();
+        return PathLib.eighthNodeToFourthCube.getInitialHolonomicPose();
     }
 
     @Override

@@ -26,7 +26,7 @@ public class IntakeRollerIOFalcon500NEO extends SubsystemBase implements IntakeR
         top.setNeutralMode(NeutralMode.Coast);
         third.setIdleMode(IdleMode.kCoast);
 
-        bottom.setInverted(true);
+        bottom.setInverted(false);
         top.setInverted(false);
         third.setInverted(false);
 

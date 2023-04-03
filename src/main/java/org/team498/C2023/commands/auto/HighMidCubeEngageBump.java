@@ -6,6 +6,7 @@ import org.team498.C2023.State;
 import org.team498.C2023.RobotState.GameMode;
 import org.team498.C2023.RobotState.ScoringOption;
 import org.team498.C2023.commands.SetRobotState;
+import org.team498.C2023.commands.drivetrain.LockWheels;
 import org.team498.C2023.commands.drivetrain.PathPlannerFollower;
 import org.team498.C2023.commands.drivetrain.chargestation.AutoEngageBangBang;
 import org.team498.C2023.commands.robot.FullScore;
@@ -36,7 +37,10 @@ public class HighMidCubeEngageBump implements Auto {
                                 new WaitCommand(2),
                                 new GroundIntake())),
                 new ParallelCommandGroup(
-                        new PathPlannerFollower(PathLib.fourthCubeToEighthNode),
+                        new SequentialCommandGroup(
+                                new PathPlannerFollower(PathLib.fourthCubeToEighthNode),
+                                new LockWheels()
+                        ),
                         new SequentialCommandGroup(
                                 new WaitCommand(.75),
                                 new ReturnToIdle(),

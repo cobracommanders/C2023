@@ -28,15 +28,17 @@ public class RobotPosition {
         return Math.hypot(drivetrain.getPose().getX() - pose.getX(), drivetrain.getPose().getY() - pose.getY()) < epsilon;
     }
 
-    public static double distanceTo(Point point) {
+    private static double distanceTo(Point point, Pose2d reference) {
         double x = point.getX();
         double y = point.getY();
 
-        double xDiff = x - drivetrain.getPose().getX();
-        double yDiff = y - drivetrain.getPose().getY();
+        double xDiff = x - reference.getX();
+        double yDiff = y - reference.getY();
 
         return Math.hypot(xDiff, yDiff);
     }
+
+    private static double distanceTo(Point point) {return distanceTo(point, drivetrain.getPose());}
 
     public static boolean inCommunity() {
         return inRegion(Robot.alliance == Alliance.Blue
@@ -64,38 +66,55 @@ public class RobotPosition {
         return angle;
     }
 
-    public static Pose2d getNextScoringNodePosition() {
+    public static Pose2d getNextScoringNodePosition() {return getNextScoringNodePosition(drivetrain.getPose());}
+
+    public static Pose2d getNextScoringNodePosition(Pose2d reference) {
         int height = switch (RobotState.getInstance().getNextScoringOption()) {
             case TOP -> 0;
             case MID -> 1;
             case SPIT -> 2;
         };
 
-        Grid closestGrid = getClosestGrid();
+        Grid closestGrid = getClosestGrid(reference);
         if (RobotState.getInstance().inCubeMode()) return closestGrid.getNodePoints()[height][1].toPose2d(); // Return the center position for cubes
         if (distanceTo(closestGrid.getNodePoints()[2][0]) < distanceTo(closestGrid.getNodePoints()[2][2]))
             return closestGrid.getNodePoints()[height][0].toPose2d();
         return closestGrid.getNodePoints()[height][2].toPose2d();
     }
 
+    private static Transform2d getVelocity(double loopCycles) {
+        var currentSpeeds = drivetrain.getCurrentSpeeds();
+        return new Transform2d(new Translation2d(currentSpeeds.vxMetersPerSecond * (Robot.DEFAULT_PERIOD * loopCycles), currentSpeeds.vyMetersPerSecond * (Robot.DEFAULT_PERIOD * loopCycles)), Rotation2d.fromRadians(currentSpeeds.omegaRadiansPerSecond * (Robot.DEFAULT_PERIOD * loopCycles)));
+    }
 
-    public static Pose2d getFutureScoringNodePose() {
-        return RobotPosition.getNextScoringNodePosition().transformBy(new Transform2d(new Translation2d(Drivetrain.getInstance().getCurrentSpeeds().vxMetersPerSecond, Drivetrain.getInstance().getCurrentSpeeds().vyMetersPerSecond), Rotation2d.fromRadians(Drivetrain.getInstance().getCurrentSpeeds().omegaRadiansPerSecond)).times(5).inverse());
+    public static Pose2d getFuturePose(double loopCycles) {
+        return drivetrain.getPose().transformBy(getVelocity(loopCycles));
+    }
+
+
+    public static Pose2d getFutureScoringNodePosition() {
+        var speeds = drivetrain.getCurrentSpeeds();
+        speeds = ChassisSpeeds.toFieldRelativeSpeeds(speeds, drivetrain.getYaw());
+        return RobotPosition.getNextScoringNodePosition(getFuturePose(20)).transformBy(getVelocity(20));
     }
 
     public static double getFutureScoringNodeDistance() {
-        return Math.abs(distanceTo(Point.fromPose2d(getFutureScoringNodePose())));
+        return Math.abs(distanceTo(Point.fromPose2d(getFutureScoringNodePosition())));
     }
 
     public static Pose2d getClosestScoringPosition() {
-        Grid closestGrid = getClosestGrid();
+        Grid closestGrid = getClosestGrid(drivetrain.getPose());
         if (RobotState.getInstance().inCubeMode()) return closestGrid.getNodePoints()[2][1].toPose2d(); // Return the center position for cubes
         if (distanceTo(closestGrid.getNodePoints()[2][0]) < distanceTo(closestGrid.getNodePoints()[2][2]))
             return closestGrid.getNodePoints()[2][0].toPose2d();
         return closestGrid.getNodePoints()[2][2].toPose2d();
     }
 
-    private static Grid getClosestGrid() {
+    public static double getClosestScoringDistance() {
+        return distanceTo(Point.fromPose2d(getClosestScoringPosition()));
+    }
+
+    private static Grid getClosestGrid(Pose2d reference) {
         LinkedList<FieldPositions.Grid> grids = Robot.alliance == Alliance.Blue
                                                 ? FieldPositions.blueGrids
                                                 : FieldPositions.redGrids;
@@ -105,7 +124,7 @@ public class RobotPosition {
         double closestDistance = Double.MAX_VALUE;
 
         for (Grid grid : grids) {
-            double distance = distanceTo(grid.getNodePoints()[1][1]);
+            double distance = distanceTo(grid.getNodePoints()[1][1], reference);
 
             if (Math.abs(distance) < closestDistance) {
                 closestDistance = Math.abs(distance);

@@ -19,14 +19,16 @@ public class ReturnToIdle extends ConditionalCommand {
         super(
                 new ConditionalCommand(
                         new SequentialCommandGroup(
-                                new ConditionalCommand(new SetRobotState(State.TRAVEL_CONE),
+                                new ConditionalCommand(
+                                        new SetRobotState(State.TRAVEL_CONE),
                                         new SetRobotState(State.TRAVEL_CUBE),
                                         () -> RobotState.getInstance().inConeMode()),
                                 new SetManipulatorToNextState(),
                                 new ParallelCommandGroup(
                                         new SetElevatorWristToNextState(),
                                         new SetIntakeWristToNextState()),
-                                new ConditionalCommand(new SetRobotState(State.IDLE_CONE),
+                                new ConditionalCommand(
+                                        new SetRobotState(State.IDLE_CONE),
                                         new SetRobotState(State.IDLE_CUBE),
                                         () -> RobotState.getInstance().inConeMode()),
                                 new SetElevatorToNextState(),
@@ -48,8 +50,7 @@ public class ReturnToIdle extends ConditionalCommand {
                                 new ConditionalCommand(
                                         new SetRobotState(State.IDLE_CONE),
                                         new SetRobotState(State.IDLE_CUBE),
-                                        () -> RobotState.getInstance()
-                                                .inConeMode()),
+                                        () -> RobotState.getInstance().inConeMode()),
                                 new SetElevatorToNextState(),
                                 new ParallelCommandGroup(
                                         new SetElevatorWristToNextState(),
