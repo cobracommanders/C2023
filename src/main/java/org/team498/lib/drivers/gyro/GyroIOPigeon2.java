@@ -1,5 +1,7 @@
 package org.team498.lib.drivers.gyro;
 
+import org.team498.lib.util.RotationUtil;
+
 import com.ctre.phoenix.sensors.Pigeon2;
 
 public class GyroIOPigeon2 implements GyroIO {
@@ -12,7 +14,7 @@ public class GyroIOPigeon2 implements GyroIO {
     public void updateInputs(GyroIOInputs inputs) {
         inputs.pitch = pigeon.getPitch();
         inputs.roll = pigeon.getRoll();
-        inputs.yaw = pigeon.getYaw();
+        inputs.yaw = RotationUtil.toSignedDegrees(pigeon.getYaw());
     }
 
     @Override
