@@ -19,6 +19,7 @@ public class Elevator extends SubsystemBase {
     private Elevator() {
         IO = switch (Constants.mode) {
             case REAL, REPLAY -> new ElevatorIOFalcon500();
+            // case REAL, REPLAY -> new ElevatorIO() {};
             case SIM -> new ElevatorIOSim();
         };
     }

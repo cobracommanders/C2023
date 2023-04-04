@@ -11,7 +11,7 @@ import org.team498.C2023.subsystems.intakerollers.IntakeRoller;
 import org.team498.C2023.subsystems.intakewrist.IntakeWrist;
 import org.team498.C2023.subsystems.manipulator.Manipulator;
 import org.team498.lib.drivers.Blinkin;
-import org.team498.lib.drivers.Blinkin.Color;
+import org.team498.lib.drivers.Blinkin.BlinkinColor;
 
 import java.util.function.BooleanSupplier;
 
@@ -51,18 +51,18 @@ public class SystemsCheck {
                 runOnce(() -> {
                     timer.reset();
                     timer.start();
-                    Blinkin.getInstance().setColor(Color.YELLOW);
+                    Blinkin.getInstance().setColor(BlinkinColor.SOLID_YELLOW); //BlinkinColor.SOLID_YELLOW
                     System.out.println("Starting test on " + system);
                 }),
                 race(
                         sequence(
                                 waitSeconds(timeout),
                                 print("Test failed in " + timeout + " seconds"),
-                                runOnce(() -> Blinkin.getInstance().setColor(Color.RED))),
+                                runOnce(() -> Blinkin.getInstance().setColor(BlinkinColor.SOLID_RED))),
                         sequence(
                                 waitUntil(isWorking),
                                 print("Test successful"),
-                                runOnce(() -> Blinkin.getInstance().setColor(Color.LIME))),
+                                runOnce(() -> Blinkin.getInstance().setColor(BlinkinColor.SOLID_LIME))),
                         run(test)),
                 runOnce(timer::stop),
                 waitSeconds(0.5));

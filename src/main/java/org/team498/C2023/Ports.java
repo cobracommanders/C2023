@@ -22,8 +22,8 @@ public final class Ports {
     }
 
     public static class IntakeRollers {
-        public static final int BOTTOM_ROLLER = 20;
-        public static final int TOP_ROLLER = 23;
+        public static final int TOP_ROLLER = 20;
+        public static final int BOTTOM_ROLLER = 23;
         public static final int THIRD_ROLLER = 24;
     }
 

@@ -28,7 +28,7 @@ import org.team498.C2023.subsystems.manipulator.Manipulator;
 import org.team498.C2023.subsystems.vision.Vision;
 import org.team498.lib.auto.Auto;
 import org.team498.lib.drivers.Blinkin;
-import org.team498.lib.drivers.Blinkin.Color;
+import org.team498.lib.drivers.Blinkin.BlinkinColor;
 import org.team498.lib.drivers.Gyro;
 import org.team498.lib.util.PoseUtil;
 import org.team498.lib.util.RotationUtil;
@@ -88,7 +88,8 @@ public class Robot extends LoggedRobot {
             new HighHighCube(),
             new HighHighCubeBump(),
             new ThreeBump(),
-            new ThreeBumpEngage()
+            new ThreeBumpEngage(),
+            new TestAuto()
                                                   );
 
     private final DigitalInput setupSwitch = new DigitalInput(SETUP_SWITCH);
@@ -203,6 +204,7 @@ public class Robot extends LoggedRobot {
         if (!matchStarted) {
             autoToRun = autoChooser.get();
             robotState.setState(autoToRun.getInitialState());
+            // Drivetrain.getInstance().setPose(autoToRun.getInitialPose());
             Elevator.getInstance().setState(autoToRun.getInitialState().elevator);
             ElevatorWrist.getInstance().setState(autoToRun.getInitialState().elevatorWrist);
         }
@@ -221,17 +223,17 @@ public class Robot extends LoggedRobot {
                                                                     - RobotPosition.calculateDegreesToTarget(
                 RobotPosition.getNextScoringNodePosition())))) < 3.5)
                 && (RobotPosition.getClosestScoringDistance()) < Units.inchesToMeters(25)) {
-            blinkin.setColor(Blinkin.Color.LIME);
+            blinkin.setColor(BlinkinColor.SOLID_LIME);
             controls.driver.rumble(0.5);
         } else if (robotState.inShootDriveMode() && RobotPosition.inCommunity()) {
-            blinkin.setColor(Blinkin.Color.RED);
+            blinkin.setColor(BlinkinColor.LIGHT_CHASE_RED);
         } else {
             if (robotState.inConeMode() && Manipulator.getInstance().isStalling()) {
-                blinkin.setColor(Color.BLUE);
+                blinkin.setColor(BlinkinColor.SOLID_BLUE);
             } else {
                 blinkin.setColor(RobotState.getInstance().inConeMode()
-                                 ? Blinkin.Color.YELLOW
-                                 : Blinkin.Color.PURPLE);
+                                 ? BlinkinColor.RAINBOW_PALETTE //SOLID_YELLOW
+                                 : BlinkinColor.OCEAN_PALETTE);
             }
             controls.driver.rumble(0);
         }

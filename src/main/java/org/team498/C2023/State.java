@@ -121,10 +121,10 @@ public enum State {
     }
 
     public enum IntakeRollers {
-        INTAKE(-1, 1, 0.5),
+        INTAKE(1, -1, 0.5),
         SPIT(1, 1, 0),
         IDLE(0, 0, 0),
-        OUTTAKE(0.4, -0.4, -0.5),
+        OUTTAKE(-0.4, 0.4, -0.5),
         PUSH(0.2, 0, 0);
 
         public final double bottomRollerSpeed;

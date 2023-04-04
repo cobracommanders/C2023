@@ -116,7 +116,7 @@ public class ElevatorIOFalcon500 extends SubsystemBase implements ElevatorIO {
         motor.setInverted(false);
     }
 
-    private double getPositionMeters() {return (front.getSelectedSensorPosition() / 2048) / MOTOR_ROTATION_TO_METERS;}
+    private double getPositionMeters() {return (-front.getSelectedSensorPosition() / 2048) / MOTOR_ROTATION_TO_METERS;}
 
 
     public enum ControlMode {

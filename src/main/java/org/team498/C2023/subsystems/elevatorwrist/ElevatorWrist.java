@@ -7,6 +7,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 import org.team498.C2023.*;
+import org.team498.C2023.Constants.Mode;
 import org.team498.C2023.subsystems.elevator.Elevator;
 
 public class ElevatorWrist extends SubsystemBase {
@@ -36,16 +37,22 @@ public class ElevatorWrist extends SubsystemBase {
 
         // IO.setBrakeMode(RobotState.isEnabled());
 
-        if (state == State.ElevatorWrist.SHOOT_DRIVE_CUBE_MID || state == State.ElevatorWrist.SHOOT_DRIVE_CUBE_TOP || state == State.ElevatorWrist.SHOOT_DRIVE_CONE_MID) {
+        if (state == State.ElevatorWrist.SHOOT_DRIVE_CUBE_MID || state == State.ElevatorWrist.SHOOT_DRIVE_CUBE_TOP
+                || state == State.ElevatorWrist.SHOOT_DRIVE_CONE_MID) {
             IO.setPosition(getSetpoint(state, RobotPosition.getFutureScoringNodeDistance()));
         }
     }
 
     public Pose3d getPose() {
-        return Elevator.getInstance().getStageTwoPose().transformBy(new Transform3d(
-                new Translation3d(0.0254, 0.130073, 0),
-                new Rotation3d(Math.toRadians(inputs.angle * 360 - 30), Math.toRadians(0), Math.toRadians(0))
-        ));
+        if (Constants.mode == Mode.SIM) {
+            return Elevator.getInstance().getStageTwoPose().transformBy(new Transform3d(
+                    new Translation3d(0.0254, 0.130073, 0),
+                    new Rotation3d(Math.toRadians(inputs.angle * 360 - 30), Math.toRadians(0), Math.toRadians(0))));
+        } else {
+            return Elevator.getInstance().getStageTwoPose().transformBy(new Transform3d(
+                    new Translation3d(0.0254, 0.130073, 0),
+                    new Rotation3d(Math.toRadians(inputs.angle * -360 - 30), Math.toRadians(0), Math.toRadians(0))));
+        }
     }
 
     public boolean atSetpoint() {

@@ -16,24 +16,24 @@ import org.team498.C2023.subsystems.elevator.Elevator;
 public class PrepareToScore extends SequentialCommandGroup {
     public PrepareToScore() {
         super(
-                new ConditionalCommand(new SetRobotState(State.TRAVEL_CONE), new SetRobotState(State.TRAVEL_CUBE), () -> RobotState.getInstance().inConeMode()),
+                new ConditionalCommand(new SetRobotState(State.TRAVEL_CONE), new SetRobotState(State.TRAVEL_CUBE),
+                        () -> RobotState.getInstance().inConeMode()),
                 new SetManipulatorToNextState(),
                 new ParallelCommandGroup(
                         new SetIntakeWristToNextState(),
                         new SetIntakeRollersToNextState(),
-                        new SetElevatorWristToNextState()),
-                new SetRobotToNextScoringState(),
-                new ParallelCommandGroup(
                         new SequentialCommandGroup(
-                                new WaitCommand(0.075),
-                                new SetElevatorToNextState()),
-                        new SequentialCommandGroup(
-                                new WaitUntilCommand(() -> Elevator.getInstance().aboveIntakeHeight()
-                                        || Elevator.getInstance().atSetpoint()),
+
+                                new WaitCommand(0.04),
+                                new SetRobotToNextScoringState(),
                                 new ParallelCommandGroup(
-                                        new SequentialCommandGroup(
-                                                new WaitCommand(0.25),
-                                                new SetElevatorWristToNextState()),
-                                        new SetIntakeWristToNextState()))));
+                                        new SetElevatorToNextState(),
+                                        new SetElevatorWristToNextState()),
+                                new WaitUntilCommand(() -> Elevator.getInstance().aboveIntakeHeight()
+                                        || Elevator.getInstance().atSetpoint()))),
+                new SetIntakeWristToNextState()
+        // new SetElevatorWristToNextState()
+
+        );
     }
 }

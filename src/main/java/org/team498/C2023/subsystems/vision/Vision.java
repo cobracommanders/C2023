@@ -19,7 +19,8 @@ public class Vision extends SubsystemBase {
         vision = switch (Constants.mode) {
             case REAL, REPLAY ->
                 new VisionIOSingleCamera();
-            case SIM -> new VisionIO() {};
+            case SIM -> new VisionIO() {
+            };
         };
     }
 
@@ -28,12 +29,12 @@ public class Vision extends SubsystemBase {
         vision.updateInputs(inputs);
         Logger.getInstance().processInputs("Vision", inputs);
 
-
         var tagPoses = new Pose2d[inputs.targets.length];
-
-        for (int i = 0; i < inputs.targets.length; i++) {
-            double[] tag = inputs.targets[i];
-            tagPoses[i] = PoseUtil.toPose2d(FieldPositions.aprilTags.get((int) tag[0]));
+        if (inputs.targets.length != 0) {
+            for (int i = 0; i < inputs.targets.length; i++) {
+                double[] tag = inputs.targets[i];
+                tagPoses[i] = PoseUtil.toPose2d(FieldPositions.aprilTags.get((int) tag[0]));
+            }
         }
 
         Logger.getInstance().recordOutput("Vision/TrackedTargets", tagPoses);
@@ -45,7 +46,6 @@ public class Vision extends SubsystemBase {
         }
         return Optional.of(inputs.estimatedPose);
     }
-
 
     private static Vision instance;
 

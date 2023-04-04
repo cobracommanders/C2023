@@ -12,7 +12,7 @@ public class IntakeRoller extends SubsystemBase {
 
     private IntakeRoller() {
         IO = switch (Constants.mode) {
-            case REAL, REPLAY -> new IntakeRollerIOFalcon500NEO();
+            case REAL, REPLAY -> new IntakeRollerIOFalcon500();
             case SIM -> new IntakeRollerIO() {};
         };
     }
