@@ -26,7 +26,7 @@ public class Blinkin {
     public void set(double val) {
         if ((val >= -1.0) && (val <= 1.0)) {
             blinkin.set(val);
-            digitalOutput.pulse((val * 500) + 1500);
+            digitalOutput.pulse(((val * 500) + 1500) / 1e+6);
         }
     }
 
