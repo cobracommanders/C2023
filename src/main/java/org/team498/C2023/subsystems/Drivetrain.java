@@ -1,13 +1,14 @@
 package org.team498.C2023.subsystems;
 
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
@@ -18,6 +19,7 @@ import org.team498.C2023.Constants;
 import org.team498.C2023.Ports;
 import org.team498.C2023.Robot;
 import org.team498.C2023.Constants.Mode;
+import org.team498.C2023.subsystems.vision.Vision;
 import org.team498.lib.drivers.gyro.GyroIO;
 import org.team498.lib.drivers.gyro.GyroIOInputsAutoLogged;
 import org.team498.lib.drivers.gyro.GyroIOPigeon2;
@@ -27,6 +29,7 @@ import org.team498.lib.drivers.swervemodule.ModuleIOFalcon500;
 import org.team498.lib.drivers.swervemodule.ModuleIOInputsAutoLogged;
 import org.team498.lib.drivers.swervemodule.ModuleIOSim;
 import org.team498.lib.logger.LoggerUtil;
+import org.team498.lib.util.PoseUtil;
 import org.team498.lib.wpilib.ChassisSpeeds;
 
 import static org.team498.C2023.Constants.DrivetrainConstants.*;
@@ -40,7 +43,7 @@ public class Drivetrain extends SubsystemBase {
     private final SlewRateLimiter xLimiter = new SlewRateLimiter(MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     private final SlewRateLimiter yLimiter = new SlewRateLimiter(MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     private final SwerveDriveKinematics kinematics;
-    private final SwerveDriveOdometry odometry;
+    private final SwerveDrivePoseEstimator poseEstimator;
     private SwerveModuleState[] stateSetpoints;
 
     private final GyroIO gyro;
@@ -76,7 +79,10 @@ public class Drivetrain extends SubsystemBase {
         yLimiter.reset(0);
 
         kinematics = new SwerveDriveKinematics(getModuleTranslations());
-        odometry = new SwerveDriveOdometry(kinematics, Rotation2d.fromDegrees(getYaw()), getModulePositions());
+
+        poseEstimator = new SwerveDrivePoseEstimator(kinematics, Rotation2d.fromDegrees(getYaw()), getModulePositions(), new Pose2d(), 
+            VecBuilder.fill(Units.inchesToMeters(3), Units.inchesToMeters(3), Math.toDegrees(4)), // Odometry standard deviation
+            VecBuilder.fill(Units.inchesToMeters(10), Units.inchesToMeters(10), Math.toDegrees(15))); // Vision standard deviation
 
         stateSetpoints = getModuleStates();
 
@@ -97,8 +103,13 @@ public class Drivetrain extends SubsystemBase {
         }
         gyro.updateInputs(gyroInputs);
         Logger.getInstance().processInputs("Gyro", gyroInputs);
-        odometry.update(Rotation2d.fromDegrees(getYaw()), getModulePositions());
-        //TODO See if SwerveDrivePoseEstimator could replace resetting the odometry so we could track both
+
+        var visionPose = Vision.getInstance().getEstimatedPose();
+        visionPose.ifPresent(pose -> {
+            poseEstimator.addVisionMeasurement(PoseUtil.toPose2d(pose.estimatedPose), pose.timestampSeconds);
+        });
+        poseEstimator.update(Rotation2d.fromDegrees(getYaw()), getModulePositions());
+        
         Logger.getInstance().recordOutput("Odometry", getPose());
         
         LoggerUtil.recordOutput("Drive/RealStates", getModuleStates());
@@ -159,8 +170,8 @@ public class Drivetrain extends SubsystemBase {
     public double calculateAngleSpeed() {return angleController.calculate(getYaw());}
     public boolean atAngleGoal() {return Math.abs(angleController.getPositionError()) < AngleConstants.EPSILON;}
 
-    public Pose2d getPose() {return odometry.getPoseMeters();}
-    public void setPose(Pose2d pose) {odometry.resetPosition(Rotation2d.fromDegrees(getYaw()), getModulePositions(), pose);}
+    public Pose2d getPose() {return poseEstimator.getEstimatedPosition();}
+    public void setPose(Pose2d pose) {poseEstimator.resetPosition(Rotation2d.fromDegrees(getYaw()), getModulePositions(), pose);}
     public double getYaw() {return gyroInputs.yaw;}
     public void setYaw(double angle) {gyro.setYaw(angle); angleController.reset(angle);}
     /** Return a double array with a value for yaw pitch and roll in that order */

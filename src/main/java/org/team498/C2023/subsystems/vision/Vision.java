@@ -40,9 +40,11 @@ import org.photonvision.common.dataflow.structures.Packet;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import org.team498.C2023.Constants;
+import org.team498.C2023.FieldPositions;
 import org.team498.C2023.subsystems.Drivetrain;
 import org.team498.lib.photonvision.PhotonPoseEstimator;
 import org.team498.lib.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.team498.lib.util.PoseUtil;
 
 import java.io.IOException;
 import java.util.List;
@@ -59,8 +61,6 @@ public class Vision extends SubsystemBase implements VisionIO {
                     -Units.inchesToMeters(5.6875),
                     Units.inchesToMeters(22)),
             new Rotation3d());
-
-    private final double acceptedTagRange = 3.5;
 
     private Vision() {
         PhotonCamera.setVersionCheckEnabled(false);
@@ -105,17 +105,15 @@ public class Vision extends SubsystemBase implements VisionIO {
                 inputs.distanceCoefficientData);
 
         if (estimatedPosition.isPresent()) {
-            // Don't return a new position if the closest target is further than 3.75 meters away
-            if (Math.abs(result.getBestTarget().getBestCameraToTarget().getTranslation().getNorm()) >= acceptedTagRange) {
+            List<PhotonTrackedTarget> targets = estimatedPosition.get().targetsUsed;
+
+            if (targets.size() == 1 && targets.get(0).getPoseAmbiguity() > 0.05) {
                 return Optional.empty();
             }
 
-            List<PhotonTrackedTarget> targets = estimatedPosition.get().targetsUsed;
-
-            Logger.getInstance().recordOutput("Vision/EstimatedPose", estimatedPosition.get().estimatedPose);
+            Logger.getInstance().recordOutput("Vision/EstimatedPose", PoseUtil.toPose2d(estimatedPosition.get().estimatedPose));
             for (var target : targets) {
-                Logger.getInstance().recordOutput("Vision/Targets/" + target.getFiducialId(),
-                        estimatedPosition.get().estimatedPose.plus(target.getBestCameraToTarget()));
+                Logger.getInstance().recordOutput("Vision/Targets/" + target.getFiducialId(), FieldPositions.aprilTags.get(target.getFiducialId()));
             }
         }
         return estimatedPosition;
