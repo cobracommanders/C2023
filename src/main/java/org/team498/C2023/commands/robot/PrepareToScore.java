@@ -31,9 +31,8 @@ public class PrepareToScore extends SequentialCommandGroup {
                                         new SetElevatorWristToNextState()),
                                 new WaitUntilCommand(() -> Elevator.getInstance().aboveIntakeHeight()
                                         || Elevator.getInstance().atSetpoint()))),
-                new SetIntakeWristToNextState()
-        // new SetElevatorWristToNextState()
-
+                new SetIntakeWristToNextState(),
+                new SetIntakeRollersToNextState()
         );
     }
 }
