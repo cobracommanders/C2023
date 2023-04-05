@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -19,13 +20,17 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
-import org.team498.C2023.commands.SystemsCheck;
 import org.team498.C2023.commands.auto.*;
+import org.team498.C2023.commands.robot.ReturnToIdle;
 import org.team498.C2023.subsystems.Drivetrain;
 import org.team498.C2023.subsystems.elevator.Elevator;
 import org.team498.C2023.subsystems.elevatorwrist.ElevatorWrist;
+import org.team498.C2023.subsystems.intakerollers.IntakeRoller;
+import org.team498.C2023.subsystems.intakewrist.IntakeWrist;
 import org.team498.C2023.subsystems.manipulator.Manipulator;
 import org.team498.C2023.subsystems.vision.Vision;
+import org.team498.lib.SystemsCheck;
+import org.team498.lib.SystemsCheck.TestableObject;
 import org.team498.lib.auto.Auto;
 import org.team498.lib.drivers.Blinkin;
 import org.team498.lib.drivers.Blinkin.BlinkinColor;
@@ -93,6 +98,25 @@ public class Robot extends LoggedRobot {
                                                   );
 
     private final DigitalInput setupSwitch = new DigitalInput(SETUP_SWITCH);
+
+    public static final SystemsCheck fullCheck = new SystemsCheck("Full", 
+        Commands.sequence(new ReturnToIdle(), Commands.runOnce(() -> Drivetrain.getInstance().X())),
+        new TestableObject("Elevator/Encoder", () -> {}, () -> Elevator.getInstance().checkEncoderConnection(), 1),
+        new TestableObject("ElevatorWrist/Encoder", () -> {}, () -> ElevatorWrist.getInstance().checkEncoderConnection(), 1),
+        new TestableObject("IntakeWrist/Encoder", () -> {}, () -> IntakeWrist.getInstance().checkEncoderConnection(), 1),
+
+        new TestableObject("IntakeWrist/Motors", () -> IntakeWrist.getInstance().setState(State.IntakeWrist.TEMPORARY_IDLE), () -> IntakeWrist.getInstance().atSetpoint(), 2),
+        new TestableObject("ElevatorWrist/Motor", () -> ElevatorWrist.getInstance().setState(State.ElevatorWrist.TRAVEL), () -> ElevatorWrist.getInstance().atSetpoint(), 2),
+        new TestableObject("Elevator/Motors", () -> Elevator.getInstance().setState(State.Elevator.TOP_CUBE), () -> Elevator.getInstance().atSetpoint(), 2),
+        new TestableObject("Manipulator/Motor", () -> Manipulator.getInstance().setState(State.Manipulator.INTAKE_CUBE), () -> Manipulator.getInstance().getCurrentDraw() > 0.2, 2),
+        new TestableObject("IntakeRoller/Motors", () -> IntakeRoller.getInstance().setState(State.IntakeRollers.INTAKE), () -> {
+            var amps = IntakeRoller.getInstance().getCurrentDraws();
+            return amps[0] + amps[1] + amps[2] > 0.6;
+        }, 2),
+        new TestableObject("Drivetrain/Motors", () -> Drivetrain.getInstance().drive(1, 0, 0, true), () ->
+            Math.abs(Drivetrain.getInstance().getCurrentSpeeds().vxMetersPerSecond - 1) < 0.05,
+            2)
+    );
 
 
     @Override
@@ -276,8 +300,6 @@ public class Robot extends LoggedRobot {
     @Override
     public void testInit() {
         CommandScheduler.getInstance().cancelAll();
-        new SystemsCheck().getCommand().schedule();
-
     }
 
     public static void main(String... args) {
