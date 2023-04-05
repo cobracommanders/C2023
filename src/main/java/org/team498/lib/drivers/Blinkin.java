@@ -1,5 +1,6 @@
 package org.team498.lib.drivers;
 
+import edu.wpi.first.wpilibj.DigitalOutput;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 
 import static org.team498.C2023.Ports.Accessories.BLINKIN;
@@ -7,6 +8,7 @@ import static org.team498.C2023.Ports.Accessories.BLINKIN;
 public class Blinkin {
     private final Spark blinkin;
     private BlinkinColor color = BlinkinColor.SOLID_BLUE;
+    private DigitalOutput digitalOutput = new DigitalOutput(BLINKIN);
 
     private Blinkin() {
         blinkin = new Spark(BLINKIN);
@@ -24,9 +26,9 @@ public class Blinkin {
     public void set(double val) {
         if ((val >= -1.0) && (val <= 1.0)) {
             blinkin.set(val);
+            digitalOutput.pulse((val * 500) + 1500);
         }
     }
-
 
     private static Blinkin instance;
 
