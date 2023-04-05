@@ -12,6 +12,7 @@ public class Blinkin {
 
     private Blinkin() {
         blinkin = new Spark(BLINKIN);
+        setColor(BlinkinColor.OCEAN_PALETTE);
     }
 
     public void setColor(BlinkinColor color) {
