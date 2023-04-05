@@ -188,7 +188,7 @@ public class Robot extends LoggedRobot {
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
 
-        photonvision.getEstimatedPose().ifPresent(drivetrain::setPose);
+        photonvision.getEstimatedPose().ifPresent(pose -> drivetrain.setPose(PoseUtil.toPose2d(pose.estimatedPose)));
 
         // field.getObject("Scoring Target").setPose(RobotPosition.getNextScoringNodePosition());
 
