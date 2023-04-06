@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -28,7 +27,6 @@ import org.team498.C2023.subsystems.elevatorwrist.ElevatorWrist;
 import org.team498.C2023.subsystems.intakerollers.IntakeRoller;
 import org.team498.C2023.subsystems.intakewrist.IntakeWrist;
 import org.team498.C2023.subsystems.manipulator.Manipulator;
-import org.team498.C2023.subsystems.vision.Vision;
 import org.team498.lib.SystemsCheck;
 import org.team498.lib.SystemsCheck.TestableObject;
 import org.team498.lib.auto.Auto;
@@ -48,17 +46,14 @@ public class Robot extends LoggedRobot {
     public static int coordinateFlip = 1;
     public static int rotationOffset = 0;
 
-    // public static final Field2d field = new Field2d();
     public static Alliance alliance = Alliance.Invalid;
     public static final Controls controls = new Controls();
 
     private final Drivetrain drivetrain = Drivetrain.getInstance();
     private final Gyro gyro = Gyro.getInstance();
-    private final Vision photonvision = Vision.getInstance();
     private final Blinkin blinkin = Blinkin.getInstance();
     private final RobotState robotState = RobotState.getInstance();
 
-    // private final SendableChooser<Auto> autoChooser = new SendableChooser<Auto>();
     private final LoggedDashboardChooser<Auto> autoChooser = new LoggedDashboardChooser<Auto>("AutoChooser");
     private Auto autoToRun;
 
@@ -112,10 +107,10 @@ public class Robot extends LoggedRobot {
         new TestableObject("IntakeRoller/Motors", () -> IntakeRoller.getInstance().setState(State.IntakeRollers.INTAKE), () -> {
             var amps = IntakeRoller.getInstance().getCurrentDraws();
             return amps[0] + amps[1] + amps[2] > 0.6;
-        }, 2),
-        new TestableObject("Drivetrain/Motors", () -> Drivetrain.getInstance().drive(1, 0, 0, true), () ->
-            Math.abs(Drivetrain.getInstance().getCurrentSpeeds().vxMetersPerSecond - 1) < 0.05,
-            2)
+        }, 2)//,
+        // new TestableObject("Drivetrain/Motors", () -> Drivetrain.getInstance().drive(1, 0, 0, true), () ->
+            // Math.abs(Drivetrain.getInstance().getCurrentSpeeds().vxMetersPerSecond - 1) < 0.05,
+            // 2)
     );
 
 
@@ -135,7 +130,7 @@ public class Robot extends LoggedRobot {
             //            logger.addDataReceiver(new WPILOGWriter("/home/lvuser/logs")); // Log to the rio directly
             logger.addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB stick
             logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
-            new PowerDistribution(1, PowerDistribution.ModuleType.kRev).close(); // Enables power distribution logging //TODO Check CAN ID
+            new PowerDistribution(1, PowerDistribution.ModuleType.kRev).close(); // Enables power distribution logging
         } else {
             switch (Constants.mode) {
                 case SIM -> {
@@ -155,7 +150,6 @@ public class Robot extends LoggedRobot {
 
         gyro.setYaw(0);
 
-        // SmartDashboard.putData(field);
         FieldPositions.displayAll();
 
         autoChooser.addDefaultOption("Score", new JustScore());
@@ -187,10 +181,6 @@ public class Robot extends LoggedRobot {
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
-
-        // photonvision.getEstimatedPose().ifPresent(pose -> drivetrain.setPose(PoseUtil.toPose2d(pose.estimatedPose)));
-
-        // field.getObject("Scoring Target").setPose(RobotPosition.getNextScoringNodePosition());
 
         if (alliance == Alliance.Invalid) {
             alliance = DriverStation.getAlliance();

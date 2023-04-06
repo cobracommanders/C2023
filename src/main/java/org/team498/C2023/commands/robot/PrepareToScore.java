@@ -23,8 +23,7 @@ public class PrepareToScore extends SequentialCommandGroup {
                         new SetIntakeWristToNextState(),
                         new SetIntakeRollersToNextState(),
                         new SequentialCommandGroup(
-
-                                new WaitCommand(0.04),
+                                new WaitCommand(0.15),
                                 new SetRobotToNextScoringState(),
                                 new ParallelCommandGroup(
                                         new SetElevatorToNextState(),

@@ -95,7 +95,7 @@ public class RobotPosition {
     public static Pose2d getFutureScoringNodePosition() {
         var speeds = drivetrain.getCurrentSpeeds();
         speeds = ChassisSpeeds.toFieldRelativeSpeeds(speeds, drivetrain.getYaw());
-        return RobotPosition.getNextScoringNodePosition(getFuturePose(20)).transformBy(Robot.alliance == Alliance.Blue ? getVelocity(50) : getVelocity(50).inverse());
+        return RobotPosition.getNextScoringNodePosition(getFuturePose(20)).transformBy(Robot.alliance == Alliance.Blue ? getVelocity(30) : getVelocity(50).inverse());
     }
 
     public static double getFutureScoringNodeDistance() {

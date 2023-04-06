@@ -60,8 +60,6 @@ public class ElevatorIOSim extends SubsystemBase implements ElevatorIO {
                 yield speed + feedforward.calculate(speed);
             case MANUAL:
                 yield this.speed + feedforward.calculate(this.speed);
-
-                // TODO change ControlMode to ElevatorMode and add a disabled state
         };
 
         elevatorSim.setInput(percentOutput * RobotController.getBatteryVoltage());

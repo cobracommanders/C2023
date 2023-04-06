@@ -41,7 +41,6 @@ import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 import org.team498.C2023.Constants;
 import org.team498.C2023.FieldPositions;
-import org.team498.C2023.subsystems.Drivetrain;
 import org.team498.lib.photonvision.PhotonPoseEstimator;
 import org.team498.lib.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.team498.lib.util.PoseUtil;

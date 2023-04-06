@@ -3,7 +3,6 @@ package org.team498.C2023;
 import org.team498.C2023.Constants.OIConstants;
 import org.team498.C2023.RobotState.GameMode;
 import org.team498.C2023.RobotState.ScoringOption;
-import org.team498.C2023.commands.SystemsCheck;
 import org.team498.C2023.commands.drivetrain.DefenseDrive;
 import org.team498.C2023.commands.drivetrain.TargetDrive;
 import org.team498.C2023.commands.elevator.ManualElevator;

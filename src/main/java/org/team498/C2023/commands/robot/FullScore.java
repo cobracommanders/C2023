@@ -10,7 +10,7 @@ public class FullScore extends SequentialCommandGroup {
     public FullScore() {
         super(
             new PrepareToScore(),
-            new ConditionalCommand(new WaitCommand(0.75), new WaitCommand(0.1), () -> RobotState.getInstance().inConeMode()), //TODO make faster
+            new ConditionalCommand(new WaitCommand(0.75), new WaitCommand(0.1), () -> RobotState.getInstance().inConeMode()),
             new Score());
     }
 }
