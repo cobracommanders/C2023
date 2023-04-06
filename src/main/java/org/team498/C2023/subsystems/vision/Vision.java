@@ -26,9 +26,7 @@ package org.team498.C2023.subsystems.vision;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -39,6 +37,7 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.common.dataflow.structures.Packet;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
+import org.photonvision.targeting.TargetCorner;
 import org.team498.C2023.Constants;
 import org.team498.C2023.FieldPositions;
 import org.team498.lib.photonvision.PhotonPoseEstimator;
@@ -46,6 +45,7 @@ import org.team498.lib.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.team498.lib.util.PoseUtil;
 
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -111,11 +111,30 @@ public class Vision extends SubsystemBase implements VisionIO {
             }
 
             Logger.getInstance().recordOutput("Vision/EstimatedPose", PoseUtil.toPose2d(estimatedPosition.get().estimatedPose));
+
+            var allCorners = new LinkedList<TargetCorner>();
             for (var target : targets) {
-                Logger.getInstance().recordOutput("Vision/Targets/" + target.getFiducialId(), FieldPositions.aprilTags.get(target.getFiducialId()));
+                Logger.getInstance().recordOutput("Vision/Targets/" + target.getFiducialId() + "/Pose", FieldPositions.aprilTags.get(target.getFiducialId()));
+
+                allCorners.addAll(target.getDetectedCorners());
             }
+            var corners = targetCornerToDoubleArray(allCorners);
+            Logger.getInstance().recordOutput("Vision/Targets/Corners/x", corners[0]);
+            Logger.getInstance().recordOutput("Vision/Targets/Corners/y", corners[1]);
+        
         }
         return estimatedPosition;
+    }
+
+    // x, y
+    private double[][] targetCornerToDoubleArray(List<TargetCorner> corners) {
+        var output = new double[2][corners.size()];
+        for (int i = 0; i < corners.size(); i++) {
+            TargetCorner corner = corners.get(i);
+            output[0][i] = corner.x;
+            output[1][i] = corner.y;
+        }
+        return output;
     }
 
     public PhotonPipelineResult getPhotonPipelineResult() {
