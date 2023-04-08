@@ -72,6 +72,7 @@ public class Robot extends LoggedRobot {
     public static final MechanismLigament2d intakeWristMechanism = Robot.base.append(new MechanismLigament2d("Intake Wrist", Units.inchesToMeters(18), 0));
 
     private final List<Auto> autoOptions = List.of(
+            new MobilityEngage(),
             new JustScore(),
             new CubeEngage(),
             new ConeTaxi(),

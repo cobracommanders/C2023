@@ -114,11 +114,13 @@ public class Drivetrain extends SubsystemBase {
         
         LoggerUtil.recordOutput("Drive/RealStates", getModuleStates());
 
-        var targetStates = new SwerveModuleState[4];
-        for (int i = 0; i < modules.length; i++) {
-            targetStates[i] = new SwerveModuleState(moduleInputs[i].targetSpeedMetersPerSecond, Rotation2d.fromDegrees(moduleInputs[i].targetAngle));
+        if (Constants.mode == Mode.REPLAY) {
+            var targetStates = new SwerveModuleState[4];
+            for (int i = 0; i < modules.length; i++) {
+                targetStates[i] = new SwerveModuleState(moduleInputs[i].targetSpeedMetersPerSecond, Rotation2d.fromDegrees(moduleInputs[i].targetAngle));
+            }
+            LoggerUtil.recordOutput("Drive/TargetStates", targetStates);
         }
-        LoggerUtil.recordOutput("Drive/TargetStates", targetStates);
 
         if (Constants.mode == Mode.SIM) {
             gyro.setYaw(gyroInputs.yaw + Math.toDegrees(kinematics.toChassisSpeeds(stateSetpoints).omegaRadiansPerSecond) * Robot.DEFAULT_PERIOD);

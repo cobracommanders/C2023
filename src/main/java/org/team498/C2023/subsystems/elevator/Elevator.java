@@ -93,6 +93,7 @@ public class Elevator extends SubsystemBase {
     public void incrementOffset(double increment) {
         onTheFlyOffset += increment;
         Logger.getInstance().recordOutput("Elevator/OnTheFlyOffset", onTheFlyOffset);
+        IO.setPosition(getSetpoint(state, RobotPosition.getFutureScoringNodeDistance()));
     }
 
     private double getSetpoint(State.Elevator state, double interpolatedValue) {

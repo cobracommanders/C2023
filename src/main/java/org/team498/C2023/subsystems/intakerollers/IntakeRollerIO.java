@@ -13,6 +13,8 @@ public interface IntakeRollerIO {
 
         public double thirdCurrentAmps = 0.0;
         public double thirdTemp = 0.0;
+
+        public double velocity = 0.0;
     }
 
     default void updateInputs(IntakeRollerIOInputs inputs) {}

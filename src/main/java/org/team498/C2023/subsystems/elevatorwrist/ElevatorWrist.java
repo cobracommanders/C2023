@@ -72,6 +72,7 @@ public class ElevatorWrist extends SubsystemBase {
     public void incrementOffset(double increment) {
         onTheFlyOffset += increment;
         Logger.getInstance().recordOutput("ElevatorWrist/OnTheFlyOffset", onTheFlyOffset);
+        IO.setPosition(getSetpoint(state, RobotPosition.getFutureScoringNodeDistance()));
     }
 
     private double getSetpoint(State.ElevatorWrist state, double interpolatedValue) {

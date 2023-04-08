@@ -40,6 +40,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 import org.photonvision.targeting.TargetCorner;
 import org.team498.C2023.Constants;
 import org.team498.C2023.FieldPositions;
+import org.team498.C2023.Constants.Mode;
 import org.team498.lib.photonvision.PhotonPoseEstimator;
 import org.team498.lib.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.team498.lib.util.PoseUtil;
@@ -110,18 +111,21 @@ public class Vision extends SubsystemBase implements VisionIO {
                 return Optional.empty();
             }
 
-            Logger.getInstance().recordOutput("Vision/EstimatedPose", PoseUtil.toPose2d(estimatedPosition.get().estimatedPose));
+            Logger.getInstance().recordOutput("Vision/EstimatedPose",
+                    PoseUtil.toPose2d(estimatedPosition.get().estimatedPose));
 
-            var allCorners = new LinkedList<TargetCorner>();
-            for (var target : targets) {
-                Logger.getInstance().recordOutput("Vision/Targets/" + target.getFiducialId() + "/Pose", FieldPositions.aprilTags.get(target.getFiducialId()));
+            if (Constants.mode == Mode.REPLAY) {
+                var allCorners = new LinkedList<TargetCorner>();
+                for (var target : targets) {
+                    Logger.getInstance().recordOutput("Vision/Targets/" + target.getFiducialId() + "/Pose",
+                            FieldPositions.aprilTags.get(target.getFiducialId()));
 
-                allCorners.addAll(target.getDetectedCorners());
+                    allCorners.addAll(target.getDetectedCorners());
+                }
+                var corners = targetCornerToDoubleArray(allCorners);
+                Logger.getInstance().recordOutput("Vision/Targets/Corners/x", corners[0]);
+                Logger.getInstance().recordOutput("Vision/Targets/Corners/y", corners[1]);
             }
-            var corners = targetCornerToDoubleArray(allCorners);
-            Logger.getInstance().recordOutput("Vision/Targets/Corners/x", corners[0]);
-            Logger.getInstance().recordOutput("Vision/Targets/Corners/y", corners[1]);
-        
         }
         return estimatedPosition;
     }

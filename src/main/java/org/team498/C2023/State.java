@@ -102,7 +102,7 @@ public enum State {
         // INTAKE(-0.03),
         OUTTAKE(-0.05),
 
-        AUTO_SHOT(0),
+        AUTO_SHOT(0.02),
 
         IDLE_CUBE(-0.06),
         IDLE_CONE(-0.03),
