@@ -117,7 +117,7 @@ public class Drivetrain extends SubsystemBase {
         if (Constants.mode == Mode.REPLAY) {
             var targetStates = new SwerveModuleState[4];
             for (int i = 0; i < modules.length; i++) {
-                targetStates[i] = new SwerveModuleState(moduleInputs[i].targetSpeedMetersPerSecond, Rotation2d.fromDegrees(moduleInputs[i].targetAngle));
+                // targetStates[i] = new SwerveModuleState(moduleInputs[i].targetSpeedMetersPerSecond, Rotation2d.fromDegrees(moduleInputs[i].targetAngle));
             }
             LoggerUtil.recordOutput("Drive/TargetStates", targetStates);
         }

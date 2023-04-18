@@ -8,7 +8,7 @@ import static org.team498.C2023.Ports.Accessories.BLINKIN;
 public class Blinkin {
     private final Spark blinkin;
     private BlinkinColor color = BlinkinColor.SOLID_BLUE;
-    private DigitalOutput digitalOutput = new DigitalOutput(BLINKIN);
+    // private DigitalOutput digitalOutput = new DigitalOutput(BLINKIN);
 
     private Blinkin() {
         blinkin = new Spark(BLINKIN);
@@ -27,7 +27,7 @@ public class Blinkin {
     public void set(double val) {
         if ((val >= -1.0) && (val <= 1.0)) {
             blinkin.set(val);
-            digitalOutput.pulse(((val * 500) + 1500) / 1e+6);
+            // digitalOutput.pulse(((val * 500) + 1500) / 1e+6);
         }
     }
 

@@ -14,7 +14,7 @@ public class BangBangBalance extends CommandBase {
 
     public BangBangBalance() {
         deadzone = 7;
-        speed = 0.33;
+        speed = 0.2;
         addRequirements(drivetrain);
     }
 
@@ -29,7 +29,7 @@ public class BangBangBalance extends CommandBase {
         if (Math.abs(angle) > deadzone) {
             drivetrain.drive(Math.copySign(speed, -angle * Robot.coordinateFlip), 0, drivetrain.calculateAngleSpeed(), true);
         } else {
-            drivetrain.drive(0, 0, 0, true);
+            drivetrain.X();
         }
     }
 

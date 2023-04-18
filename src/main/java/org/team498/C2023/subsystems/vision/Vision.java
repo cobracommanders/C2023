@@ -111,8 +111,7 @@ public class Vision extends SubsystemBase implements VisionIO {
                 return Optional.empty();
             }
 
-            Logger.getInstance().recordOutput("Vision/EstimatedPose",
-                    PoseUtil.toPose2d(estimatedPosition.get().estimatedPose));
+            Logger.getInstance().recordOutput("Vision/EstimatedPose", PoseUtil.toPose2d(estimatedPosition.get().estimatedPose));
 
             if (Constants.mode == Mode.REPLAY) {
                 var allCorners = new LinkedList<TargetCorner>();

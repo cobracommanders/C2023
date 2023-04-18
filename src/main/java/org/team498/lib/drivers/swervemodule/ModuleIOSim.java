@@ -66,18 +66,18 @@ public class ModuleIOSim implements ModuleIO {
         // inputs.angle = steerPID.getSetpoint();
 
 
-        inputs.targetSpeedMetersPerSecond = currentTarget.speedMetersPerSecond;
-        inputs.targetAngle = currentTarget.angle.getDegrees();
+        // inputs.targetSpeedMetersPerSecond = currentTarget.speedMetersPerSecond;
+        // inputs.targetAngle = currentTarget.angle.getDegrees();
 
         inputs.driveAppliedVolts = driveVoltage;
         inputs.driveCurrentAmps = driveSim.getCurrentDrawAmps();
         inputs.driveTemp = 0.0;
-        inputs.driveRawEncoder = 0.0;
+        // inputs.driveRawEncoder = 0.0;
 
         inputs.steerAppliedVolts = steerVoltage;
         inputs.steerCurrentAmps = steerSim.getCurrentDrawAmps();
         inputs.steerTemp = 0.0;
-        inputs.steerRawEncoder = 0.0;
+        // inputs.steerRawEncoder = 0.0;
     }
 
     // Custom optimize method by team 364

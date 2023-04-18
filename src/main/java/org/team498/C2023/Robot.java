@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -72,7 +73,8 @@ public class Robot extends LoggedRobot {
     public static final MechanismLigament2d intakeWristMechanism = Robot.base.append(new MechanismLigament2d("Intake Wrist", Units.inchesToMeters(18), 0));
 
     private final List<Auto> autoOptions = List.of(
-            new MobilityEngage(),
+            new MobilityEngageCubeHigh(),
+            new MobilityEngageConeMid(),
             new JustScore(),
             new CubeEngage(),
             new ConeTaxi(),
@@ -176,7 +178,6 @@ public class Robot extends LoggedRobot {
                                                     ElevatorWrist.getInstance().setBrakeMode(false);
                                                 }
                                                ));
-        ;
     }
 
     @Override
@@ -201,6 +202,8 @@ public class Robot extends LoggedRobot {
         logger.recordOutput("Targets/FutureScoringPose", RobotPosition.getFutureScoringNodePosition());
         logger.recordOutput("Targets/FutureRobotPose", RobotPosition.getFuturePose(20));
         logger.recordOutput("Targets/Distance", RobotPosition.getFutureScoringNodeDistance());
+
+        SmartDashboard.putNumber("Pitch", Gyro.getInstance().getPitch());
     }
 
     @Override
@@ -218,9 +221,11 @@ public class Robot extends LoggedRobot {
 
         if (!matchStarted) {
             autoToRun = autoChooser.get();
-            robotState.setState(autoToRun.getInitialState());
-            Elevator.getInstance().setState(autoToRun.getInitialState().elevator);
-            ElevatorWrist.getInstance().setState(autoToRun.getInitialState().elevatorWrist);
+            if (autoToRun != null) {
+                robotState.setState(autoToRun.getInitialState());
+                Elevator.getInstance().setState(autoToRun.getInitialState().elevator);
+                ElevatorWrist.getInstance().setState(autoToRun.getInitialState().elevatorWrist);
+            }
         }
 
         Drivetrain.getInstance().stop();
@@ -233,10 +238,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void teleopPeriodic() {
-        if ((Math.abs(RotationUtil.toSignedDegrees(Math.abs(drivetrain.getYaw()
-                                                                    - RobotPosition.calculateDegreesToTarget(
-                RobotPosition.getNextScoringNodePosition())))) < 3.5)
-                && (RobotPosition.getClosestScoringDistance()) < Units.inchesToMeters(25)) {
+        if ((Math.abs(RotationUtil.toSignedDegrees(Math.abs(drivetrain.getYaw() - RobotPosition.calculateDegreesToTarget(RobotPosition.getNextScoringNodePosition())))) < 3.5) && (RobotPosition.getClosestScoringDistance()) < Units.inchesToMeters(25)) {
             blinkin.setColor(BlinkinColor.SOLID_LIME);
             controls.driver.rumble(0.5);
         } else if (robotState.inShootDriveMode() && RobotPosition.inCommunity()) {
@@ -246,8 +248,8 @@ public class Robot extends LoggedRobot {
                 blinkin.setColor(BlinkinColor.SOLID_BLUE);
             } else {
                 blinkin.setColor(RobotState.getInstance().inConeMode()
-                                 ? BlinkinColor.RAINBOW_PALETTE //SOLID_YELLOW
-                                 : BlinkinColor.OCEAN_PALETTE);
+                                 ? BlinkinColor.SOLID_YELLOW//RAINBOW_PALETTE
+                                 : BlinkinColor.SOLID_VIOLET);
             }
             controls.driver.rumble(0);
         }

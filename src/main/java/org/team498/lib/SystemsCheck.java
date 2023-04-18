@@ -1,17 +1,15 @@
 package org.team498.lib;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.BooleanSupplier;
-
-import org.team498.lib.drivers.Blinkin;
-import org.team498.lib.drivers.Blinkin.BlinkinColor;
-
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import org.team498.lib.drivers.Blinkin;
+import org.team498.lib.drivers.Blinkin.BlinkinColor;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.BooleanSupplier;
 
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 
@@ -47,8 +45,7 @@ public class SystemsCheck {
             testCommands.add(getTestCommand(test));
         }
         testCommands.add(resetCommand);
-        return sequence(
-                testCommands.toArray(new Command[testCommands.size()]));
+        return sequence(testCommands.toArray(new Command[testCommands.size()]));
     }
 
     private CommandBase getTestCommand(TestableObject test) {

@@ -72,7 +72,7 @@ public class RobotPosition {
         int height = switch (RobotState.getInstance().getNextScoringOption()) {
             case TOP -> 0;
             case MID -> 1;
-            case SPIT -> 2;
+            case LOW, SPIT -> 2;
         };
 
         Grid closestGrid = getClosestGrid(reference);
@@ -84,7 +84,18 @@ public class RobotPosition {
 
     private static Transform2d getVelocity(double loopCycles) {
         var currentSpeeds = drivetrain.getCurrentSpeeds();
-        return new Transform2d(new Translation2d(currentSpeeds.vxMetersPerSecond * (Robot.DEFAULT_PERIOD * loopCycles), currentSpeeds.vyMetersPerSecond * (Robot.DEFAULT_PERIOD * loopCycles)), Rotation2d.fromRadians(currentSpeeds.omegaRadiansPerSecond * (Robot.DEFAULT_PERIOD * loopCycles)));
+        return new Transform2d(new Translation2d(
+            currentSpeeds.vxMetersPerSecond * (Robot.DEFAULT_PERIOD * loopCycles), 
+            currentSpeeds.vyMetersPerSecond * (Robot.DEFAULT_PERIOD * loopCycles)),
+            Rotation2d.fromRadians(currentSpeeds.omegaRadiansPerSecond * (Robot.DEFAULT_PERIOD * loopCycles)));
+    }
+
+    private static Transform2d getVelocitySquared(double loopCycles) {
+        var currentSpeeds = drivetrain.getCurrentSpeeds();
+        var x = currentSpeeds.vxMetersPerSecond * (Robot.DEFAULT_PERIOD * loopCycles);
+        var y = currentSpeeds.vyMetersPerSecond * (Robot.DEFAULT_PERIOD * loopCycles);
+        var r = Rotation2d.fromRadians(currentSpeeds.omegaRadiansPerSecond * (Robot.DEFAULT_PERIOD * loopCycles));
+        return new Transform2d(new Translation2d(Math.copySign(x * x, x), Math.copySign(y * y, y)), r);
     }
 
     public static Pose2d getFuturePose(double loopCycles) {
@@ -95,7 +106,7 @@ public class RobotPosition {
     public static Pose2d getFutureScoringNodePosition() {
         var speeds = drivetrain.getCurrentSpeeds();
         speeds = ChassisSpeeds.toFieldRelativeSpeeds(speeds, drivetrain.getYaw());
-        return RobotPosition.getNextScoringNodePosition(getFuturePose(20)).transformBy(Robot.alliance == Alliance.Blue ? getVelocity(30) : getVelocity(50).inverse());
+        return RobotPosition.getNextScoringNodePosition(getFuturePose(20)).transformBy(Robot.alliance == Alliance.Blue ? getVelocity(50) : getVelocity(50).inverse());
     }
 
     public static double getFutureScoringNodeDistance() {

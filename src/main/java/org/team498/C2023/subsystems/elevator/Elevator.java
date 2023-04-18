@@ -87,7 +87,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public boolean aboveIntakeHeight() {
-        return inputs.positionMeters > 0.4; //TODO find out the real number here
+        return inputs.positionMeters > 0.25; //TODO find out the real number here
     }
 
     public void incrementOffset(double increment) {

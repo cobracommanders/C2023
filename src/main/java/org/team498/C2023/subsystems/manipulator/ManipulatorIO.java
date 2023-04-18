@@ -7,6 +7,7 @@ public interface ManipulatorIO {
     class ManipulatorIOInputs {
         public double motorCurrentAmps = 0.0;
         public double motorTemp = 0.0;
+        public double velocityRotationsPerSecond = 0.0;
     }
 
     default void updateInputs(ManipulatorIOInputs inputs) {}

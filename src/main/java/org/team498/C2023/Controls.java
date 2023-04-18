@@ -55,7 +55,7 @@ public class Controls {
 
         driver.rightTrigger()
               .whileTrue(either(
-                      new TargetDrive(() -> 0/*driver::leftYSquared */, driver::leftXSquared, driver.rightBumper(), RobotPosition::getFutureScoringNodePosition),
+                      new TargetDrive(/*() -> 0*/driver::leftYSquared , driver::leftXSquared, driver.rightBumper(), RobotPosition::getFutureScoringNodePosition),
                       none(),
                       () -> RobotState.getInstance().inCubeMode()
                               && RobotState.getInstance().getNextScoringOption() != ScoringOption.SPIT
@@ -63,9 +63,9 @@ public class Controls {
                                ))
               .onTrue(new PrepareToScore())
               .onFalse(new ChoiceCommand(() -> switch (robotState.getNextScoringOption()) {
-                  case TOP, MID -> sequence(new VerifyScoreLocation(),
+                  case TOP, MID, LOW -> sequence(new VerifyScoreLocation(),
                                             either(
-                                                    waitSeconds(0.75),
+                                                    waitSeconds(robotState.getNextScoringOption() == ScoringOption.LOW ? 0 : 0),
                                                     waitSeconds(0.1),
                                                     () -> RobotState.getInstance().inConeMode()
                                                   ),
@@ -75,14 +75,15 @@ public class Controls {
               }));
 
         driver.X().onTrue(new Spit());
-
         driver.Y().onTrue(Robot.fullCheck.test());
+
+        driver.start().whileTrue(new FixCube()).onFalse(new ReturnToIdle());
     }
 
     public void configureOperatorCommands() {
         operator.Y().onTrue(runOnce(() -> robotState.setNextScoringOption(RobotState.ScoringOption.TOP)));
         operator.B().onTrue(runOnce(() -> robotState.setNextScoringOption(RobotState.ScoringOption.MID)));
-        operator.A().onTrue(runOnce(() -> robotState.setNextScoringOption(RobotState.ScoringOption.SPIT)));
+        operator.A().onTrue(runOnce(() -> robotState.setNextScoringOption(RobotState.ScoringOption.LOW)));
         operator.X().toggleOnTrue(startEnd(() -> robotState.setShootDrive(true), () -> robotState.setShootDrive(false)));
 
         operator.rightBumper().onTrue(runOnce(() -> robotState.setCurrentGameMode(GameMode.CONE)));

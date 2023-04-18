@@ -70,18 +70,18 @@ public class ModuleIOFalcon500 implements ModuleIO {
         inputs.speedMetersPerSecond = Falcon500Conversions.falconToMPS(drive.getSelectedSensorVelocity(), Units.inchesToMeters(DRIVE_WHEEL_CIRCUMFERENCE), MK4I_DRIVE_REDUCTION_L2);
         inputs.angle = Falcon500Conversions.falconToDegrees(steer.getSelectedSensorPosition(), MK4I_STEER_REDUCTION_L2);
 
-        inputs.targetSpeedMetersPerSecond = currentTarget.speedMetersPerSecond;
-        inputs.targetAngle = currentTarget.angle.getDegrees();
+        // inputs.targetSpeedMetersPerSecond = currentTarget.speedMetersPerSecond;
+        // inputs.targetAngle = currentTarget.angle.getDegrees();
 
         // inputs.driveAppliedVolts = drive.getMotorOutputVoltage();
         inputs.driveCurrentAmps = drive.getStatorCurrent();
         inputs.driveTemp = (drive.getTemperature() * 1.8) + 32;
-        inputs.driveRawEncoder = drive.getSelectedSensorPosition();
+        // inputs.driveRawEncoder = drive.getSelectedSensorPosition();
 
         // inputs.steerAppliedVolts = steer.getMotorOutputVoltage();
         inputs.steerCurrentAmps = steer.getStatorCurrent();
         inputs.steerTemp = (steer.getTemperature() * 1.8) + 32;
-        inputs.steerRawEncoder = steer.getSelectedSensorPosition();
+        // inputs.steerRawEncoder = steer.getSelectedSensorPosition();
     }
 
     @Override

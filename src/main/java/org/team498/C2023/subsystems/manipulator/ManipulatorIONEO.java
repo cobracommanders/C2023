@@ -22,6 +22,7 @@ public class ManipulatorIONEO extends SubsystemBase implements ManipulatorIO {
     public void updateInputs(ManipulatorIOInputs inputs) {
         inputs.motorCurrentAmps = motor.getOutputCurrent();
         inputs.motorTemp = (motor.getMotorTemperature() * 1.8) + 32;
+        inputs.velocityRotationsPerSecond = motor.getEncoder().getVelocity();
     }
 
     @Override

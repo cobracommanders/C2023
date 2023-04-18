@@ -10,18 +10,13 @@ public interface ModuleIO {
         public double speedMetersPerSecond = 0.0;
         public double angle = 0.0;
 
-        public double targetSpeedMetersPerSecond = 0.0;
-        public double targetAngle = 0.0;
-
         public double driveAppliedVolts = 0.0;
         public double driveCurrentAmps = 0.0;
         public double driveTemp = 0.0;
-        public double driveRawEncoder = 0.0;
 
         public double steerAppliedVolts = 0.0;
         public double steerCurrentAmps = 0.0;
         public double steerTemp = 0.0;
-        public double steerRawEncoder = 0.0;
     }
 
     default void updateInputs(ModuleIOInputs inputs) {}
