@@ -14,8 +14,8 @@ public final class Constants {
 
         public static final double SWERVE_MODULE_DISTANCE_FROM_CENTER = 10.75;
 
-        public static final double MK4I_DRIVE_REDUCTION_L2 = 6.75;
-        public static final double MK4I_STEER_REDUCTION_L2 = 21.428571428571428571428571428571; // 150 / 7
+        public static final double MK4I_DRIVE_REDUCTION_L3 = 6.12;
+        public static final double MK4I_STEER_REDUCTION_L3 = 21.428571428571428571428571428571; // 150 / 7
 
         public static final double DRIVE_WHEEL_DIAMETER = 4;
         public static final double DRIVE_WHEEL_CIRCUMFERENCE = DRIVE_WHEEL_DIAMETER * Math.PI;

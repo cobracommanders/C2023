@@ -62,8 +62,8 @@ public class SwerveModule extends SubsystemBase {
             simDriveMotor = driveMotor.getSimCollection();
             simSteerMotor = steerMotor.getSimCollection();
             simEncoder = encoder.getSimCollection();
-            steerSim = new FlywheelSim(DCMotor.getFalcon500(1), MK4I_STEER_REDUCTION_L2, 0.004096955);
-            driveSim = new FlywheelSim(DCMotor.getFalcon500(1), MK4I_DRIVE_REDUCTION_L2, 0.025);
+            steerSim = new FlywheelSim(DCMotor.getFalcon500(1), MK4I_STEER_REDUCTION_L3, 0.004096955);
+            driveSim = new FlywheelSim(DCMotor.getFalcon500(1), MK4I_DRIVE_REDUCTION_L3, 0.025);
 
             // encoder.setPosition(angleOffset);
         } else {
@@ -80,13 +80,13 @@ public class SwerveModule extends SubsystemBase {
     /** Matches the integrated encoder to the reading from the CANCoder */
     public void matchEncoders() {
         steerMotor.setSelectedSensorPosition(Falcon500Conversions.degreesToFalcon(encoder.getAbsolutePosition() - angleOffset,
-                                                                                  MK4I_STEER_REDUCTION_L2
+                                                                                  MK4I_STEER_REDUCTION_L3
         ));
     }
 
     /** Return the position of the wheel based on the integrated motor encoder */
     public double getSteerEncoder() {
-        return Falcon500Conversions.falconToDegrees(steerMotor.getSelectedSensorPosition(), MK4I_STEER_REDUCTION_L2);
+        return Falcon500Conversions.falconToDegrees(steerMotor.getSelectedSensorPosition(), MK4I_STEER_REDUCTION_L3);
     }
 
     public SwerveModuleState currentTarget = new SwerveModuleState();
@@ -104,13 +104,13 @@ public class SwerveModule extends SubsystemBase {
 
     @Override
     public void periodic() {
-        double velocity = Falcon500Conversions.MPSToFalcon(currentTarget.speedMetersPerSecond, Units.inchesToMeters(DRIVE_WHEEL_DIAMETER), MK4I_DRIVE_REDUCTION_L2);
+        double velocity = Falcon500Conversions.MPSToFalcon(currentTarget.speedMetersPerSecond, Units.inchesToMeters(DRIVE_WHEEL_DIAMETER), MK4I_DRIVE_REDUCTION_L3);
         driveMotor.set(ControlMode.Velocity, velocity);
 
         double angle = (Math.abs(velocity) <= MAX_VELOCITY_METERS_PER_SECOND * 0.01) && !forcedAngle
                        ? lastAngle
                        : currentTarget.angle.getDegrees();
-        steerMotor.set(ControlMode.Position, Falcon500Conversions.degreesToFalcon(angle, MK4I_STEER_REDUCTION_L2));
+        steerMotor.set(ControlMode.Position, Falcon500Conversions.degreesToFalcon(angle, MK4I_STEER_REDUCTION_L3));
 
         lastAngle = getState().angle.getDegrees();
 
@@ -119,16 +119,16 @@ public class SwerveModule extends SubsystemBase {
 
     @Override
     public void simulationPeriodic() {
-        encoder.setPosition(Falcon500Conversions.falconToDegrees(steerMotor.getSelectedSensorPosition(), MK4I_STEER_REDUCTION_L2));
+        encoder.setPosition(Falcon500Conversions.falconToDegrees(steerMotor.getSelectedSensorPosition(), MK4I_STEER_REDUCTION_L3));
 
         steerSim.setInputVoltage(steerMotor.getMotorOutputVoltage());
         steerSim.update(Robot.kDefaultPeriod);
-        steerMotor.setSelectedSensorPosition(steerMotor.getSelectedSensorPosition() + ((steerSim.getAngularVelocityRPM() / MK4I_STEER_REDUCTION_L2) * 2048 * Robot.kDefaultPeriod));
+        steerMotor.setSelectedSensorPosition(steerMotor.getSelectedSensorPosition() + ((steerSim.getAngularVelocityRPM() / MK4I_STEER_REDUCTION_L3) * 2048 * Robot.kDefaultPeriod));
 
         driveSim.setInputVoltage(driveMotor.getMotorOutputVoltage());
         driveSim.update(Robot.kDefaultPeriod);
-        driveMotor.setSelectedSensorPosition(driveMotor.getSelectedSensorPosition() + ((driveSim.getAngularVelocityRPM() / MK4I_DRIVE_REDUCTION_L2) * 2048 * Robot.kDefaultPeriod));
-        simDriveMotor.setIntegratedSensorVelocity((int) Falcon500Conversions.RPMToFalcon(driveSim.getAngularVelocityRPM(), MK4I_DRIVE_REDUCTION_L2));
+        driveMotor.setSelectedSensorPosition(driveMotor.getSelectedSensorPosition() + ((driveSim.getAngularVelocityRPM() / MK4I_DRIVE_REDUCTION_L3) * 2048 * Robot.kDefaultPeriod));
+        simDriveMotor.setIntegratedSensorVelocity((int) Falcon500Conversions.RPMToFalcon(driveSim.getAngularVelocityRPM(), MK4I_DRIVE_REDUCTION_L3));
 	}
 
     /** Get the velocity of the wheel in meters per second */
@@ -136,7 +136,7 @@ public class SwerveModule extends SubsystemBase {
         // Convert the value returned by the sensor (rotations per 100ms) to rotations per second
         return Falcon500Conversions.falconToMPS(driveMotor.getSelectedSensorVelocity(),
                                                 Units.inchesToMeters(DRIVE_WHEEL_CIRCUMFERENCE),
-                                                MK4I_DRIVE_REDUCTION_L2
+                                                MK4I_DRIVE_REDUCTION_L3
         );
     }
 
@@ -155,7 +155,7 @@ public class SwerveModule extends SubsystemBase {
     }
 
     private double getPositionMeters() {
-        return (Falcon500Conversions.falconToDegrees(driveMotor.getSelectedSensorPosition(), MK4I_DRIVE_REDUCTION_L2) / 360) * Units.inchesToMeters(DRIVE_WHEEL_CIRCUMFERENCE);
+        return (Falcon500Conversions.falconToDegrees(driveMotor.getSelectedSensorPosition(), MK4I_DRIVE_REDUCTION_L3) / 360) * Units.inchesToMeters(DRIVE_WHEEL_CIRCUMFERENCE);
     }
 
     public Pose2d getPose(Pose2d swerve, Translation2d relativePosition) {
