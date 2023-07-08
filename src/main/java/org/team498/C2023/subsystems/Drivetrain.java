@@ -33,6 +33,8 @@ import static org.team498.C2023.Ports.Drivetrain.*;
 
 import java.util.function.Supplier;
 
+import javax.print.DocFlavor.STRING;
+
 public class Drivetrain extends SubsystemBase {
     // Profiled controller for the rotation of the robot
     private final ProfiledPIDController angleController = new ProfiledPIDController(AngleConstants.P,
@@ -55,18 +57,19 @@ public class Drivetrain extends SubsystemBase {
     public ChassisSpeeds currentSpeeds = new ChassisSpeeds();
 
     private Drivetrain() {
-        WPI_TalonFX FL_Drive = new WPI_TalonFX(FL_DRIVE);
-        WPI_TalonFX FR_Drive = new WPI_TalonFX(FR_DRIVE);
-        WPI_TalonFX BL_Drive = new WPI_TalonFX(BL_DRIVE);
-        WPI_TalonFX BR_Drive = new WPI_TalonFX(BR_DRIVE);
-        WPI_TalonFX FL_Steer = new WPI_TalonFX(FL_STEER);
-        WPI_TalonFX FR_Steer = new WPI_TalonFX(FR_STEER);
-        WPI_TalonFX BL_Steer = new WPI_TalonFX(BL_STEER);
-        WPI_TalonFX BR_Steer = new WPI_TalonFX(BR_STEER);
-        WPI_CANCoder FL_CANCoder = new WPI_CANCoder(FL_CANCODER);
-        WPI_CANCoder FR_CANCoder = new WPI_CANCoder(FR_CANCODER);
-        WPI_CANCoder BL_CANCoder = new WPI_CANCoder(BL_CANCODER);
-        WPI_CANCoder BR_CANCoder = new WPI_CANCoder(BR_CANCODER);
+        String canivoreName = "Canivore";
+        WPI_TalonFX FL_Drive = new WPI_TalonFX(FL_DRIVE, canivoreName);
+        WPI_TalonFX FR_Drive = new WPI_TalonFX(FR_DRIVE, canivoreName);
+        WPI_TalonFX BL_Drive = new WPI_TalonFX(BL_DRIVE, canivoreName);
+        WPI_TalonFX BR_Drive = new WPI_TalonFX(BR_DRIVE, canivoreName);
+        WPI_TalonFX FL_Steer = new WPI_TalonFX(FL_STEER, canivoreName);
+        WPI_TalonFX FR_Steer = new WPI_TalonFX(FR_STEER, canivoreName);
+        WPI_TalonFX BL_Steer = new WPI_TalonFX(BL_STEER, canivoreName);
+        WPI_TalonFX BR_Steer = new WPI_TalonFX(BR_STEER, canivoreName);
+        WPI_CANCoder FL_CANCoder = new WPI_CANCoder(FL_CANCODER, canivoreName);
+        WPI_CANCoder FR_CANCoder = new WPI_CANCoder(FR_CANCODER, canivoreName);
+        WPI_CANCoder BL_CANCoder = new WPI_CANCoder(BL_CANCODER, canivoreName);
+        WPI_CANCoder BR_CANCoder = new WPI_CANCoder(BR_CANCODER, canivoreName);
 
         SwerveModule FL_Module = new SwerveModule("FL", FL_Drive, FL_Steer, FL_CANCoder, FL_MODULE_OFFSET);
         SwerveModule FR_Module = new SwerveModule("FR", FR_Drive, FR_Steer, FR_CANCoder, FR_MODULE_OFFSET);
