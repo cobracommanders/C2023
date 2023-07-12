@@ -1,5 +1,6 @@
 package org.team498.C2023.subsystems.manipulator;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -8,14 +9,17 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import static org.team498.C2023.Ports.Manipulator.*;
 
-public class ManipulatorIONEO extends SubsystemBase implements ManipulatorIO {
-    private final CANSparkMax motor;
-
-    public ManipulatorIONEO() {
-        motor = new CANSparkMax(ROLLERS, MotorType.kBrushless);
-        motor.restoreFactoryDefaults();
+public class ManipulatorIOFALCON extends SubsystemBase implements ManipulatorIO {
+    private final TalonFX motor;
+    private final TalonFX motor2;
+    public ManipulatorIOFALCON() {
+       motor = new TalonFX(ROLLERS);
+       motor2 = new TalonFX(ROLLERS2);
+        motor.configfactorydefaults();
         motor.setInverted(false);
-        motor.setIdleMode(IdleMode.kCoast);
+        motor2.follow(motor,true);
+        motor.setNeutralMode(NeutralMode.Brake);
+        motor2.setNeutralMode(NeutralMode.Brake);
     }
 
     @Override

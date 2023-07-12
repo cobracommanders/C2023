@@ -42,6 +42,7 @@ public final class Ports {
 
     public static class Manipulator {
         public static final int ROLLERS = 40;
+        public static final int ROLLERS2 = 41;
     }
 
     public static class ElevatorWrist {
