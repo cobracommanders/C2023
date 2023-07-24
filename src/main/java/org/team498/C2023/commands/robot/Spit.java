@@ -12,7 +12,7 @@ public class Spit extends SequentialCommandGroup {
         super(
                 new SetRobotState(State.SPIT_CUBE),
                 new SetManipulatorToNextState(),
-                new WaitCommand(0.5),
+                new WaitCommand(0.75),
                 new ReturnToIdle());
     }
 }

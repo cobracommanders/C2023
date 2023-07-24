@@ -3,6 +3,7 @@ package org.team498.C2023.commands.drivetrain;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import org.team498.C2023.Robot;
+import org.team498.C2023.RobotPosition;
 import org.team498.C2023.subsystems.Drivetrain;
 
 import java.util.function.BooleanSupplier;
@@ -36,10 +37,10 @@ public class TargetDrive extends CommandBase {
         double yTranslation = yTranslationSupplier.getAsDouble() * MAX_VELOCITY_METERS_PER_SECOND * Robot.coordinateFlip * speed;
 
         // Set the target of the PID controller
-        drivetrain.setAngleGoal(drivetrain.calculateDegreesToTarget(target.get()));
+        drivetrain.setAngleGoal(RobotPosition.calculateDegreesToTarget(target.get()));
 
         // Calculate the rotational speed from the pid controller, unless it's already at the goal
-        double rotationalSpeed = drivetrain.calculateRotationalSpeed();
+        double rotationalSpeed = drivetrain.calculateAngleSpeed();
 
         // Set the robot to drive in field relative mode, with the rotation controlled by the snap controller
         drivetrain.drive(xTranslation, yTranslation, rotationalSpeed, true);

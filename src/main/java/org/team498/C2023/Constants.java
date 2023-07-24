@@ -3,6 +3,12 @@ package org.team498.C2023;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 
 public final class Constants {
+    public enum Mode {
+        REAL, SIM, REPLAY
+    }
+
+    public static Mode mode = Mode.REAL;
+
     public static final class OIConstants {
         public static final int DRIVER_CONTROLLER_ID = 0;
         public static final int OPERATOR_CONTROLLER_ID = 1;
@@ -10,7 +16,7 @@ public final class Constants {
 
     public static final class DrivetrainConstants {
         public static final double MAX_VELOCITY_METERS_PER_SECOND = 5;
-        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 20;//TODO: test for best traction/speed
+        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 20; //TODO: test for best traction/speed
 
         public static final double SWERVE_MODULE_DISTANCE_FROM_CENTER = 10.75;
 
@@ -31,7 +37,7 @@ public final class Constants {
             public static final double P = 5;
             public static final double I = 0;
             public static final double D = 0;
-            public static final double EPSILON = 1.0;
+            public static final double EPSILON = Constants.mode == Mode.SIM ? 5.0 : 1.0;
 
 
             // Constraints for the profiled angle controller
@@ -69,12 +75,12 @@ public final class Constants {
     public static final class IntakeWristConstants {
         public static final double P = 2.5;
         public static final double I = 0;
-        public static final double D = 0.01;
+        public static final double D = 0.025;
 
         public static final double F = 0;
     }
 
-    public static final class WristConstants {
+    public static final class ElevatorWristConstants {
         public static final double P = 6;
         public static final double I = 0;
         public static final double D = 0;

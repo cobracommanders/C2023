@@ -2,6 +2,7 @@ package org.team498.C2023;
 
 public enum State {
     SPIT_CUBE(Elevator.SPIT, ElevatorWrist.SPIT, IntakeWrist.SPIT, IntakeRollers.SPIT, Manipulator.SPIT),
+    SLOW_SPIT(Elevator.SPIT, ElevatorWrist.SPIT, IntakeWrist.SPIT, IntakeRollers.SLOW_SPIT, Manipulator.SPIT),
 
     TOP_CONE(Elevator.TOP_CONE, ElevatorWrist.TOP_CONE, IntakeWrist.IDLE_IN, IntakeRollers.IDLE, Manipulator.TOP_CONE),
     TOP_CUBE(Elevator.TOP_CUBE, ElevatorWrist.TOP_CUBE, IntakeWrist.IDLE_IN, IntakeRollers.IDLE, Manipulator.TOP_CUBE),
@@ -9,10 +10,12 @@ public enum State {
     MID_CONE(Elevator.MID_CONE, ElevatorWrist.MID_CONE, IntakeWrist.IDLE_IN, IntakeRollers.IDLE, Manipulator.MID_CONE),
     MID_CUBE(Elevator.MID_CUBE, ElevatorWrist.MID_CUBE, IntakeWrist.IDLE_IN, IntakeRollers.IDLE, Manipulator.MID_CUBE),
 
+    LOW_CONE(Elevator.LOW_CONE, ElevatorWrist.LOW_CONE, IntakeWrist.IDLE_IN, IntakeRollers.IDLE, Manipulator.LOW_CONE),
+
     IDLE_CONE(Elevator.IDLE, ElevatorWrist.IDLE_CONE, IntakeWrist.IDLE_IN, IntakeRollers.IDLE, Manipulator.IDLE),
     IDLE_CUBE(Elevator.IDLE, ElevatorWrist.IDLE_CUBE, IntakeWrist.IDLE_IN, IntakeRollers.IDLE, Manipulator.IDLE),
 
-    OUTTAKE(Elevator.IDLE, ElevatorWrist.OUTTAKE, IntakeWrist.OUTTAKE, IntakeRollers.OUTTAKE, Manipulator.SPIT),
+    OUTTAKE(Elevator.OUTTAKE, ElevatorWrist.OUTTAKE, IntakeWrist.OUTTAKE, IntakeRollers.OUTTAKE, Manipulator.SPIT),
 
     INTAKE(Elevator.INTAKE, ElevatorWrist.INTAKE, IntakeWrist.INTAKE, IntakeRollers.INTAKE, Manipulator.INTAKE_CUBE),
 
@@ -28,8 +31,9 @@ public enum State {
     SHOOT_DRIVE_CONE_MID(Elevator.SHOOT_DRIVE_CONE_MID, ElevatorWrist.SHOOT_DRIVE_CONE_MID, IntakeWrist.IDLE_IN, IntakeRollers.IDLE, Manipulator.SHOOT_DRIVE_CONE_MID),
 
     TRAVEL_EMPTY(Elevator.IDLE, ElevatorWrist.TRAVEL, /*IntakeWrist.IDLE_IN,*/ IntakeWrist.TEMPORARY_IDLE, IntakeRollers.IDLE, Manipulator.IDLE),
-    TRAVEL_CONE(Elevator.IDLE, ElevatorWrist.TRAVEL, IntakeWrist.TRAVEL_CONE, IntakeRollers.IDLE, Manipulator.INTAKE_CONE),
-    TRAVEL_CUBE(Elevator.IDLE, ElevatorWrist.TRAVEL, IntakeWrist.TEMPORARY_IDLE, IntakeRollers.IDLE, Manipulator.TRAVEL_CUBE),
+    // TRAVEL_CONE(Elevator.IDLE, ElevatorWrist.TRAVEL, IntakeWrist.TRAVEL_CONE, IntakeRollers.PUSH, Manipulator.IDLE),
+    TRAVEL_CONE(Elevator.IDLE, ElevatorWrist.TRAVEL, IntakeWrist.TRAVEL_CONE, IntakeRollers.PUSH, Manipulator.INTAKE_CONE),
+    TRAVEL_CUBE(Elevator.IDLE, ElevatorWrist.TRAVEL, IntakeWrist.TEMPORARY_IDLE, IntakeRollers.PUSH, Manipulator.TRAVEL_CUBE),
 
     AUTO_SHOT(Elevator.AUTO_SHOT, ElevatorWrist.AUTO_SHOT, IntakeWrist.IDLE_IN, IntakeRollers.IDLE, Manipulator.AUTO_SHOT),
     ;
@@ -59,12 +63,15 @@ public enum State {
         MID_CONE(0.825),
         MID_CUBE(0.5),
 
+        LOW_CONE(0.3),
+
         TOP_CONE(0.875),
         TOP_CUBE( 0.885),
 
         AUTO_SHOT(0),
 
         INTAKE(0.1),
+        OUTTAKE(0.1),
         // INTAKE(0),
 
         IDLE(0),
@@ -88,7 +95,10 @@ public enum State {
 
         SPIT(-0.025),
 
-        MID_CONE(0.1),
+        LOW_CONE(0.1),
+
+        MID_CONE(0.105),
+        // MID_CONE(0.1),
         MID_CUBE(-0.04),
 
         // TOP_CONE(0.25),
@@ -97,14 +107,14 @@ public enum State {
 
         TRAVEL(0.041067),
 
-        INTAKE(-0.075),
+        INTAKE(-0.06),
         // INTAKE(-0.03),
-        OUTTAKE(-0.05),
+        OUTTAKE(-0.06),
 
-        AUTO_SHOT(0),
+        AUTO_SHOT(0.02),
 
         IDLE_CUBE(-0.06),
-        IDLE_CONE(-0.03),
+        IDLE_CONE(-0.06),
 
         CONEARISER_CUBE(-0.065),
         CONEARISER_CONE(0),
@@ -121,10 +131,12 @@ public enum State {
     }
 
     public enum IntakeRollers {
-        INTAKE(1, 1, 0.5),
-        SPIT(-1, 1, 0),
+        INTAKE(1, -1, 0.5),
+        SPIT(1, 1, 0),
+        SLOW_SPIT(0.75, 0.75, 0),
         IDLE(0, 0, 0),
-        OUTTAKE(-0.4, -0.4, -0.5);
+        OUTTAKE(-0.4, 0.4, -0.5),
+        PUSH(-0.2, 0, 0);
 
         public final double bottomRollerSpeed;
         public final double topRollerSpeed;
@@ -155,14 +167,15 @@ public enum State {
     }
 
     public enum Manipulator {
-        INTAKE_CONE(1),
+        INTAKE_CONE(-1),
         INTAKE_CUBE(-1),
 
         SPIT(0.9),
-        MID_CONE(-1),
+        MID_CONE(1),
         MID_CUBE(0.5),
-        TOP_CONE(-1),
+        TOP_CONE(1),
         TOP_CUBE(0.5),
+        LOW_CONE(0.75),
 
         AUTO_SHOT(0.5),
         SHOOT_DRIVE_CUBE_MID(0),

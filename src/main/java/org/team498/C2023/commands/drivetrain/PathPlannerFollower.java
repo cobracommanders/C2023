@@ -10,7 +10,9 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
+import org.littletonrobotics.junction.Logger;
 import org.team498.C2023.Robot;
+import org.team498.C2023.RobotPosition;
 import org.team498.C2023.subsystems.Drivetrain;
 import org.team498.lib.util.PoseUtil;
 
@@ -57,9 +59,9 @@ public class PathPlannerFollower extends CommandBase {
 
         stopTimes.addAll(stopPoints.keySet());
 
-        Robot.field.getObject("Stop Points").setPoses(markerPoses);
-
-        drivetrain.setPose(Robot.alliance == Alliance.Blue ? trajectory.getInitialHolonomicPose() : PoseUtil.flip(trajectory.getInitialHolonomicPose()));
+        // Pose2d initialPose = Robot.alliance == Alliance.Blue ? trajectory.getInitialHolonomicPose() : PoseUtil.flip(trajectory.getInitialHolonomicPose());
+        // drivetrain.setPose(initialPose);
+        // drivetrain.setYaw(initialPose.getRotation().getDegrees());
 
         // Display the trajectory on the driver station dashboard
         List<Pose2d> poses = new LinkedList<>();
@@ -71,7 +73,8 @@ public class PathPlannerFollower extends CommandBase {
                 poses.add(PoseUtil.flip(trajectoryStates.get(i).poseMeters));
             }
         }
-        Robot.field.getObject("Trajectory").setPoses(poses);
+
+        Logger.getInstance().recordOutput("CurrentTrajectory", trajectory);
 
     }
 
@@ -79,35 +82,36 @@ public class PathPlannerFollower extends CommandBase {
 
     @Override
     public void execute() {
-        if (markerPoses.size() > 0) {
-            if (!drivetrain.isNear(markerPoses.get(0), 0.25)) {
-                PathPlannerState state = (PathPlannerState) trajectory.sample(trajectoryTimer.get());
-
-                if (Robot.alliance == Alliance.Blue) {
-                    drivetrain.setPositionGoal(new Pose2d(state.poseMeters.getX(), state.poseMeters.getY(), state.holonomicRotation));
-                } else {
-                    drivetrain.setPositionGoal(PoseUtil.flip(new Pose2d(state.poseMeters.getX(), state.poseMeters.getY(), state.holonomicRotation)));
-                }
-
-                drivetrain.driveToPositionGoals();
-            } else {
-                if (!hasReset) {
-                    trajectoryTimer.stop();
-                    drivetrain.drive(0, 0, 0, false);
-                    stopTimer.reset();
-                    stopTimer.start();
-                    hasReset = true;
-                }
-
-                if (stopTimer.hasElapsed(stopPoints.get(stopTimes.get(0)))) {
-                    markerPoses.remove(0);
-                    stopTimes.remove(0);
-                    stopTimer.stop();
-                    trajectoryTimer.start();
-                    hasReset = false;
-                }
-            }
-        } else {
+        // if (markerPoses.size() > 0) {
+            // if (!RobotPosition.isNear(markerPoses.get(0), 0.25)) {
+                // PathPlannerState state = (PathPlannerState) trajectory.sample(trajectoryTimer.get());
+// 
+                // if (Robot.alliance == Alliance.Blue) {
+                    // drivetrain.setPositionGoal(new Pose2d(state.poseMeters.getX(), state.poseMeters.getY(), state.holonomicRotation));
+                // } else {
+                    // drivetrain.setPositionGoal(PoseUtil.flip(new Pose2d(state.poseMeters.getX(), state.poseMeters.getY(), state.holonomicRotation)));
+                // }
+// 
+                // var speeds = drivetrain.calculatePositionSpeed();
+                // drivetrain.drive(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond, true);
+            // } else {
+                // if (!hasReset) {
+                    // trajectoryTimer.stop();
+                    // drivetrain.drive(0, 0, 0, false);
+                    // stopTimer.reset();
+                    // stopTimer.start();
+                    // hasReset = true;
+                // }
+// 
+                // if (stopTimer.hasElapsed(stopPoints.get(stopTimes.get(0)))) {
+                    // markerPoses.remove(0);
+                    // stopTimes.remove(0);
+                    // stopTimer.stop();
+                    // trajectoryTimer.start();
+                    // hasReset = false;
+                // }
+            // }
+        // } else {
             PathPlannerState state = (PathPlannerState) trajectory.sample(trajectoryTimer.get());
 
             if (Robot.alliance == Alliance.Blue) {
@@ -116,23 +120,23 @@ public class PathPlannerFollower extends CommandBase {
                 drivetrain.setPositionGoal(PoseUtil.flip(new Pose2d(state.poseMeters.getX(), state.poseMeters.getY(), state.holonomicRotation)));
             }
 
-            drivetrain.driveToPositionGoals();
-        }
+            var speeds = drivetrain.calculatePositionSpeed();
+            drivetrain.drive(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond, true);
+        // }
     }
 
     @Override
     public boolean isFinished() {
-        return trajectoryTimer.get() > trajectory.getTotalTimeSeconds();
-        // if (Robot.alliance == Alliance.Blue) {
-            // return drivetrain.isNear(trajectory.getEndState().poseMeters, Constants.DrivetrainConstants.PoseConstants.EPSILON);
-        // } else {
-            // return drivetrain.isNear(PoseUtil.flip(trajectory.getEndState().poseMeters), Constants.DrivetrainConstants.PoseConstants.EPSILON);
-        // }
+        // return trajectoryTimer.get() > trajectory.getTotalTimeSeconds();
+        if (Robot.alliance == Alliance.Blue) {
+            return RobotPosition.isNear(trajectory.getEndState().poseMeters, 0.1);
+        } else {
+            return RobotPosition.isNear(PoseUtil.flip(trajectory.getEndState().poseMeters), 0.1);
+        }
     }
 
     @Override
     public void end(boolean interrupted) {
         drivetrain.stop();
-        // Robot.cameraEnabled = true;
     }
 }

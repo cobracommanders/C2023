@@ -6,6 +6,7 @@ import org.team498.C2023.State;
 import org.team498.C2023.RobotState.GameMode;
 import org.team498.C2023.RobotState.ScoringOption;
 import org.team498.C2023.commands.SetRobotState;
+import org.team498.C2023.commands.drivetrain.LockWheels;
 import org.team498.C2023.commands.drivetrain.PathPlannerFollower;
 import org.team498.C2023.commands.robot.GroundIntake;
 import org.team498.C2023.commands.robot.PrepareToScore;
@@ -41,7 +42,10 @@ public class TwoPlusOne implements Auto {
                                 new SetRobotState(State.INTAKE),
                                 new GroundIntake())),
                 new ParallelCommandGroup(
-                        new PathPlannerFollower(PathLib.topCubeToSecondNode),
+                        new SequentialCommandGroup(
+                                new PathPlannerFollower(PathLib.topCubeToSecondNode),
+                                new LockWheels()
+                        ),
                         new SequentialCommandGroup(
                                 new WaitCommand(.75),
                                 new ReturnToIdle(),

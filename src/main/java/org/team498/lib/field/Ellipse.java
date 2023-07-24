@@ -46,7 +46,7 @@ public class Ellipse extends Ellipse2D.Double implements BaseRegion {
             allPoses.add(new Pose2d(xCoordinate, yCoordinate, new Rotation2d()));
         }
 
-        Robot.field.getObject(name).setPoses(allPoses);
+        // Robot.field.getObject(name).setPoses(allPoses);
     }
 
     /**

@@ -15,7 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class FieldPositions {
+public final class FieldPositions {
     public static final double height = 8.0137;
     public static final double width = 16.54175;
 
@@ -104,7 +104,7 @@ public class FieldPositions {
         for (Point marker : stagingMarkers) {
             stagingMarkerPoses.add(marker.toPose2d());
         }
-        Robot.field.getObject("Staging Markers").setPoses(stagingMarkerPoses);
+        // Robot.field.getObject("Staging Markers").setPoses(stagingMarkerPoses);
 
         LinkedList<Pose2d> nodePoses = new LinkedList<>();
 
@@ -119,14 +119,14 @@ public class FieldPositions {
                 }
             }
         }
-        Robot.field.getObject("Nodes").setPoses(nodePoses);
+        // Robot.field.getObject("Nodes").setPoses(nodePoses);
 
         LinkedList<Pose2d> aprilTagPoses = new LinkedList<>();
         for (int i = 1; i <= aprilTags.size(); i++) {
             aprilTagPoses.add(new Pose2d(aprilTags.get(i).getX(), aprilTags.get(i).getY(), new Rotation2d()));
         }
 
-        Robot.field.getObject("AprilTags").setPoses(aprilTagPoses);
+        // Robot.field.getObject("AprilTags").setPoses(aprilTagPoses);
     }
 
     public static final Map<Integer, Pose3d> aprilTags = Map.of(1,

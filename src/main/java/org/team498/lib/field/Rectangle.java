@@ -33,7 +33,7 @@ public class Rectangle extends Rectangle2D.Double implements BaseRegion {
         Pose2d upperRight = new Pose2d(x, y + height, new Rotation2d());
         Pose2d upperLeft = new Pose2d(x, y, new Rotation2d());
 
-        Robot.field.getObject(name).setPoses(bottomLeft, bottomRight, upperRight, upperLeft, bottomLeft);
+        // Robot.field.getObject(name).setPoses(bottomLeft, bottomRight, upperRight, upperLeft, bottomLeft);
     }
 
     /**

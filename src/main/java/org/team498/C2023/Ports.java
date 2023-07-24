@@ -18,12 +18,12 @@ public final class Ports {
         public static final int BL_CANCODER = 12;
         public static final int BR_CANCODER = 14;
 
-        public static final int GYRO = 20;
+        public static final int GYRO = 15;
     }
 
     public static class IntakeRollers {
-        public static final int BOTTOM_ROLLER = 20;
-        public static final int TOP_ROLLER = 23;
+        public static final int TOP_ROLLER = 20;
+        public static final int BOTTOM_ROLLER = 23;
         public static final int THIRD_ROLLER = 24;
     }
 
@@ -41,7 +41,8 @@ public final class Ports {
     }
 
     public static class Manipulator {
-        public static final int ROLLERS = 40;
+        public static final int L_ROLLERS = 40;
+        public static final int R_ROLLERS = 41; 
     }
 
     public static class ElevatorWrist {
@@ -51,5 +52,8 @@ public final class Ports {
 
     public static class Accessories {
         public static final int BLINKIN = 9; // PWM
+        public static final int SETUP_SWITCH = 8; //DIO
+        public static final String DriveBus = "bus"; //Canivore's name
+        public static final String RioBus =  "rio"; //Name of the native bus on the roborio
     }
 }

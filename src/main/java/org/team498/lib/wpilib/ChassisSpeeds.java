@@ -58,5 +58,14 @@ public class ChassisSpeeds extends edu.wpi.first.math.kinematics.ChassisSpeeds {
         );
     }
 
+    public static ChassisSpeeds toFieldRelativeSpeeds(ChassisSpeeds fieldRelativeSpeeds, double robotAngleDegrees) {
+        return toFieldRelativeSpeeds(fieldRelativeSpeeds, Rotation2d.fromDegrees(robotAngleDegrees));
+    }
+
+
+    public static ChassisSpeeds fromWPIChassisSpeeds(edu.wpi.first.math.kinematics.ChassisSpeeds speeds) {
+        return new ChassisSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond);
+    }
+
 
 }

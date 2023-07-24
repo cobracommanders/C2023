@@ -1,67 +1,86 @@
 package org.team498.C2023;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import org.team498.C2023.commands.auto.CubeEngage;
-import org.team498.C2023.commands.auto.HighHighCube;
-import org.team498.C2023.commands.auto.HighHighCubeBump;
-import org.team498.C2023.commands.auto.HighHighCubeEngage;
-import org.team498.C2023.commands.auto.HighHighCubeEngageBump;
-import org.team498.C2023.commands.auto.JustScore;
-import org.team498.C2023.commands.auto.LeftConeTaxi;
-import org.team498.C2023.commands.auto.LeftCubeTaxi;
-import org.team498.C2023.commands.auto.RightConeTaxi;
-import org.team498.C2023.commands.auto.RightCubeTaxi;
-import org.team498.C2023.commands.auto.HighMidCubeBump;
-import org.team498.C2023.commands.auto.HighMidCubeEngage;
-import org.team498.C2023.commands.auto.HighMidCubeEngageBump;
-import org.team498.C2023.commands.auto.HighMidCube;
-import org.team498.C2023.commands.auto.TwoPlusOneBump;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import org.littletonrobotics.junction.LogFileUtil;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGReader;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+import org.team498.C2023.commands.auto.*;
+import org.team498.C2023.commands.robot.ReturnToIdle;
 import org.team498.C2023.subsystems.Drivetrain;
-import org.team498.C2023.subsystems.Manipulator;
-import org.team498.C2023.subsystems.Photonvision;
+import org.team498.C2023.subsystems.elevator.Elevator;
+import org.team498.C2023.subsystems.elevatorwrist.ElevatorWrist;
+import org.team498.C2023.subsystems.intakerollers.IntakeRoller;
+import org.team498.C2023.subsystems.intakewrist.IntakeWrist;
+import org.team498.C2023.subsystems.manipulator.Manipulator;
+import org.team498.lib.SystemsCheck;
+import org.team498.lib.SystemsCheck.TestableObject;
 import org.team498.lib.auto.Auto;
 import org.team498.lib.drivers.Blinkin;
-import org.team498.lib.drivers.Blinkin.Color;
+import org.team498.lib.drivers.Blinkin.BlinkinColor;
 import org.team498.lib.drivers.Gyro;
-import org.team498.lib.field.Point;
 import org.team498.lib.util.PoseUtil;
 import org.team498.lib.util.RotationUtil;
 
 import java.util.List;
 
-public class Robot extends TimedRobot {
+import static org.team498.C2023.Ports.Accessories.SETUP_SWITCH;
+
+
+public class Robot extends LoggedRobot {
+    public static final double DEFAULT_PERIOD = 0.02;
     public static int coordinateFlip = 1;
     public static int rotationOffset = 0;
 
-    public static final Field2d field = new Field2d();
     public static Alliance alliance = Alliance.Invalid;
     public static final Controls controls = new Controls();
 
     private final Drivetrain drivetrain = Drivetrain.getInstance();
     private final Gyro gyro = Gyro.getInstance();
-    private final Photonvision photonvision = Photonvision.getInstance();
     private final Blinkin blinkin = Blinkin.getInstance();
     private final RobotState robotState = RobotState.getInstance();
 
-    private final SendableChooser<Auto> autoChooser = new SendableChooser<Auto>();
+    private final LoggedDashboardChooser<Auto> autoChooser = new LoggedDashboardChooser<Auto>("AutoChooser");
+    private Auto autoToRun;
+
+    private final Logger logger = Logger.getInstance();
+
+    private boolean matchStarted = false;
+
+    public static final Mechanism2d mechanism2d = new Mechanism2d(Units.inchesToMeters(35), Units.inchesToMeters(65));
+    public static final MechanismRoot2d root = mechanism2d.getRoot("Root", Units.inchesToMeters(1), Units.inchesToMeters(1));
+    public static final MechanismLigament2d base = root.append(new MechanismLigament2d("Drivetrain", Units.inchesToMeters(28), 0));
+
+    public static final MechanismLigament2d elevatorBase = Robot.root.append(new MechanismLigament2d("Elevator Base", Units.inchesToMeters(3), 90));
+    public static final MechanismLigament2d elevatorBase2 = elevatorBase.append(new MechanismLigament2d("Elevator", Units.inchesToMeters(4), -30));
+    public static final MechanismLigament2d elevatorMechanism = elevatorBase2.append(new MechanismLigament2d("Elevator", 0, 0));
+    public static final MechanismLigament2d elevatorWristMechanism = elevatorMechanism.append(new MechanismLigament2d("Elevator Wrist", Units.inchesToMeters(15), 90));
+    public static final MechanismLigament2d intakeWristMechanism = Robot.base.append(new MechanismLigament2d("Intake Wrist", Units.inchesToMeters(18), 0));
 
     private final List<Auto> autoOptions = List.of(
+            new MobilityEngageCubeHigh(),
+            new MobilityEngageConeMid(),
             new JustScore(),
             new CubeEngage(),
-            new LeftConeTaxi(),
-            new LeftCubeTaxi(),
-            new RightConeTaxi(),
-            new RightCubeTaxi(),
+            new ConeTaxi(),
+            new CubeTaxi(),
+            new ConeTaxiBump(),
+            new CubeTaxiBump(),
             new TwoPlusOneBump(),
             new HighMidCubeEngage(),
             new HighMidCubeEngageBump(),
@@ -70,25 +89,75 @@ public class Robot extends TimedRobot {
             new HighHighCubeEngage(),
             new HighHighCubeEngageBump(),
             new HighHighCube(),
-            new HighHighCubeBump());
+            new HighHighCubeBump(),
+            new ThreeBump(),
+            new ThreeBumpEngage(),
+            new TestAuto()
+                                                  );
 
-    private Auto autoToRun;
+    private final DigitalInput setupSwitch = new DigitalInput(SETUP_SWITCH);
+
+    public static final SystemsCheck fullCheck = new SystemsCheck("Full", 
+        Commands.sequence(new ReturnToIdle(), Commands.runOnce(() -> Drivetrain.getInstance().X())),
+        new TestableObject("Elevator/Encoder", () -> {}, () -> Elevator.getInstance().checkEncoderConnection(), 1),
+        new TestableObject("ElevatorWrist/Encoder", () -> {}, () -> ElevatorWrist.getInstance().checkEncoderConnection(), 1),
+        new TestableObject("IntakeWrist/Encoder", () -> {}, () -> IntakeWrist.getInstance().checkEncoderConnection(), 1),
+
+        new TestableObject("IntakeWrist/Motors", () -> IntakeWrist.getInstance().setState(State.IntakeWrist.TEMPORARY_IDLE), () -> IntakeWrist.getInstance().atSetpoint(), 2),
+        new TestableObject("ElevatorWrist/Motor", () -> ElevatorWrist.getInstance().setState(State.ElevatorWrist.TRAVEL), () -> ElevatorWrist.getInstance().atSetpoint(), 2),
+        new TestableObject("Elevator/Motors", () -> Elevator.getInstance().setState(State.Elevator.TOP_CUBE), () -> Elevator.getInstance().atSetpoint(), 2),
+        new TestableObject("Manipulator/Motor", () -> Manipulator.getInstance().setState(State.Manipulator.INTAKE_CUBE), () -> Manipulator.getInstance().getCurrentDraw() > 0.2, 2),
+        new TestableObject("IntakeRoller/Motors", () -> IntakeRoller.getInstance().setState(State.IntakeRollers.INTAKE), () -> {
+            var amps = IntakeRoller.getInstance().getCurrentDraws();
+            return amps[0] + amps[1] + amps[2] > 0.6;
+        }, 2)//,
+        // new TestableObject("Drivetrain/Motors", () -> Drivetrain.getInstance().drive(1, 0, 0, true), () ->
+            // Math.abs(Drivetrain.getInstance().getCurrentSpeeds().vxMetersPerSecond - 1) < 0.05,
+            // 2)
+    );
+
 
     @Override
     public void robotInit() {
-        drivetrain.setPose(new Pose2d(8.29, 4, Rotation2d.fromDegrees(0)));
-        controls.driver.setRightStickLastAngle(-gyro.getAngleOffset());
+        if (isReal()) Constants.mode = Constants.Mode.REAL;
+
+        //logger.recordMetadata("ProjectName", "C2023");
+        //logger.recordMetadata("RuntimeType", getRuntimeType().toString());
+        //logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
+        //logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
+        //logger.recordMetadata("GitSHA", BuildConstants.GIT_SHA);
+        //logger.recordMetadata("GitDate", BuildConstants.GIT_DATE);
+        //logger.recordMetadata("GitBranch", BuildConstants.GIT_BRANCH);
+
+        if (isReal()) {
+            //            logger.addDataReceiver(new WPILOGWriter("/home/lvuser/logs")); // Log to the rio directly
+            logger.addDataReceiver(new WPILOGWriter("/media/sda1/")); // Log to a USB stick
+            logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+            new PowerDistribution(1, PowerDistribution.ModuleType.kRev).close(); // Enables power distribution logging
+        } else {
+            switch (Constants.mode) {
+                case SIM -> {
+                    logger.addDataReceiver(new WPILOGWriter("/"));
+                    logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+                }
+                case REPLAY -> {
+                    setUseTiming(false); // Set as false to run as fast as possible when replaying logs
+                    String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
+                    logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
+                    logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
+                }
+            }
+        }
+
+        logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.
 
         gyro.setYaw(0);
 
-        SmartDashboard.putData(field);
         FieldPositions.displayAll();
 
-        autoChooser.setDefaultOption("Score", new JustScore());
+        autoChooser.addDefaultOption("Score", new JustScore());
 
-        autoOptions.forEach(auto -> {
-            autoChooser.addOption(auto.getName(), auto);
-        });
+        autoOptions.forEach(auto -> autoChooser.addOption(auto.getName(), auto));
 
         controls.configureDefaultCommands();
         controls.configureDriverCommands();
@@ -96,84 +165,96 @@ public class Robot extends TimedRobot {
 
         PathLib.eighthNodeToChargeStation.getClass();
 
-        SmartDashboard.putData(autoChooser);
-    }
+        Elevator.getInstance().setBrakeMode(false);
+        ElevatorWrist.getInstance().setBrakeMode(false);
 
-    @Override
-    public void simulationPeriodic() {
-        Simulation.getInstance().update();
+        new Trigger(() -> setupSwitch.get() && isDisabled())
+                .toggleOnTrue(Commands.startEnd(() -> {
+                                                    Elevator.getInstance().setBrakeMode(true);
+                                                    ElevatorWrist.getInstance().setBrakeMode(true);
+                                                },
+                                                () -> {
+                                                    Elevator.getInstance().setBrakeMode(false);
+                                                    ElevatorWrist.getInstance().setBrakeMode(false);
+                                                }
+                                               ));
     }
 
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
 
-        photonvision.getEstimatedGlobalPose().ifPresent(pose -> drivetrain.setOdometry(pose.estimatedPose));
-
-        // field.getObject("Scoring
-        // Target").setPose(RobotPositions.getNextScoringNodePosition());
-
-        // TODO: Check if alliance is actually invalid when the FMS is not connected
         if (alliance == Alliance.Invalid) {
             alliance = DriverStation.getAlliance();
-            // This reverses the coordinates/direction of the drive commands on the red
-            // alliance
+            // This reverses the coordinates/direction of the drive commands on the red alliance
             coordinateFlip = alliance == Alliance.Blue
-                    ? 1
-                    : -1;
+                             ? 1
+                             : -1;
             // Add 180 degrees to all teleop rotation setpoints while on the red alliance
             rotationOffset = alliance == Alliance.Blue
-                    ? 0
-                    : 180;
+                             ? 0
+                             : 180;
         }
 
-        SmartDashboard.putString("Robot State", RobotState.getInstance().getCurrentState().name());
-        SmartDashboard.putString("Blinkin Color", blinkin.getColor().name());
+        logger.recordOutput("Mechanism2d", mechanism2d);
 
-        SmartDashboard.putNumber("Interpolation Value",
-                Drivetrain.getInstance().distanceTo(Point.fromPose2d(RobotPositions.getNextScoringNodePosition())));
+        logger.recordOutput("Targets/NextScoringPose", RobotPosition.getNextScoringNodePosition());
+        logger.recordOutput("Targets/FutureScoringPose", RobotPosition.getFutureScoringNodePosition());
+        logger.recordOutput("Targets/FutureRobotPose", RobotPosition.getFuturePose(20));
+        logger.recordOutput("Targets/Distance", RobotPosition.getFutureScoringNodeDistance());
+
+        SmartDashboard.putNumber("Pitch", Gyro.getInstance().getPitch());
     }
 
     @Override
     public void disabledPeriodic() {
-        // blinkin.setColor(Blinkin.Color.BLUE);
-
         alliance = DriverStation.getAlliance();
-        // This reverses the coordinates/direction of the drive commands on the red
-        // alliance
+        // This reverses the coordinates/direction of the drive commands on the red alliance
         coordinateFlip = alliance == Alliance.Blue
-                ? 1
-                : -1;
+                         ? 1
+                         : -1;
         // Add 180 degrees to all teleop rotation setpoints while on the red alliance
         rotationOffset = alliance == Alliance.Blue
-                ? 0
-                : 180;
+                         ? 0
+                         : 180;
 
-        autoToRun = autoChooser.getSelected();
 
+        if (!matchStarted) {
+            autoToRun = autoChooser.get();
+            if (autoToRun != null) {
+                robotState.setState(autoToRun.getInitialState());
+                Elevator.getInstance().setState(autoToRun.getInitialState().elevator);
+                ElevatorWrist.getInstance().setState(autoToRun.getInitialState().elevatorWrist);
+            }
+        }
+
+        Drivetrain.getInstance().stop();
+    }
+
+    @Override
+    public void teleopInit() {
+        matchStarted = true;
     }
 
     @Override
     public void teleopPeriodic() {
-        if ((Math.abs(RotationUtil.toSignedDegrees(Math.abs(drivetrain.getYaw()
-                - drivetrain.calculateDegreesToTarget(RobotPositions.getNextScoringNodePosition())))) < 3.5)
-                && (drivetrain.distanceTo(Point.fromPose2d(RobotPositions.getClosestScoringPosition())) < Units
-                        .inchesToMeters(25))) {
-            blinkin.setColor(Blinkin.Color.LIME);
+        if ((Math.abs(RotationUtil.toSignedDegrees(Math.abs(drivetrain.getYaw() - RobotPosition.calculateDegreesToTarget(RobotPosition.getNextScoringNodePosition())))) < 3.5) && (RobotPosition.getClosestScoringDistance()) < Units.inchesToMeters(25)) {
+            blinkin.setColor(BlinkinColor.SOLID_LIME);
             controls.driver.rumble(0.5);
-        } else if (robotState.inShootDriveMode() && RobotPositions.inCommunity()) {
-            blinkin.setColor(Blinkin.Color.RED);
+        } else if (robotState.inShootDriveMode() && RobotPosition.inCommunity()) {
+            blinkin.setColor(BlinkinColor.LIGHT_CHASE_RED);
         } else {
             if (robotState.inConeMode() && Manipulator.getInstance().isStalling()) {
-                blinkin.setColor(Color.BLUE);
+                blinkin.setColor(BlinkinColor.SOLID_BLUE);
             } else {
                 blinkin.setColor(RobotState.getInstance().inConeMode()
-                        ? Blinkin.Color.YELLOW
-                        : Blinkin.Color.PURPLE);
+                                 ? BlinkinColor.SOLID_YELLOW//RAINBOW_PALETTE
+                                 : BlinkinColor.SOLID_VIOLET);
             }
             controls.driver.rumble(0);
         }
     }
+
 
     @Override
     public void teleopExit() {
@@ -182,23 +263,30 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
+        matchStarted = true;
+
         if (autoToRun == null)
             autoToRun = new JustScore();
 
         if (alliance == Alliance.Blue) {
+            Drivetrain.getInstance().setYaw(autoToRun.getInitialPose().getRotation().getDegrees());
             Drivetrain.getInstance().setPose(autoToRun.getInitialPose());
         } else {
+            Drivetrain.getInstance().setYaw(PoseUtil.flip(autoToRun.getInitialPose()).getRotation().getDegrees());
             Drivetrain.getInstance().setPose(PoseUtil.flip(autoToRun.getInitialPose()));
         }
 
-        // Elevator.getInstance().updateInitialPosition(auto.getInitialState() ==
-        // State.AUTO_SHOT);
-
-        // Elevator.getInstance().setState(autoToRun.getInitialState().elevator);
-        // ElevatorWrist.getInstance().setState(autoToRun.getInitialState().elevatorWrist);
-        // IntakeWrist.getInstance().setState(autoToRun.getInitialState().intakeWrist);
-
         autoToRun.getCommand().schedule();
+
+        CommandScheduler.getInstance().run();
+
+        if (alliance == Alliance.Blue) {
+            Drivetrain.getInstance().setYaw(autoToRun.getInitialPose().getRotation().getDegrees());
+            Drivetrain.getInstance().setPose(autoToRun.getInitialPose());
+        } else {
+            Drivetrain.getInstance().setYaw(PoseUtil.flip(autoToRun.getInitialPose()).getRotation().getDegrees());
+            Drivetrain.getInstance().setPose(PoseUtil.flip(autoToRun.getInitialPose()));
+        }
     }
 
     @Override
@@ -209,5 +297,4 @@ public class Robot extends TimedRobot {
     public static void main(String... args) {
         RobotBase.startRobot(Robot::new);
     }
-
 }
