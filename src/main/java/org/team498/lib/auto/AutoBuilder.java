@@ -1,6 +1,5 @@
 package org.team498.lib.auto;
 
-import org.team498.C2023.commands.auto.CubeEngage;
 import org.team498.lib.auto.Auto.Action;
 import org.team498.lib.auto.Auto.Position;
 
@@ -11,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 
 public class AutoBuilder {
-    public static Auto[] autos = {new CubeEngage()};
+    public static Auto[] autos = {};
     public static SendableChooser<Position> startPosition = new SendableChooser<>();
     public static SendableChooser<Action> firstAction = new SendableChooser<>();
     public static SendableChooser<Action> secondAction = new SendableChooser<>();

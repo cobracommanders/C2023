@@ -53,34 +53,4 @@ public final class Constants {
             public static final double EPSILON = 0.05;
         }
     }
-
-    public static final class ElevatorConstants {
-        public static final double MOTOR_ROTATION_TO_METERS = (1.273 * 2 * Math.PI) * 5;
-
-        public static final double P = 5;
-        public static final double I = 0;
-        public static final double D = 0.001;
-
-        public static final double S = 0;
-        public static final double G = 0.075;
-        public static final double V = 0;
-    }
-
-    public static final class IntakeWristConstants {
-        public static final double P = 2.5;
-        public static final double I = 0;
-        public static final double D = 0.01;
-
-        public static final double F = 0;
-    }
-
-    public static final class WristConstants {
-        public static final double P = 6;
-        public static final double I = 0;
-        public static final double D = 0;
-
-        public static final double F = 0;
-
-        public static final double WRIST_RATIO = 5 * 4 * 3 * (80.0 / 36.0);
-    }
 }

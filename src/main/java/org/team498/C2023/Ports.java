@@ -20,36 +20,4 @@ public final class Ports {
 
         public static final int GYRO = 20;
     }
-
-    public static class IntakeRollers {
-        public static final int BOTTOM_ROLLER = 20;
-        public static final int TOP_ROLLER = 23;
-        public static final int THIRD_ROLLER = 24;
-    }
-
-    public static class IntakeWrist {
-        public static final int L_WRIST = 21;
-        public static final int R_WRIST = 22;
-        public static final int ENCODER_PORT = 1; // DIO
-    }
-
-    public static class Elevator {
-        public static final int F_ELEVATOR_ID = 30;
-        public static final int B_ELEVATOR_ID = 31;
-
-        public static final int ENCODER_PORT = 4; // DIO
-    }
-
-    public static class Manipulator {
-        public static final int ROLLERS = 40;
-    }
-
-    public static class ElevatorWrist {
-        public static final int WRIST = 50;
-        public static final int ENCODER_PORT = 0; // DIO
-    }
-
-    public static class Accessories {
-        public static final int BLINKIN = 9; // PWM
-    }
 }

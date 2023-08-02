@@ -1,7 +1,6 @@
 package org.team498.lib.drivers;
 
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
-import static org.team498.C2023.Ports.Accessories.BLINKIN;
 
 public class Blinkin {
     private final Spark blinkin;
@@ -24,8 +23,8 @@ public class Blinkin {
         }
     }
 
-    private Blinkin() {
-        blinkin = new Spark(BLINKIN);
+    private Blinkin(int id) {
+        blinkin = new Spark(id);
     }
 
     public void setColor(Color color) {
@@ -44,13 +43,13 @@ public class Blinkin {
         }
     }
 
+    //TODO implement this in Robot.java
+    // private static Blinkin instance;
 
-    private static Blinkin instance;
-
-    public static Blinkin getInstance() {
-        if (instance == null) {
-            instance = new Blinkin();
-        }
-        return instance;
-    }
+    // public static Blinkin getInstance() {
+    //     if (instance == null) {
+    //         instance = new Blinkin();
+    //     }
+    //     return instance;
+    // }
 }
