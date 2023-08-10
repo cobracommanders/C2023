@@ -47,10 +47,17 @@ public final class Constants {
 
         public static final class PoseConstants {
             public static final double P = -2.5;
-            public static final double I = 0;
-            public static final double D = 0;
 
             public static final double EPSILON = 0.05;
         }
+    }
+
+    public static class FlywheelConstants {
+        public static final double MAX_RPM = 5000;
+        public static final double P = 0.0;
+        
+        public static final double S = 0.0;
+        public static final double V = 0.0;
+        public static final double A = 0.0;
     }
 }

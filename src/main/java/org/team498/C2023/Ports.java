@@ -20,4 +20,8 @@ public final class Ports {
 
         public static final int GYRO = 20;
     }
+    public static class Flywheel {
+        public static final int L_MOTOR = 60;
+        public static final int R_MOTOR = 61;
+    }
 }
