@@ -1,4 +1,4 @@
-package org.team498.C2023.commands.drivetrain;
+package org.team498.C2023.commands.drivetrain.chargeStation;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
