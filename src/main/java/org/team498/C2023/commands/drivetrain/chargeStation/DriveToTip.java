@@ -1,4 +1,4 @@
-package org.team498.C2023.commands.drivetrain;
+package org.team498.C2023.commands.drivetrain.chargeStation;
 
 import org.team498.C2023.Robot;
 import org.team498.C2023.subsystems.Drivetrain;

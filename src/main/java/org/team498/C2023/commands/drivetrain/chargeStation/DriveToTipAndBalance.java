@@ -1,4 +1,4 @@
-package org.team498.C2023.commands.drivetrain;
+package org.team498.C2023.commands.drivetrain.chargeStation;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
