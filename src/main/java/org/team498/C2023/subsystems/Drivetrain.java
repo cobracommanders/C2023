@@ -27,6 +27,7 @@ import org.team498.lib.field.BaseRegion;
 import org.team498.lib.field.Point;
 import org.team498.lib.util.RotationUtil;
 import org.team498.lib.wpilib.ChassisSpeeds;
+import org.team498.lib.wpilib.PController;
 
 import static org.team498.C2023.Constants.DrivetrainConstants.*;
 import static org.team498.C2023.Ports.Drivetrain.*;
@@ -43,10 +44,10 @@ public class Drivetrain extends SubsystemBase {
                                                                                     AngleConstants.CONTROLLER_CONSTRAINTS
     );
     // Profiled controller for the x position of the robot
-    private final PIDController xController = new PIDController(PoseConstants.P, PoseConstants.I, PoseConstants.D);
+    private final PController xController = new PController(PoseConstants.P);
     private static SlewRateLimiter xLimiter = new SlewRateLimiter(DrivetrainConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
     // Profiled controller for the y position of the robot
-    private final PIDController yController = new PIDController(PoseConstants.P, PoseConstants.I, PoseConstants.D);
+    private final PController yController = new PController(PoseConstants.P);
     private static SlewRateLimiter yLimiter = new SlewRateLimiter(DrivetrainConstants.MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
 
     private final SwerveModule[] swerveModules;
@@ -81,8 +82,6 @@ public class Drivetrain extends SubsystemBase {
 
         angleController.enableContinuousInput(-180, 180);
         angleController.setTolerance(AngleConstants.EPSILON);
-        xController.setTolerance(0);
-        yController.setTolerance(0);
         xLimiter.reset(0);
         yLimiter.reset(0);
 
@@ -194,7 +193,7 @@ public class Drivetrain extends SubsystemBase {
 
     /** @return true if all three swerve controllers have reached their position goals (x pos, y pos, angle) */
     public boolean atPositionGoals() {
-        return (Math.abs(xController.getPositionError()) < PoseConstants.EPSILON) && (Math.abs(yController.getPositionError()) < PoseConstants.EPSILON) && atAngleGoal();
+        return (Math.abs(xController.getError()) < PoseConstants.EPSILON) && (Math.abs(yController.getError()) < PoseConstants.EPSILON) && atAngleGoal();
     }
 
     /** Sets the position goals of the swerve drive. */
@@ -234,7 +233,7 @@ public class Drivetrain extends SubsystemBase {
     }
 
     public boolean atXControllerGoal() {
-        return Math.abs(xController.getPositionError()) < PoseConstants.EPSILON;
+        return Math.abs(xController.getError()) < PoseConstants.EPSILON;
     }
 
     /**
