@@ -3,7 +3,6 @@ package org.team498.C2023.subsystems;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.WPI_CANCoder;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -31,10 +30,6 @@ import org.team498.lib.wpilib.PController;
 
 import static org.team498.C2023.Constants.DrivetrainConstants.*;
 import static org.team498.C2023.Ports.Drivetrain.*;
-
-import java.util.function.Supplier;
-
-import javax.print.DocFlavor.STRING;
 
 public class Drivetrain extends SubsystemBase {
     // Profiled controller for the rotation of the robot
@@ -99,37 +94,43 @@ public class Drivetrain extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Pitch", gyro.getPitch());
-        SmartDashboard.putNumber("Roll", gyro.getRoll());
         if (Robot.isReal()) odometry.update(Rotation2d.fromDegrees(getYaw()), getModulePositions());
-
+        int i = 0;
         if (RobotState.isDisabled()) {
-            for (SwerveModule swerveModule : swerveModules) {
-                swerveModule.matchEncoders();
+            if (i++ >= 10) { // only do this every 10 cycles to save CPU
+                for (SwerveModule swerveModule : swerveModules) {
+                    swerveModule.matchEncoders();
+                }
+                i = 0;
             }
         }
 
-        SmartDashboard.putData(this);
-        SmartDashboard.putNumber("Gyro", getYaw());
 
         Robot.field.setRobotPose(getPose());
-		Robot.field.getObject("Swerve Modules").setPoses(getModulePoses());
+		// Robot.field.getObject("Swerve Modules").setPoses(getModulePoses());
 
-        SwerveModuleState[] targetStates = getTargetModuleStates();
-        SmartDashboard.putNumberArray("Target Swerve States", new double[] {
-            targetStates[0].angle.getDegrees(), targetStates[0].speedMetersPerSecond,
-            targetStates[1].angle.getDegrees(), targetStates[1].speedMetersPerSecond,
-            targetStates[2].angle.getDegrees(), targetStates[2].speedMetersPerSecond,
-            targetStates[3].angle.getDegrees(), targetStates[3].speedMetersPerSecond,
-        });
+        // SwerveModuleState[] targetStates = getTargetModuleStates();
+        
+        // SwerveModuleState[] realStates = getModuleStates();
 
-        SwerveModuleState[] realStates = getModuleStates();
-        SmartDashboard.putNumberArray("Swerve States", new double[] {
-            realStates[0].angle.getDegrees(), realStates[0].speedMetersPerSecond,
-            realStates[1].angle.getDegrees(), realStates[1].speedMetersPerSecond,
-            realStates[2].angle.getDegrees(), realStates[2].speedMetersPerSecond,
-            realStates[3].angle.getDegrees(), realStates[3].speedMetersPerSecond,
-        });
+        // SmartDashboard.putNumberArray("Target Swerve States", new double[] {
+        //     targetStates[0].angle.getDegrees(), targetStates[0].speedMetersPerSecond,
+        //     targetStates[1].angle.getDegrees(), targetStates[1].speedMetersPerSecond,
+        //     targetStates[2].angle.getDegrees(), targetStates[2].speedMetersPerSecond,
+        //     targetStates[3].angle.getDegrees(), targetStates[3].speedMetersPerSecond,
+        // });
+
+        // SmartDashboard.putNumberArray("Swerve States", new double[] {
+        //     realStates[0].angle.getDegrees(), realStates[0].speedMetersPerSecond,
+        //     realStates[1].angle.getDegrees(), realStates[1].speedMetersPerSecond,
+        //     realStates[2].angle.getDegrees(), realStates[2].speedMetersPerSecond,
+        //     realStates[3].angle.getDegrees(), realStates[3].speedMetersPerSecond,
+        // });
+        // SmartDashboard.putNumber("Pitch", gyro.getPitch());
+        // SmartDashboard.putNumber("Roll", gyro.getRoll());
+        
+        // SmartDashboard.putNumber("Gyro", getYaw());
+        // SmartDashboard.putData(this);
     }
 
     @Override
