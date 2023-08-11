@@ -1,5 +1,6 @@
 package org.team498.C2023.subsystems;
 
+import org.team498.C2023.Ports;
 import org.team498.C2023.State;
 import org.team498.C2023.Constants.ElevatorConstants;
 import org.team498.lib.drivers.LazyTalonFX;
@@ -15,8 +16,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Elevator extends SubsystemBase {
 
     //motors
-    private final LazyTalonFX topMotor; // Declaration for a TalonFX / Falcon500 brushless motor
-    private final LazyTalonFX bottomMotor;
+    private final LazyTalonFX fMotor; // Declaration for a TalonFX / Falcon500 brushless motor
+    private final LazyTalonFX bMotor;
     private final DutyCycle encoder;
 
     private final PController pController;
@@ -29,9 +30,9 @@ public class Elevator extends SubsystemBase {
 
 
     public Elevator() {
-        topMotor = new LazyTalonFX(0);
-        bottomMotor = new LazyTalonFX(0);
-        encoder = new DutyCycle(new DigitalInput(0));
+        fMotor = new LazyTalonFX(Ports.Elevator.F_MOTOR);
+        bMotor = new LazyTalonFX(Ports.Elevator.B_MOTOR);
+        encoder = new DutyCycle(new DigitalInput(Ports.Elevator.ENCODER));
 
         pController = new PController(ElevatorConstants.P);
         feedforward = new ElevatorFeedforward(ElevatorConstants.S, ElevatorConstants.G, ElevatorConstants.V);
@@ -46,7 +47,7 @@ public class Elevator extends SubsystemBase {
             speed = manualSpeed;
         } else {
             double position = currentState.height;
-            speed = pController.calculate(position, topMotor.getSelectedSensorPosition() / ElevatorConstants.MOTOR_ROTATION_TO_METERS);
+            speed = pController.calculate(position, fMotor.getSelectedSensorPosition() / ElevatorConstants.MOTOR_ROTATION_TO_METERS);
         }
         speed = feedforward.calculate(speed);
         set(speed);
@@ -69,8 +70,8 @@ public class Elevator extends SubsystemBase {
     }
 
     private void set(double speed) {
-        topMotor.set(ControlMode.PercentOutput, speed);
-        bottomMotor.set(ControlMode.PercentOutput, speed);
+        fMotor.set(ControlMode.PercentOutput, speed);
+        bMotor.set(ControlMode.PercentOutput, speed);
     }
 
     private static Elevator instance;

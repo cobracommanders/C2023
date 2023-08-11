@@ -20,6 +20,13 @@ public final class Ports {
 
         public static final int GYRO = 20;
     }
+
+    public static class Elevator {
+        public static final int F_MOTOR = 30;
+        public static final int B_MOTOR = 31;
+        public static final int ENCODER = 4; // DIO
+    }
+
     public static class Flywheel {
         public static final int L_MOTOR = 60;
         public static final int R_MOTOR = 61;
