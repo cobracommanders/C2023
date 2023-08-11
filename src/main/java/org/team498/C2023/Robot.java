@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+
+import org.team498.C2023.commands.auto.DoNothing;
 import org.team498.C2023.subsystems.Drivetrain;
 import org.team498.lib.auto.Auto;
 import org.team498.lib.drivers.Gyro;
@@ -33,7 +35,7 @@ public class Robot extends TimedRobot {
             );
 
     private Auto autoToRun;
-    private Auto defaultAutoCommand = null; //TODO set real auto
+    private Auto defaultAutoCommand = new DoNothing(); //TODO set real auto
 
     @Override
     public void robotInit() {
@@ -54,7 +56,7 @@ public class Robot extends TimedRobot {
         controls.configureDriverCommands();
         controls.configureOperatorCommands();
 
-        PathLib.testPath.getClass();
+        PathLib.testPath.getClass(); // load all trajectories
 
         SmartDashboard.putData(autoChooser);
     }
@@ -65,7 +67,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotPeriodic() {
-        CommandScheduler.getInstance().run(); //TODO does this need to happen every loop?
+        CommandScheduler.getInstance().run(); // runs all periodic() methods
 
         //TODO: This condition varies depending on Field Symmetry
         // alliance is invalid when the FMS is not connected
