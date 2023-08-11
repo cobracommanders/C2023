@@ -8,6 +8,14 @@
       "/SmartDashboard/ElevatorWrist": "Subsystem",
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/SendableChooser[0]": "String Chooser"
+    },
+    "windows": {
+      "/SmartDashboard/Field": {
+        "image": "C:\\Users\\caleb\\Downloads\\PathPlanner-Windows\\data\\flutter_assets\\images\\field23.png",
+        "window": {
+          "visible": true
+        }
+      }
     }
   },
   "NetworkTables": {
