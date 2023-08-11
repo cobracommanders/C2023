@@ -1,14 +1,15 @@
 package org.team498.C2023;
 
 public enum State {
-    IDLE(Flywheel.IDLE),
-    LOW(Flywheel.LOW),
-    HIGH(Flywheel.HIGH);
+    IDLE(Elevator.IDLE),
+    LOW_CUBE(Elevator.LOW_CUBE),
+    MID_CUBE(Elevator.MID_CUBE),
+    HIGH_CUBE(Elevator.HIGH_CUBE);
 
-    public final Flywheel flywheel;
+    public final Elevator elevator;
 
-    State(Flywheel flywheel) {
-        this.flywheel = flywheel;
+    State(Elevator elevator) {
+        this.elevator = elevator;
     }
 
     public enum Flywheel {
@@ -20,6 +21,19 @@ public enum State {
 
         Flywheel(double setpoint) {
             this.setpoint = setpoint;
+        }
+    }
+
+    public enum Elevator {
+        IDLE(0.0),
+        LOW_CUBE(0.0),
+        MID_CUBE(0.0),
+        HIGH_CUBE(0.0);
+
+        public final double height;
+
+        Elevator(double height) {
+            this.height = height;
         }
     }
 }

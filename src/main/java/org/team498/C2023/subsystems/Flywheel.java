@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * While this code is for a Flywheel, the ideas here can be used for any velocity-based subsystem
  */
 public class Flywheel extends SubsystemBase {
-    // all variable/object declaration goes at the top of the class. 
+    // all variable/object declaration goes at the top of the class
     // They can be instantiated (given values) later, but they must be declared here
 
     // Motors will almost always be private because they will only be controlled using public methods. There should be NO global use where motors 
@@ -57,7 +57,10 @@ public class Flywheel extends SubsystemBase {
     public void periodic() {
         // This condition will reduce CPU utilization when the motor is not meant to run and save power because 
         // it will not actively deccelerate the wheel
-        if (setpoint == 0) return; //don't run the motor or calculate anything if the setpoint is 0
+        if (setpoint == 0) { //don't run the motor or calculate anything if the setpoint is 0
+            set(0);
+            return;
+        } 
 
         double speed; // We will use this variable to keep track of our desired speed
         speed = feedforward.calculate(setpoint); // adjust the setpoint to account for physical motor properties using feedforward
@@ -81,7 +84,7 @@ public class Flywheel extends SubsystemBase {
     // We do NOT use the preset methods for following and inverting motors in case of flash failure 
     // (Ask Caleb about that if you're curious)
     // Use a method to define motor control in relevant groups
-    public void set(double speed) {
+    private void set(double speed) {
         lMotor.set(speed);
         rMotor.set(-speed); // invert speed on right side (assuming the motor is facing opposite the left)
     }

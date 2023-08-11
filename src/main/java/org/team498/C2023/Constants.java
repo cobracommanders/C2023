@@ -52,6 +52,16 @@ public final class Constants {
         }
     }
 
+    public static class ElevatorConstants {
+        public static final double MOTOR_ROTATION_TO_METERS = (1.273 * 2 * Math.PI) * 5;
+
+        public static final double P = 5;
+
+        public static final double S = 0;
+        public static final double G = 0.075;
+        public static final double V = 0;
+    }
+
     public static class FlywheelConstants {
         public static final double MAX_RPM = 5000;
         public static final double P = 0.0;
