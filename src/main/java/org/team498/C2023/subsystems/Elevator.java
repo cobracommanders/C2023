@@ -37,6 +37,9 @@ public class Elevator extends SubsystemBase {
         pController = new PController(ElevatorConstants.P);
 
         currentState = State.Elevator.IDLE;
+
+        fMotor.configFactoryDefault();
+        bMotor.configFactoryDefault();
     }
 
     @Override
