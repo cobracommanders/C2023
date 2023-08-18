@@ -14,6 +14,7 @@ public class SetElevatorState extends CommandBase {
     private final State.Elevator state;
 
     public SetElevatorState(State.Elevator state) {
+        addRequirements(Elevator.getInstance());
         this.state = state;
     }
 

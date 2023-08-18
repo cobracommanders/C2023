@@ -14,10 +14,11 @@ public class LazySparkMax extends CANSparkMax {
 
     @Override
     public void set(double setpoint) {
-        if (Math.abs(setpoint - currentSetpoint) >= epsilon) {
+        if (setpoint != currentSetpoint) {
             this.currentSetpoint = setpoint;
             super.set(setpoint);
         }
+        //super.set(setpoint);
     }
 
     @Override

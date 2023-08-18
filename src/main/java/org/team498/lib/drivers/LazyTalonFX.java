@@ -21,11 +21,12 @@ public class LazyTalonFX extends TalonFX {
 
     @Override
     public void set(ControlMode mode, double setpoint) {
-        if (Math.abs(setpoint - currentSetpoint) >= epsilon || mode != currentControlMode) {
-            this.currentControlMode = mode;
-            this.currentSetpoint = setpoint;
-            super.set(mode, setpoint);
-        }
+        // if (setpoint != currentSetpoint || mode != currentControlMode) {
+        //     this.currentControlMode = mode;
+        //     this.currentSetpoint = setpoint;
+        //     super.set(mode, setpoint);
+        // }
+        super.set(mode, setpoint);
     }
 
     @Override

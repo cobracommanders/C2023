@@ -11,6 +11,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycle;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Elevator extends SubsystemBase {
@@ -21,7 +22,6 @@ public class Elevator extends SubsystemBase {
     private final DutyCycle encoder;
 
     private final PController pController;
-    private final ElevatorFeedforward feedforward;
 
     private State.Elevator currentState;
     private double manualSpeed;
@@ -35,21 +35,24 @@ public class Elevator extends SubsystemBase {
         encoder = new DutyCycle(new DigitalInput(Ports.Elevator.ENCODER));
 
         pController = new PController(ElevatorConstants.P);
-        feedforward = new ElevatorFeedforward(ElevatorConstants.S, ElevatorConstants.G, ElevatorConstants.V);
 
         currentState = State.Elevator.IDLE;
     }
 
     @Override
     public void periodic() {
+        // SmartDashboard.putNumber("Elevator Height", -fMotor.getSelectedSensorPosition() / ElevatorConstants.MOTOR_ROTATION_TO_METERS / 2048);
+        // SmartDashboard.putNumber("Setpoint", currentState.height);
+        // SmartDashboard.putNumber("Manual Speed", manualSpeed);
+        // SmartDashboard.putBoolean("Manual Mode", isManual);
         double speed;
         if (isManual) {
             speed = manualSpeed;
         } else {
             double position = currentState.height;
-            speed = pController.calculate(position, fMotor.getSelectedSensorPosition() / ElevatorConstants.MOTOR_ROTATION_TO_METERS);
+            speed = pController.calculate(-fMotor.getSelectedSensorPosition() / ElevatorConstants.MOTOR_ROTATION_TO_METERS / 2048, position);
         }
-        speed = feedforward.calculate(speed);
+        speed += ElevatorConstants.G;
         set(speed);
     }
 
@@ -70,8 +73,8 @@ public class Elevator extends SubsystemBase {
     }
 
     private void set(double speed) {
-        fMotor.set(ControlMode.PercentOutput, speed);
-        bMotor.set(ControlMode.PercentOutput, speed);
+        fMotor.set(ControlMode.PercentOutput, -speed);
+        bMotor.set(ControlMode.PercentOutput, -speed);
     }
 
     private static Elevator instance;

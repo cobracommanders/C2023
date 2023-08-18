@@ -34,7 +34,7 @@ public final class Constants {
             public static final double EPSILON = 1.0;
 
 
-            // Constraints for the profiled angle controller
+            // Constraints for the profiled angle controller^
             public static final double MAX_ANGULAR_SPEED_DEGREES_PER_SECOND = 720;
             public static final double MAX_ANGULAR_SPEED_DEGREES_PER_SECOND_SQUARED = Math.pow(MAX_ANGULAR_SPEED_DEGREES_PER_SECOND, 2);
 
@@ -55,11 +55,18 @@ public final class Constants {
     public static class ElevatorConstants {
         public static final double MOTOR_ROTATION_TO_METERS = (1.273 * 2 * Math.PI) * 5;
 
-        public static final double P = 5;
+        public static final double P = .5;
 
-        public static final double S = 0;
         public static final double G = 0.075;
-        public static final double V = 0;
+    }
+
+    public static class ElevatorWrist {
+
+        public static final double P = 6;
+    }
+
+    public static final class IntakeWristConstants {
+        public static final double P = 1;
     }
 
     public static class FlywheelConstants {
