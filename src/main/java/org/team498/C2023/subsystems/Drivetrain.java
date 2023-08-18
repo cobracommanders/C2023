@@ -31,6 +31,8 @@ import org.team498.lib.wpilib.PController;
 import static org.team498.C2023.Constants.DrivetrainConstants.*;
 import static org.team498.C2023.Ports.Drivetrain.*;
 
+import org.team498.C2023.Ports;
+
 public class Drivetrain extends SubsystemBase {
     // Profiled controller for the rotation of the robot
     private final ProfiledPIDController angleController = new ProfiledPIDController(AngleConstants.P,
@@ -53,7 +55,7 @@ public class Drivetrain extends SubsystemBase {
     public ChassisSpeeds currentSpeeds = new ChassisSpeeds();
 
     private Drivetrain() {
-        String canivoreName = "Canivore";
+        String canivoreName = Ports.Accessories.DriveBus;
         WPI_TalonFX FL_Drive = new WPI_TalonFX(FL_DRIVE, canivoreName);
         WPI_TalonFX FR_Drive = new WPI_TalonFX(FR_DRIVE, canivoreName);
         WPI_TalonFX BL_Drive = new WPI_TalonFX(BL_DRIVE, canivoreName);
