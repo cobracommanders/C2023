@@ -1,27 +1,27 @@
 package org.team498.C2023;
 
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-
-import org.team498.C2023.subsystems.ElevatorWrist;
 import org.team498.C2023.Constants.OIConstants;
-import org.team498.C2023.subsystems.IntakeWrist;
-import org.team498.C2023.subsystems.Elevator;
+import org.team498.C2023.RobotState.GameMode;
+import org.team498.C2023.RobotState.ScoringOption;
 import org.team498.C2023.commands.drivetrain.DefenseDrive;
+import org.team498.C2023.commands.drivetrain.TargetDrive;
 import org.team498.C2023.commands.elevator.ManualElevator;
-import org.team498.C2023.commands.elevator.SetElevatorState;
 import org.team498.C2023.commands.elevatorWrist.ManualElevatorWrist;
-import org.team498.C2023.commands.elevatorWrist.SetElevatorWristState;
-import org.team498.C2023.commands.intakeRollers.SetIntakeRollersState;
-import org.team498.C2023.commands.intakeWrist.ManualIntakeWrist;
-import org.team498.C2023.commands.intakeWrist.SetIntakeWristState;
-import org.team498.C2023.commands.manipulator.SetManipulatorState;
+import org.team498.C2023.commands.robot.*;
 import org.team498.C2023.subsystems.Drivetrain;
+import org.team498.C2023.subsystems.ElevatorWrist;
+import org.team498.C2023.subsystems.Manipulator;
 import org.team498.lib.drivers.Gyro;
 import org.team498.lib.drivers.Xbox;
+import org.team498.lib.wpilib.ChoiceCommand;
+
+import static edu.wpi.first.wpilibj2.command.Commands.*;
 
 public class Controls {
     public final Xbox driver = new Xbox(OIConstants.DRIVER_CONTROLLER_ID);
     public final Xbox operator = new Xbox(OIConstants.OPERATOR_CONTROLLER_ID);
+
+    private final RobotState robotState = RobotState.getInstance();
 
     public Controls() {
         driver.setDeadzone(0.15);
@@ -31,24 +31,53 @@ public class Controls {
     }
 
     public void configureDefaultCommands() {
-        Elevator.getInstance().setDefaultCommand(new ManualElevator(operator::leftYSquared));
-        Drivetrain.getInstance().setDefaultCommand(new DefenseDrive(driver::leftYSquared, driver::leftXSquared, driver::rightX, driver.rightBumper()));
-        ElevatorWrist.getInstance().setDefaultCommand(new ManualElevatorWrist(operator::rightYSquared));
+        Drivetrain.getInstance()
+                  .setDefaultCommand(new DefenseDrive(driver::leftYSquared, driver::leftXSquared, driver::rightX, driver.rightBumper()));
     }
 
     public void configureDriverCommands() {
-        driver.A().onTrue(new InstantCommand(() -> Gyro.getInstance().setYaw(0)));
-        driver.X().onTrue(new SetElevatorWristState(State.ElevatorWrist.IDLE_CONE));
-        driver.Y().onTrue(new SetElevatorWristState(State.ElevatorWrist.INTAKE));
+        driver.leftTrigger()
+              .onTrue(new IntakeGround())
+              .onFalse(new ReturnToIdle());
+        driver.leftBumper()
+              .onTrue(new Outtake())
+              .onFalse(new ReturnToIdle());
+        driver.A().onTrue(runOnce(() -> Gyro.getInstance().setYaw(0)));
+        //driver.B().onTrue(new RealignCone());
+        driver.rightTrigger()
+              .onTrue(new PrepareToScore())
+              .onFalse(either(
+                            waitSeconds(0),
+                            waitSeconds(0.1),
+                            () -> RobotState.getInstance().inConeMode()
+                        ),
+                        new Score()
+              );
+
+        driver.X().onTrue(new Spit());
+        driver.Y().onTrue(Robot.fullCheck.test());
+
+        driver.start().whileTrue(new FixCube()).onFalse(new ReturnToIdle());
     }
 
-    /**
-     * 
-     */
     public void configureOperatorCommands() {
-        operator.A().onTrue(new SetElevatorState(State.Elevator.MID_CONE));
-        operator.B().onTrue(new SetElevatorState(State.Elevator.IDLE));
-        operator.X().onTrue(new SetIntakeRollersState(State.IntakeRollers.IDLE));
-        operator.Y().onTrue(new SetIntakeRollersState(State.IntakeRollers.OUTTAKE));
+        operator.Y().onTrue(runOnce(() -> robotState.setNextScoringOption(RobotState.ScoringOption.TOP)));
+        operator.B().onTrue(runOnce(() -> robotState.setNextScoringOption(RobotState.ScoringOption.MID)));
+        operator.A().onTrue(runOnce(() -> robotState.setNextScoringOption(RobotState.ScoringOption.LOW)));
+        operator.X().toggleOnTrue(startEnd(() -> robotState.setShootDrive(true), () -> robotState.setShootDrive(false)));
+
+        operator.rightBumper().onTrue(runOnce(() -> robotState.setCurrentGameMode(GameMode.CONE)));
+        operator.leftBumper().onTrue(runOnce(() -> robotState.setCurrentGameMode(GameMode.CUBE)));
+
+        operator.leftTrigger().onTrue(new IntakeSubStation()).onFalse(new ReturnToIdle());
+
+        operator.start().toggleOnTrue(new ManualElevator(() -> -operator.rightY()));
+        operator.back().toggleOnTrue(new ManualElevatorWrist(() -> -operator.leftY()));
+
+        operator.POV90().whileTrue(runOnce(() -> Manipulator.getInstance().setState(State.Manipulator.INTAKE_CONE)));
+        operator.POVMinus90().whileTrue(runOnce(() -> Manipulator.getInstance().setState(State.Manipulator.MID_CONE)));
+
+        operator.POV0().onTrue(runOnce(() -> ElevatorWrist.getInstance().incrementOffset(0.01)));
+        operator.POV180().onTrue(runOnce(() -> ElevatorWrist.getInstance().incrementOffset(-0.01)));
     }
-} 
+}
