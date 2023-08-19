@@ -16,10 +16,10 @@ public class IntakeGround extends SequentialCommandGroup{
         super(
             new SetRobotState(State.INTAKE),
             new ParallelCommandGroup(
-                new SetIntakeWristState(RobotState.getInstance().getState().intakeWrist),
-                new SetElevatorWristState(RobotState.getInstance().getState().elevatorWrist),
-                new SetIntakeRollersState(RobotState.getInstance().getState().intakeRollers),
-                new SetManipulatorState(RobotState.getInstance().getState().manipulator)
+                new SetIntakeWristState(State.IntakeWrist.INTAKE),
+                new SetElevatorWristState(State.ElevatorWrist.INTAKE),
+                new SetIntakeRollersState(State.IntakeRollers.INTAKE),
+                new SetManipulatorState(State.Manipulator.INTAKE_CUBE)
             )
         );
     }

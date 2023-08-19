@@ -36,26 +36,27 @@ public class IntakeWrist extends SubsystemBase {
         lmotor.restoreFactoryDefaults();
         rmotor.restoreFactoryDefaults();
 
-        setpoint = 0;
         currentState = State.IntakeWrist.IDLE_IN;
+        
+        setpoint = currentState.position;
         manualSpeed = 0;
     }
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Angle",getAngle());
+        SmartDashboard.putNumber("Intake Wrist Angle", getAngle());
         double speed;
-        SmartDashboard.putNumber("Setpoint", setpoint);
+        SmartDashboard.putNumber("Intake Wrist Setpoint", setpoint);
         if(isManual){
             speed = manualSpeed;
         }  else {
             speed = pController.calculate(getAngle());
         }
-        SmartDashboard.putNumber("Speed", speed);
+        SmartDashboard.putNumber("Intake Wrist Speed", speed);
         set(speed);
     }
 
     public boolean atSetpoint(){
-        return pController.atSetpoint(.001);
+        return pController.atSetpoint(.05);
     }
 
     public State.IntakeWrist getState(){

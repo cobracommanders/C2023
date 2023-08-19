@@ -6,7 +6,10 @@ import org.team498.C2023.RobotState.ScoringOption;
 import org.team498.C2023.commands.drivetrain.DefenseDrive;
 import org.team498.C2023.commands.drivetrain.TargetDrive;
 import org.team498.C2023.commands.elevator.ManualElevator;
+import org.team498.C2023.commands.elevator.SetElevatorState;
 import org.team498.C2023.commands.elevatorWrist.ManualElevatorWrist;
+import org.team498.C2023.commands.elevatorWrist.SetElevatorWristState;
+import org.team498.C2023.commands.intakeWrist.SetIntakeWristState;
 import org.team498.C2023.commands.robot.*;
 import org.team498.C2023.subsystems.Drivetrain;
 import org.team498.C2023.subsystems.ElevatorWrist;
@@ -46,14 +49,19 @@ public class Controls {
         //driver.B().onTrue(new RealignCone());
         driver.rightTrigger()
               .onTrue(new PrepareToScore())
-              .onFalse(either(
+              .onFalse(
+                sequence(
+                    either(
                             waitSeconds(0),
                             waitSeconds(0.1),
                             () -> RobotState.getInstance().inConeMode()
                         ),
                         new Score()
+                )
               );
         //driver.Y().onTrue(Robot.fullCheck.test());
+        driver.X().onTrue(new SetElevatorWristState(State.ElevatorWrist.SINGLE_SS)).onFalse(new SetElevatorWristState(State.ElevatorWrist.IDLE_CUBE));
+        driver.Y().onTrue(new SetIntakeWristState(State.IntakeWrist.INTAKE)).onFalse(new SetIntakeWristState(State.IntakeWrist.IDLE_IN));
 
        // driver.start().whileTrue(new FixCube()).onFalse(new ReturnToIdle());
     }

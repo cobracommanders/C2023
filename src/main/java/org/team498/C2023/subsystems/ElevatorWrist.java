@@ -53,11 +53,11 @@ public class ElevatorWrist extends SubsystemBase {
         }  else {
             speed = pController.calculate(encoder.getOutput() -.22);
         }
-        if(Elevator.getInstance().isSafe()) set(speed);
+        set(speed);
 
         SmartDashboard.putNumber("Wrist speed", speed);
-        SmartDashboard.putNumber("Setpoint", setpoint);
-        SmartDashboard.putNumber("Encoder", encoder.getOutput() -.22);
+        SmartDashboard.putNumber("Elevator Wrist Setpoint", setpoint);
+        SmartDashboard.putNumber("Elevator Wrist Encoder", encoder.getOutput() -.22);
     }
 
     public boolean atSetpoint() {

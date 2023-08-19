@@ -113,7 +113,7 @@ public enum State {
 
         AUTO_SHOT(0.02),
 
-        IDLE_CUBE(-0.06),
+        IDLE_CUBE(0.0),
         IDLE_CONE(-0.06),
 
         CONEARISER_CUBE(-0.065),

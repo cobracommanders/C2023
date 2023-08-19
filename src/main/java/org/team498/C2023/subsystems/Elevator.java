@@ -60,7 +60,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public boolean atSetpoint(){
-        return pController.atSetpoint(0.01);
+        return pController.atSetpoint(0.1);
     }
 
     public boolean isSafe() {
