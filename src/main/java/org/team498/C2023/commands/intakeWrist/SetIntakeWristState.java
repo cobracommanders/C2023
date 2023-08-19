@@ -4,6 +4,7 @@ import org.team498.C2023.State;
 import org.team498.C2023.subsystems.IntakeWrist;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 public class SetIntakeWristState extends CommandBase {
     private final State.IntakeWrist state;
@@ -17,4 +18,10 @@ public class SetIntakeWristState extends CommandBase {
     public void initialize() {
         IntakeWrist.getInstance().setState(state);
     }
+
+    @Override
+    public boolean isFinished(){
+        return IntakeWrist.getInstance().atSetpoint();
+    }
+
 }

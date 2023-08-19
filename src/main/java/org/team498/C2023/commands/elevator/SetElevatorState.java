@@ -4,6 +4,7 @@ import org.team498.C2023.State;
 import org.team498.C2023.subsystems.Elevator;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 /*
  *  Most subsystems will have a Wrapper class that casts the setState() method to a command
@@ -22,5 +23,9 @@ public class SetElevatorState extends CommandBase {
     @Override
     public void initialize() {
         Elevator.getInstance().setState(state); // set the state of the elevator using setState()
+    }
+
+    public boolean isFinished(){
+        return Elevator.getInstance().atSetpoint();
     }
 }

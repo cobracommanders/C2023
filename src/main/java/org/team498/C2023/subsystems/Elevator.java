@@ -59,6 +59,14 @@ public class Elevator extends SubsystemBase {
         set(speed);
     }
 
+    public boolean atSetpoint(){
+        return pController.atSetpoint(0.01);
+    }
+
+    public boolean isSafe() {
+        return -fMotor.getSelectedSensorPosition() / ElevatorConstants.MOTOR_ROTATION_TO_METERS / 2048 > 0.25;
+    }
+
     public State.Elevator getState() {
         return currentState;
     }

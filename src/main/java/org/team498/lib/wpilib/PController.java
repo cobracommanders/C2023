@@ -22,6 +22,14 @@ public class PController {
         this.setpoint = setpoint;
     }
 
+    public boolean atSetpoint() {
+        return atSetpoint(0.01);
+    }
+
+    public boolean atSetpoint(double epsilon) {
+        return Math.abs(error) < epsilon;
+    }
+
     public double calculate(double measurement) {
         error = setpoint - measurement;
         return kP * error;

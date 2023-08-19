@@ -54,6 +54,10 @@ public class IntakeWrist extends SubsystemBase {
         set(speed);
     }
 
+    public boolean atSetpoint(){
+        return pController.atSetpoint(.001);
+    }
+
     public State.IntakeWrist getState(){
         return currentState;
     }
