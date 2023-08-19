@@ -6,6 +6,8 @@ import org.team498.lib.util.RotationUtil;
 
 import static org.team498.C2023.Ports.Drivetrain.GYRO;
 
+import org.team498.C2023.Ports;
+
 public class Gyro extends Pigeon2 {
     private double angleOffset = 0;
     private double simAngle = 0;
@@ -42,7 +44,7 @@ public class Gyro extends Pigeon2 {
     }
 
     private Gyro(int CANId) {
-        super(CANId);
+        super(CANId, Ports.Accessories.DriveBus);
     }
 
     private static Gyro instance;

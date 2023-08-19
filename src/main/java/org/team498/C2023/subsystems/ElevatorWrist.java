@@ -9,7 +9,10 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycle;
 import edu.wpi.first.wpilibj.I2C.Port;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import org.team498.C2023.Constants;
 import org.team498.C2023.Ports;
 
 /*
@@ -33,7 +36,7 @@ public class ElevatorWrist extends SubsystemBase {
         motor = new LazySparkMax(Ports.ElevatorWrist.WRIST, MotorType.kBrushless);
         encoder = new DutyCycle(new DigitalInput(Ports.ElevatorWrist.ENCODER));
 
-        pController = new PController(setpoint);
+        pController = new PController(Constants.ElevatorWrist.P);
 
         motor.restoreFactoryDefaults();
 
@@ -48,9 +51,13 @@ public class ElevatorWrist extends SubsystemBase {
         if(isManual){
             speed = manualSpeed;
         }  else {
-            speed = pController.calculate(encoder.getOutput());
+            speed = pController.calculate(encoder.getOutput() -.22);
         }
         set(speed);
+
+        SmartDashboard.putNumber("Wrist speed", speed);
+        SmartDashboard.putNumber("Setpoint", setpoint);
+        SmartDashboard.putNumber("Encoder", encoder.getOutput() -.22);
     }
 
     public State.ElevatorWrist getState(){
@@ -72,7 +79,7 @@ public class ElevatorWrist extends SubsystemBase {
     }
 
     public void set(double speed){
-        motor.set(speed);
+        motor.set(-speed);
     }
 
     private static ElevatorWrist instance;

@@ -20,7 +20,7 @@ public class ManualElevatorWrist extends CommandBase {
 
     @Override
     public void execute() {
-        ElevatorWrist.getInstance().setManualSpeed(-speed.getAsDouble());
+        ElevatorWrist.getInstance().setManualSpeed(speed.getAsDouble());
     }
 
     @Override
