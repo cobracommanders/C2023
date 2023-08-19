@@ -53,19 +53,16 @@ public class Controls {
                         ),
                         new Score()
               );
+        //driver.Y().onTrue(Robot.fullCheck.test());
 
-        driver.X().onTrue(new Spit());
-        driver.Y().onTrue(Robot.fullCheck.test());
-
-        driver.start().whileTrue(new FixCube()).onFalse(new ReturnToIdle());
+       // driver.start().whileTrue(new FixCube()).onFalse(new ReturnToIdle());
     }
 
     public void configureOperatorCommands() {
         operator.Y().onTrue(runOnce(() -> robotState.setNextScoringOption(RobotState.ScoringOption.TOP)));
         operator.B().onTrue(runOnce(() -> robotState.setNextScoringOption(RobotState.ScoringOption.MID)));
         operator.A().onTrue(runOnce(() -> robotState.setNextScoringOption(RobotState.ScoringOption.LOW)));
-        operator.X().toggleOnTrue(startEnd(() -> robotState.setShootDrive(true), () -> robotState.setShootDrive(false)));
-
+        
         operator.rightBumper().onTrue(runOnce(() -> robotState.setCurrentGameMode(GameMode.CONE)));
         operator.leftBumper().onTrue(runOnce(() -> robotState.setCurrentGameMode(GameMode.CUBE)));
 
@@ -77,7 +74,7 @@ public class Controls {
         operator.POV90().whileTrue(runOnce(() -> Manipulator.getInstance().setState(State.Manipulator.INTAKE_CONE)));
         operator.POVMinus90().whileTrue(runOnce(() -> Manipulator.getInstance().setState(State.Manipulator.MID_CONE)));
 
-        operator.POV0().onTrue(runOnce(() -> ElevatorWrist.getInstance().incrementOffset(0.01)));
-        operator.POV180().onTrue(runOnce(() -> ElevatorWrist.getInstance().incrementOffset(-0.01)));
+        // operator.POV0().onTrue(runOnce(() -> ElevatorWrist.getInstance().incrementOffset(0.01)));
+        // operator.POV180().onTrue(runOnce(() -> ElevatorWrist.getInstance().incrementOffset(-0.01)));
     }
 }
