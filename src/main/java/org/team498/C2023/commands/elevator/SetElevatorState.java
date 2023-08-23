@@ -1,7 +1,9 @@
 package org.team498.C2023.commands.elevator;
 
+import org.team498.C2023.RobotState;
 import org.team498.C2023.State;
 import org.team498.C2023.subsystems.Elevator;
+
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -12,16 +14,16 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
  */
 public class SetElevatorState extends CommandBase {
 
-    private final State.Elevator state;
+    private State.Elevator state;
 
-    public SetElevatorState(State.Elevator state) {
+    public SetElevatorState() {
         addRequirements(Elevator.getInstance());
-        this.state = state;
     }
 
     // The initialize() method runs once when the command starts
     @Override
     public void initialize() {
+        state = RobotState.getInstance().getState().elevator; 
         Elevator.getInstance().setState(state); // set the state of the elevator using setState()
     }
 

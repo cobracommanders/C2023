@@ -20,18 +20,18 @@ public class ReturnToIdle extends SequentialCommandGroup{
         super(
             new SetRobotState(State.TRAVEL_CUBE),
             new ParallelCommandGroup(
-                new SetIntakeWristState(RobotState.getInstance().getState().intakeWrist),
-                new SetElevatorWristState(RobotState.getInstance().getState().elevatorWrist)
+                new SetIntakeWristState(),
+                new SetElevatorWristState()
             ),
             new SetRobotState(State.IDLE_CUBE), 
             new ParallelCommandGroup(
-                new SetElevatorState(RobotState.getInstance().getState().elevator),
-                new SetManipulatorState(RobotState.getInstance().getState().manipulator),
-                new SetIntakeRollersState(RobotState.getInstance().getState().intakeRollers)
+                new SetElevatorState(),
+                new SetManipulatorState(),
+                new SetIntakeRollersState()
             ),
             new ParallelCommandGroup(
-                new SetElevatorWristState(RobotState.getInstance().getState().elevatorWrist),
-                new SetIntakeWristState(RobotState.getInstance().getState().intakeWrist)
+                new SetElevatorWristState(),
+                new SetIntakeWristState()
             )
         );
        }

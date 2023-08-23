@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 public class Score extends SequentialCommandGroup{
     public Score(){
         super(
-            new SetManipulatorState(RobotState.getInstance().getState().manipulator),
+            new SetManipulatorState(),
             new WaitCommand(0.1),
             new ReturnToIdle()
         );

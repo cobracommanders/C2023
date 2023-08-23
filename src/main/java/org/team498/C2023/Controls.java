@@ -60,8 +60,8 @@ public class Controls {
                 )
               );
         //driver.Y().onTrue(Robot.fullCheck.test());
-        driver.X().onTrue(new SetElevatorWristState(State.ElevatorWrist.SINGLE_SS)).onFalse(new SetElevatorWristState(State.ElevatorWrist.IDLE_CUBE));
-        driver.Y().onTrue(new SetIntakeWristState(State.IntakeWrist.INTAKE)).onFalse(new SetIntakeWristState(State.IntakeWrist.IDLE_IN));
+        // driver.X().onTrue(new SetElevatorWristState(State.ElevatorWrist.SINGLE_SS)).onFalse(new SetElevatorWristState(State.ElevatorWrist.IDLE_CUBE));
+        // driver.Y().onTrue(new SetIntakeWristState(State.IntakeWrist.INTAKE)).onFalse(new SetIntakeWristState(State.IntakeWrist.IDLE_IN));
 
        // driver.start().whileTrue(new FixCube()).onFalse(new ReturnToIdle());
     }
