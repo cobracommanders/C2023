@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 import org.team498.C2023.commands.auto.DoNothing;
+import org.team498.C2023.commands.auto.HighHighCone;
 import org.team498.C2023.subsystems.Drivetrain;
 import org.team498.lib.auto.Auto;
 import org.team498.lib.drivers.Gyro;
@@ -32,6 +33,8 @@ public class Robot extends TimedRobot {
     private final SendableChooser<Auto> autoChooser = new SendableChooser<Auto>();
 
     private final List<Auto> autoOptions = List.of(
+        new DoNothing(),
+        new HighHighCone()
             );
 
     private Auto autoToRun;

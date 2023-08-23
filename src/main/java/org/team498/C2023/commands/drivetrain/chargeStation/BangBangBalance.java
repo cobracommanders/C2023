@@ -14,7 +14,7 @@ public class BangBangBalance extends CommandBase {
 
     public BangBangBalance() {
         deadzone = 7;
-        speed = 0.33;
+        speed = 0.2;
         addRequirements(drivetrain);
     }
 

@@ -15,7 +15,6 @@ public class ManualIntakeWrist extends CommandBase {
     }
     @Override
     public void initialize() {
-        state = RobotState.getInstance().getState().intakeWrist;
         IntakeWrist.getInstance().setManual(true);
     }
 

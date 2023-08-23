@@ -16,15 +16,15 @@ public class IntakeSubStation extends SequentialCommandGroup{
         super(
             new SetRobotState(State.TRAVEL_CUBE),
             new ParallelCommandGroup(
-                new SetIntakeWristState(RobotState.getInstance().getState().intakeWrist),
-                new SetElevatorWristState(RobotState.getInstance().getState().elevatorWrist)
+                new SetIntakeWristState(),
+                new SetElevatorWristState()
             ),
             new SetRobotState(RobotState.getInstance().getNextSubStationState()),
-            new SetElevatorState(RobotState.getInstance().getState().elevator),
+            new SetElevatorState(),
             new ParallelCommandGroup(
-                new SetIntakeWristState(RobotState.getInstance().getState().intakeWrist),
-                new SetElevatorWristState(RobotState.getInstance().getState().elevatorWrist),
-                new SetManipulatorState(RobotState.getInstance().getState().manipulator)
+                new SetIntakeWristState(),
+                new SetElevatorWristState(),
+                new SetManipulatorState()
             )
         );
     }

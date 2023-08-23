@@ -16,10 +16,10 @@ public class Outtake extends SequentialCommandGroup{
         super(
             new SetRobotState(State.OUTTAKE),
             new ParallelCommandGroup(
-                new SetIntakeWristState(RobotState.getInstance().getState().intakeWrist),
-                new SetElevatorWristState(RobotState.getInstance().getState().elevatorWrist),
-                new SetIntakeRollersState(RobotState.getInstance().getState().intakeRollers),
-                new SetManipulatorState(RobotState.getInstance().getState().manipulator)
+                new SetIntakeWristState(),
+                new SetElevatorWristState(),
+                new SetIntakeRollersState(),
+                new SetManipulatorState()
             )
         );
     }
