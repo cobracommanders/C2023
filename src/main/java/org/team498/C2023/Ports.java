@@ -18,7 +18,7 @@ public final class Ports {
         public static final int BL_CANCODER = 12;
         public static final int BR_CANCODER = 14;
 
-        public static final int GYRO = 20;
+        public static final int GYRO = 15;
     }
 
     public static class Elevator {
