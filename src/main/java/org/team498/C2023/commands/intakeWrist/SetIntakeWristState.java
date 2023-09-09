@@ -22,7 +22,7 @@ public class SetIntakeWristState extends CommandBase {
 
     @Override
     public boolean isFinished(){
-        return IntakeWrist.getInstance().atSetpoint();
+        return true;//IntakeWrist.getInstance().atSetpoint();
     }
 
 }

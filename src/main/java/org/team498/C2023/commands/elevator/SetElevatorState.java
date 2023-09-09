@@ -28,6 +28,6 @@ public class SetElevatorState extends CommandBase {
     }
 
     public boolean isFinished(){
-        return Elevator.getInstance().atSetpoint();
+        return true;//Elevator.getInstance().atSetpoint();
     }
 }

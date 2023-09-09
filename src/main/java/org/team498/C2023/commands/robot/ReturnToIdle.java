@@ -4,6 +4,7 @@ import org.team498.C2023.subsystems.Manipulator;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 import org.team498.C2023.RobotState;
 import org.team498.C2023.State;
@@ -29,6 +30,7 @@ public class ReturnToIdle extends SequentialCommandGroup{
                 new SetManipulatorState(),
                 new SetIntakeRollersState()
             ),
+            new WaitCommand(2),
             new ParallelCommandGroup(
                 new SetElevatorWristState(),
                 new SetIntakeWristState()

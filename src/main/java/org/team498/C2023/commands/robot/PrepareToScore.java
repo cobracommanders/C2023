@@ -12,15 +12,13 @@ import org.team498.C2023.subsystems.Manipulator;
 
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 public class PrepareToScore extends SequentialCommandGroup{
     public PrepareToScore(){
         super(
-            new SetRobotState(State.TRAVEL_CUBE),
-            new ParallelCommandGroup(
-                new SetIntakeWristState(),
-                new SetElevatorWristState()
-            ),
+            new Travel(),
+            new WaitCommand(1),
             new SetRobotState(RobotState.getInstance().getNextScoringState()),
             new SetElevatorState(),
             new ParallelCommandGroup(

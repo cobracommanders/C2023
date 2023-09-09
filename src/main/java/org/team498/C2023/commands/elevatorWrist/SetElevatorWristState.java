@@ -24,6 +24,6 @@ public class SetElevatorWristState extends CommandBase{
 
     @Override
     public boolean isFinished() {
-        return ElevatorWrist.getInstance().atSetpoint();
+        return true;//ElevatorWrist.getInstance().atSetpoint();
     }
 }

@@ -18,6 +18,9 @@ public class LazyTalonFX extends TalonFX {
     public LazyTalonFX(int deviceNumber) {
         super(deviceNumber);
     }
+    public LazyTalonFX(int deviceNumber, String canBus) {
+        super(deviceNumber, canBus);
+    }
 
     @Override
     public void set(ControlMode mode, double setpoint) {

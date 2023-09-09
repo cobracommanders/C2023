@@ -3,6 +3,7 @@ package org.team498.C2023.subsystems;
 import org.team498.C2023.Ports;
 import org.team498.C2023.State;
 import org.team498.C2023.Constants.ElevatorConstants;
+import org.team498.C2023.Ports.Accessories;
 import org.team498.lib.drivers.LazyTalonFX;
 import org.team498.lib.wpilib.PController;
 
@@ -30,8 +31,8 @@ public class Elevator extends SubsystemBase {
 
 
     public Elevator() {
-        fMotor = new LazyTalonFX(Ports.Elevator.F_MOTOR);
-        bMotor = new LazyTalonFX(Ports.Elevator.B_MOTOR);
+        fMotor = new LazyTalonFX(Ports.Elevator.F_MOTOR, Accessories.DriveBus);
+        bMotor = new LazyTalonFX(Ports.Elevator.B_MOTOR, Accessories.DriveBus);
         encoder = new DutyCycle(new DigitalInput(Ports.Elevator.ENCODER));
 
         pController = new PController(ElevatorConstants.P);
@@ -73,6 +74,7 @@ public class Elevator extends SubsystemBase {
 
     public void setState(State.Elevator state) {
         currentState = state;
+        pController.setSetpoint(currentState.height);
     }
 
     public void setManual(boolean isManual) {
